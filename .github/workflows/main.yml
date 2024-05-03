@@ -11,7 +11,7 @@ jobs:
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        server: ${{ secrets.ftp_host }}
-        username: ${{ secrets.ftp_user }}
+        server:  ftp.fetichlove.com
+        username: fetichlove@dev.dev
         password: ${{ secrets.ftp_password }}
         server-dir: dev.dev/fetichlove
