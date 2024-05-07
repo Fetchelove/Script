@@ -14,4 +14,4 @@ jobs:
         server:  ftp.fetichlove.com
         username: fetichlove@dev.dev
         password: ${{ secrets.ftp_password }}
-        server-dir: dev.dev/fetichlove/
+        
