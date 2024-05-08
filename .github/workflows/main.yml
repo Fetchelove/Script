@@ -11,7 +11,7 @@ jobs:
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
-        server:  ftp.fetichlove.com
-        username: fetchlove@dev1.fetchlove.com
+        server:  ftp://fetichlove.shop
+        username: u844043179
         password: ${{ secrets.ftp_password }}
         
