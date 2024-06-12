@@ -7,4 +7,6 @@
 <div class="alert alert-danger d-block w-100" role="alert">
     <i class="bi-exclamation-triangle-fill mr-2"></i> {!! __('general.payment_method_configured_disabled', ['payment' => '<a href="'.url('settings/payout/method').'" class="link-border text-white">'. __('users.payout_method') .'</a>']) !!}
     </div>
+
+    
 @endif
