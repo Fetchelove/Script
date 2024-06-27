@@ -966,6 +966,8 @@ class AdminController extends Controller
 		$data = PaymentGateways::findOrFail($id);
 		$name = ucfirst($data->name);
 
+	
+
 		return view('admin.' . str_slug($name) . '-settings')->withData($data);
 	}
 
