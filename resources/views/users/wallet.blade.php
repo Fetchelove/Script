@@ -8,7 +8,7 @@
         <div class="row justify-content-center text-center mb-sm">
             <div class="col-lg-8 py-5">
                 <h2 class="mb-0 font-montserrat"><i class="iconmoon icon-Wallet mr-2"></i> {{__('general.wallet')}}</h2>
-                <p class="lead text-muted mt-0">{{__('general.wallet_desc')}} Max teste</p>
+                <p class="lead text-muted mt-0">{{__('general.wallet_desc')}}</p>
             </div>
         </div>
         <div class="row">
