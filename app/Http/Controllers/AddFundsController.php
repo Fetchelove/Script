@@ -93,6 +93,10 @@ class AddFundsController extends Controller
         return $this->sendPayPal();
         break;
 
+      case 'Asaas':
+        return $this->sendAsaas();
+        break;
+
       case 'Stripe':
         return $this->sendStripe();
         break;
@@ -235,7 +239,36 @@ class AddFundsController extends Controller
         'errors' => ['error' => $e->getMessage()]
       ]);
     }
-  } // sendPayPal
+  } 
+
+
+  protected function sendAsaas() {
+
+    $Asaas = PaymentGateways::whereId(1)->whereName('PayPal')->firstOrFail();
+
+    $isSuccess = true;
+
+    $token = $Asaas->token;
+    $patch = $Asaas->webhook_secret;
+    $patch = "https://sandbox.asaas.com/api/";
+
+    if ($isSuccess) {
+
+      return response()->json([
+        'success' => true,
+        'insertBody' => $Asaas,
+      ]);
+
+    } else {
+
+      return response()->json([
+        'errors' => ['error' => "falha ao tentar enviar"]
+      ]);
+
+    } 
+
+  }
+
 
   /**
    *  Add funds Stripe
@@ -1005,76 +1038,76 @@ class AddFundsController extends Controller
 
   public function sendNowPayments()
   {
-      try {
-        // Get Payment Gateway
-        $payment = PaymentGateways::whereName('NowPayments')->firstOrFail();
-        $fee   = $payment->fee;
-        $cents = $payment->fee_cents;
-        $taxes = config('settings.tax_on_wallet') ? ($this->request->amount * auth()->user()->isTaxable()->sum('percentage') / 100) : 0;
-        $amount = number_format($this->request->amount + ($this->request->amount * $fee / 100) + $cents + $taxes, 2, '.', '');
-        $orderId = 'OR-'  . Helper::getHashedToken(15);
+    try {
+      // Get Payment Gateway
+      $payment = PaymentGateways::whereName('NowPayments')->firstOrFail();
+      $fee   = $payment->fee;
+      $cents = $payment->fee_cents;
+      $taxes = config('settings.tax_on_wallet') ? ($this->request->amount * auth()->user()->isTaxable()->sum('percentage') / 100) : 0;
+      $amount = number_format($this->request->amount + ($this->request->amount * $fee / 100) + $cents + $taxes, 2, '.', '');
+      $orderId = 'OR-'  . Helper::getHashedToken(15);
 
-        // Percentage applied
-        $percentageApplied =  $cents == 0.00 ?
-          (($fee != 0.0) ? $fee . '%' : null)
-          : (($fee != 0.0) ? $fee . '% + ' : null) . $cents;
+      // Percentage applied
+      $percentageApplied =  $cents == 0.00 ?
+        (($fee != 0.0) ? $fee . '%' : null)
+        : (($fee != 0.0) ? $fee . '% + ' : null) . $cents;
 
-        // Percentage applied amount
-        $transactionFeeAmount = number_format($this->request->amount + ($this->request->amount * $fee / 100) + $cents, 2, '.', '');
-        $transactionFee = ($transactionFeeAmount - $this->request->amount);
+      // Percentage applied amount
+      $transactionFeeAmount = number_format($this->request->amount + ($this->request->amount * $fee / 100) + $cents, 2, '.', '');
+      $transactionFee = ($transactionFeeAmount - $this->request->amount);
 
-        $client = new HttpClient();
+      $client = new HttpClient();
 
-        $deposit = new Deposits();
-        $deposit->user_id = auth()->id();
-        $deposit->txn_id = $orderId;
-        $deposit->amount = $this->request->amount;
-        $deposit->payment_gateway = 'NowPayments';
-        $deposit->status = 'pending';
-        $deposit->percentage_applied = $percentageApplied;
-        $deposit->transaction_fee = $transactionFee;
-        $deposit->taxes = auth()->user()->taxesPayable();
-        $deposit->save();
+      $deposit = new Deposits();
+      $deposit->user_id = auth()->id();
+      $deposit->txn_id = $orderId;
+      $deposit->amount = $this->request->amount;
+      $deposit->payment_gateway = 'NowPayments';
+      $deposit->status = 'pending';
+      $deposit->percentage_applied = $percentageApplied;
+      $deposit->transaction_fee = $transactionFee;
+      $deposit->taxes = auth()->user()->taxesPayable();
+      $deposit->save();
 
-        $request = $client->request('POST', 'https://api.nowpayments.io/v1/invoice', [
-          'headers' => [
-            'Content-Type' => 'application/json',
-            'x-api-key' => $payment->key,
-          ],
-          'body' => json_encode(array_merge_recursive([
-            'price_amount' => $amount,
-            'price_currency' => config('settings.currency_code'),
-            'ipn_callback_url' => route('webhook.nowpayments'),
-            'order_description' => __('general.add_funds'),
-            'order_id' => $orderId,
-            'success_url' => url('my/wallet'),
-            'cancel_url' => url('my/wallet')
-          ]))
+      $request = $client->request('POST', 'https://api.nowpayments.io/v1/invoice', [
+        'headers' => [
+          'Content-Type' => 'application/json',
+          'x-api-key' => $payment->key,
+        ],
+        'body' => json_encode(array_merge_recursive([
+          'price_amount' => $amount,
+          'price_currency' => config('settings.currency_code'),
+          'ipn_callback_url' => route('webhook.nowpayments'),
+          'order_description' => __('general.add_funds'),
+          'order_id' => $orderId,
+          'success_url' => url('my/wallet'),
+          'cancel_url' => url('my/wallet')
+        ]))
+      ]);
+
+      $response = json_decode($request->getBody(), true);
+
+      if (isset($response['invoice_url'])) {
+        return response()->json([
+          'success' => true,
+          'url' => $response['invoice_url']
         ]);
-
-        $response = json_decode($request->getBody(), true);
-        
-        if (isset($response['invoice_url'])) {
-          return response()->json([
-            'success' => true,
-            'url' => $response['invoice_url']
-          ]);
-        } else {
-          $deposit->delete();
-
-          return response()->json([
-            'success' => false,
-            'errors' => ['error' => __('general.error')]
-          ]);
-        }
-      } catch (\Exception $e) {
+      } else {
         $deposit->delete();
 
         return response()->json([
           'success' => false,
-          'errors' => ['error' => $e->getMessage()],
+          'errors' => ['error' => __('general.error')]
         ]);
       }
+    } catch (\Exception $e) {
+      $deposit->delete();
+
+      return response()->json([
+        'success' => false,
+        'errors' => ['error' => $e->getMessage()],
+      ]);
+    }
   }
 
   public function webhookNowpayments(Request $request)
@@ -1093,27 +1126,26 @@ class AddFundsController extends Controller
         if ($request_json !== false && !empty($request_json)) {
           $hmac = hash_hmac("sha512", $sorted_request_json, trim($ipn_secret));
 
-            if (isset($response['payment_status']) && isset($response['payment_id']) && isset($response['order_id'])) {
-              $paymentId = $response['payment_id'];
+          if (isset($response['payment_status']) && isset($response['payment_id']) && isset($response['order_id'])) {
+            $paymentId = $response['payment_id'];
 
-              // Get Deposit
-              $deposit = Deposits::where('txn_id', $response['order_id'])->orWhere('txn_id', $paymentId)->first();
+            // Get Deposit
+            $deposit = Deposits::where('txn_id', $response['order_id'])->orWhere('txn_id', $paymentId)->first();
 
-              if ($deposit) {
-                if ($deposit->status == 'pending' && $response['payment_status'] === 'finished') {
-                  $deposit->txn_id = $paymentId;
-                  $deposit->status = 'active';
-                  $deposit->save();
-                  User::find($deposit->user_id)->increment('wallet', $deposit->amount);
-                } elseif (in_array($response['payment_status'], ['expired', 'failed'])) {
-                  $deposit->delete();
-                } elseif ($response['payment_status'] === 'refunded') {
-                  User::find($deposit->user_id)->decrement('wallet', $deposit->amount);
-                  $deposit->delete();
-                }
+            if ($deposit) {
+              if ($deposit->status == 'pending' && $response['payment_status'] === 'finished') {
+                $deposit->txn_id = $paymentId;
+                $deposit->status = 'active';
+                $deposit->save();
+                User::find($deposit->user_id)->increment('wallet', $deposit->amount);
+              } elseif (in_array($response['payment_status'], ['expired', 'failed'])) {
+                $deposit->delete();
+              } elseif ($response['payment_status'] === 'refunded') {
+                User::find($deposit->user_id)->decrement('wallet', $deposit->amount);
+                $deposit->delete();
               }
             }
-          
+          }
         } else {
           info('NOWPayments Error reading POST data');
         }
