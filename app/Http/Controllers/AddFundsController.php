@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Notifications\AdminDepositPending;
 use Illuminate\Support\Facades\Notification;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use App\Library\Asaas;
 
 class AddFundsController extends Controller
 {
@@ -91,6 +92,10 @@ class AddFundsController extends Controller
     switch ($this->request->payment_gateway) {
       case 'PayPal':
         return $this->sendPayPal();
+        break;
+
+      case 'Asaas':
+        return $this->sendAssas();
         break;
 
       case 'Stripe':
@@ -236,6 +241,178 @@ class AddFundsController extends Controller
       ]);
     }
   } // sendPayPal
+
+
+  public function sendAssas()
+  {
+
+    $payment = PaymentGateways::whereName('Asaas')->firstOrFail();
+
+    $_token = $this->request->_token;
+    $amount = $this->request->amount;
+    $payment_gateway = $this->request->payment_gateway;
+    $name_complete = $this->request->name_complete;
+    $cpf = $this->request->cpf;
+    $card_name = $this->request->card_name;
+    $card_number = $this->request->card_number;
+    $card_expiry_month = $this->request->card_expiry_month;
+    $card_expiry_year = $this->request->card_expiry_year;
+    $card_cvc = $this->request->card_cvc;
+    $payment_method = $this->request->payment_method;
+
+    $key = $payment->key_secret;
+    $path = $payment->webhook_secret;
+    $url = $path . "v3/payments";
+    $urlCustomer = $path . "v3/customers";
+
+    $httpClient = new HttpClient();
+
+    try {
+      $checkout = $httpClient->request(
+        'POST',
+        $urlCustomer,
+        [
+          'headers' => [
+            'Content-Type' => 'application/json',
+            'access_token' => $key,
+          ],
+          'body' => json_encode([
+            "name" => $name_complete,
+            "cpfCnpj" => $cpf
+          ])
+        ]
+      );
+      $response = json_decode($checkout->getBody()->getContents());
+    } catch (\Exception $e) {
+      return response()->json([
+        'success' => false,
+        'errors' => ['error' => $e->getMessage()],
+      ]);
+    }
+
+
+    $payment_method = $payment_method == "" ?  "PIX" : $payment_method;
+
+    if ($payment_method == "PIX") {
+      try {
+        $reqPayment = $httpClient->request(
+          'POST',
+          $url,
+          [
+            'headers' => [
+              'Content-Type' => 'application/json',
+              'access_token' => $key,
+            ],
+            'body' => json_encode([
+              "billingType" => "PIX",
+              "customer" => $response->id,
+              "value" => $amount,
+              "dueDate" => date("Y-m-d"),
+              "externalReference" => uniqid()
+            ])
+          ]
+        );
+        $resPayment = json_decode($reqPayment->getBody()->getContents());
+
+        $reqQrcode = $httpClient->request(
+          'GET',
+          $path . "v3/payments/" . $resPayment->id . "/pixQrCode",
+          [
+            'headers' => [
+              // 'Content-Type' => 'application/json',
+              'access_token' => $key,
+            ],
+            'body' => ''
+          ]
+        );
+        $resQrcode = json_decode($reqQrcode->getBody()->getContents());
+      } catch (\Exception $e) {
+        return response()->json([
+          'success' => false,
+          'errors' => ['error' => $e->getMessage()],
+        ]);
+      }
+    }
+
+    if ($payment_method == "CREDIT_CARD") {
+      try {
+        $reqPayment = $httpClient->request(
+          'POST',
+          $url,
+          [
+            'headers' => [
+              'Content-Type' => 'application/json',
+              'access_token' => $key,
+            ],
+            'body' => json_encode([
+              "billingType" => "CREDIT_CARD",
+              "customer" => $response->id,
+              "value" => $amount,
+              "dueDate" => date("Y-m-d"),
+              "externalReference" => uniqid(),
+              "creditCard" => [
+                "holderName" => $card_name,
+                "number" => $card_number,
+                "expiryMonth" => $card_expiry_month,
+                "expiryYear" => $card_expiry_year,
+                "ccv" => $card_cvc
+              ],
+            ])
+          ]
+        );
+        $resPayment = json_decode($reqPayment->getBody()->getContents());
+      } catch (\Exception $e) {
+        return response()->json([
+          'success' => false,
+          'errors' => ['error' => $e->getMessage()],
+        ]);
+      }
+    }
+
+
+
+
+    if ($payment_method == "CreditCard") {
+      $body = "";
+    } else {
+      $body = '
+        <script>
+              (function() {
+                    let $form = document.querySelector("#formAddFunds")
+                    if($form) {
+                          let div = document.createElement("div")
+                          div.innerHTML = ""
+                          div.innerHTML += "<img src=\"data:image/jpeg;base64,'.$resQrcode->encodedImage.'\">"
+                          div.innerHTML += "<input class=\"form-control\" value=\"'.$resQrcode->payload.'\">"
+                          $form.appendChild(div)
+                    }
+              })();
+        </script>
+        ';
+    }
+
+
+    $isSuccess = true;
+    if ($isSuccess) {
+      return response()->json([
+        'success' => true,
+        'insertBody' => $body,
+        'res_asaas' => $resQrcode ?? [],
+        'path' => $path . "v3/payments/" . $resPayment->id . "/pixQrCode" ?? '',
+
+        // "url" => $url,
+        // 'instantPayment' => true,
+        // "status" => 'pending',
+        // 'status_info' => __('general.pending_deposit'),
+
+      ]);
+    } else {
+      return response()->json([
+        'success' => false,
+        'errors' => ['error' => "Error ao fazer pagamente tente mais tarde"],
+      ]);
+    }
+  }
 
   /**
    *  Add funds Stripe
@@ -1005,76 +1182,76 @@ class AddFundsController extends Controller
 
   public function sendNowPayments()
   {
-      try {
-        // Get Payment Gateway
-        $payment = PaymentGateways::whereName('NowPayments')->firstOrFail();
-        $fee   = $payment->fee;
-        $cents = $payment->fee_cents;
-        $taxes = config('settings.tax_on_wallet') ? ($this->request->amount * auth()->user()->isTaxable()->sum('percentage') / 100) : 0;
-        $amount = number_format($this->request->amount + ($this->request->amount * $fee / 100) + $cents + $taxes, 2, '.', '');
-        $orderId = 'OR-'  . Helper::getHashedToken(15);
+    try {
+      // Get Payment Gateway
+      $payment = PaymentGateways::whereName('NowPayments')->firstOrFail();
+      $fee   = $payment->fee;
+      $cents = $payment->fee_cents;
+      $taxes = config('settings.tax_on_wallet') ? ($this->request->amount * auth()->user()->isTaxable()->sum('percentage') / 100) : 0;
+      $amount = number_format($this->request->amount + ($this->request->amount * $fee / 100) + $cents + $taxes, 2, '.', '');
+      $orderId = 'OR-'  . Helper::getHashedToken(15);
 
-        // Percentage applied
-        $percentageApplied =  $cents == 0.00 ?
-          (($fee != 0.0) ? $fee . '%' : null)
-          : (($fee != 0.0) ? $fee . '% + ' : null) . $cents;
+      // Percentage applied
+      $percentageApplied =  $cents == 0.00 ?
+        (($fee != 0.0) ? $fee . '%' : null)
+        : (($fee != 0.0) ? $fee . '% + ' : null) . $cents;
 
-        // Percentage applied amount
-        $transactionFeeAmount = number_format($this->request->amount + ($this->request->amount * $fee / 100) + $cents, 2, '.', '');
-        $transactionFee = ($transactionFeeAmount - $this->request->amount);
+      // Percentage applied amount
+      $transactionFeeAmount = number_format($this->request->amount + ($this->request->amount * $fee / 100) + $cents, 2, '.', '');
+      $transactionFee = ($transactionFeeAmount - $this->request->amount);
 
-        $client = new HttpClient();
+      $client = new HttpClient();
 
-        $deposit = new Deposits();
-        $deposit->user_id = auth()->id();
-        $deposit->txn_id = $orderId;
-        $deposit->amount = $this->request->amount;
-        $deposit->payment_gateway = 'NowPayments';
-        $deposit->status = 'pending';
-        $deposit->percentage_applied = $percentageApplied;
-        $deposit->transaction_fee = $transactionFee;
-        $deposit->taxes = auth()->user()->taxesPayable();
-        $deposit->save();
+      $deposit = new Deposits();
+      $deposit->user_id = auth()->id();
+      $deposit->txn_id = $orderId;
+      $deposit->amount = $this->request->amount;
+      $deposit->payment_gateway = 'NowPayments';
+      $deposit->status = 'pending';
+      $deposit->percentage_applied = $percentageApplied;
+      $deposit->transaction_fee = $transactionFee;
+      $deposit->taxes = auth()->user()->taxesPayable();
+      $deposit->save();
 
-        $request = $client->request('POST', 'https://api.nowpayments.io/v1/invoice', [
-          'headers' => [
-            'Content-Type' => 'application/json',
-            'x-api-key' => $payment->key,
-          ],
-          'body' => json_encode(array_merge_recursive([
-            'price_amount' => $amount,
-            'price_currency' => config('settings.currency_code'),
-            'ipn_callback_url' => route('webhook.nowpayments'),
-            'order_description' => __('general.add_funds'),
-            'order_id' => $orderId,
-            'success_url' => url('my/wallet'),
-            'cancel_url' => url('my/wallet')
-          ]))
+      $request = $client->request('POST', 'https://api.nowpayments.io/v1/invoice', [
+        'headers' => [
+          'Content-Type' => 'application/json',
+          'x-api-key' => $payment->key,
+        ],
+        'body' => json_encode(array_merge_recursive([
+          'price_amount' => $amount,
+          'price_currency' => config('settings.currency_code'),
+          'ipn_callback_url' => route('webhook.nowpayments'),
+          'order_description' => __('general.add_funds'),
+          'order_id' => $orderId,
+          'success_url' => url('my/wallet'),
+          'cancel_url' => url('my/wallet')
+        ]))
+      ]);
+
+      $response = json_decode($request->getBody(), true);
+
+      if (isset($response['invoice_url'])) {
+        return response()->json([
+          'success' => true,
+          'url' => $response['invoice_url']
         ]);
-
-        $response = json_decode($request->getBody(), true);
-        
-        if (isset($response['invoice_url'])) {
-          return response()->json([
-            'success' => true,
-            'url' => $response['invoice_url']
-          ]);
-        } else {
-          $deposit->delete();
-
-          return response()->json([
-            'success' => false,
-            'errors' => ['error' => __('general.error')]
-          ]);
-        }
-      } catch (\Exception $e) {
+      } else {
         $deposit->delete();
 
         return response()->json([
           'success' => false,
-          'errors' => ['error' => $e->getMessage()],
+          'errors' => ['error' => __('general.error')]
         ]);
       }
+    } catch (\Exception $e) {
+      $deposit->delete();
+
+      return response()->json([
+        'success' => false,
+        'errors' => ['error' => $e->getMessage()],
+      ]);
+    }
   }
 
   public function webhookNowpayments(Request $request)
@@ -1093,27 +1270,26 @@ class AddFundsController extends Controller
         if ($request_json !== false && !empty($request_json)) {
           $hmac = hash_hmac("sha512", $sorted_request_json, trim($ipn_secret));
 
-            if (isset($response['payment_status']) && isset($response['payment_id']) && isset($response['order_id'])) {
-              $paymentId = $response['payment_id'];
+          if (isset($response['payment_status']) && isset($response['payment_id']) && isset($response['order_id'])) {
+            $paymentId = $response['payment_id'];
 
-              // Get Deposit
-              $deposit = Deposits::where('txn_id', $response['order_id'])->orWhere('txn_id', $paymentId)->first();
+            // Get Deposit
+            $deposit = Deposits::where('txn_id', $response['order_id'])->orWhere('txn_id', $paymentId)->first();
 
-              if ($deposit) {
-                if ($deposit->status == 'pending' && $response['payment_status'] === 'finished') {
-                  $deposit->txn_id = $paymentId;
-                  $deposit->status = 'active';
-                  $deposit->save();
-                  User::find($deposit->user_id)->increment('wallet', $deposit->amount);
-                } elseif (in_array($response['payment_status'], ['expired', 'failed'])) {
-                  $deposit->delete();
-                } elseif ($response['payment_status'] === 'refunded') {
-                  User::find($deposit->user_id)->decrement('wallet', $deposit->amount);
-                  $deposit->delete();
-                }
+            if ($deposit) {
+              if ($deposit->status == 'pending' && $response['payment_status'] === 'finished') {
+                $deposit->txn_id = $paymentId;
+                $deposit->status = 'active';
+                $deposit->save();
+                User::find($deposit->user_id)->increment('wallet', $deposit->amount);
+              } elseif (in_array($response['payment_status'], ['expired', 'failed'])) {
+                $deposit->delete();
+              } elseif ($response['payment_status'] === 'refunded') {
+                User::find($deposit->user_id)->decrement('wallet', $deposit->amount);
+                $deposit->delete();
               }
             }
-          
+          }
         } else {
           info('NOWPayments Error reading POST data');
         }

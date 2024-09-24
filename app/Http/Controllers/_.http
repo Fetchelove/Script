@@ -1,0 +1,6 @@
+POST https://sandbox.asaas.com/api/v3/payments
+accept: application/json
+access_token: $aact_YTU5YTE0M2M2N2I4MTliNzk0YTI5N2U5MzdjNWZmNDQ6OjAwMDAwMDAwMDAwMDAwODYxNzU6OiRhYWNoXzk4ZmFmMzM1LTI1ZGUtNDVlMS04ZmM3LTA1OWQyYzVlMzgwOQ==
+content-type: application/json
+
+{}
