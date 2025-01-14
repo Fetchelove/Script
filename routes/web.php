@@ -871,6 +871,9 @@ Route::post('webhook/payku', [AddFundsController::class, 'paykuNotify']);
 // Coinbase
 Route::any('webhook/coinbase', [AddFundsController::class, 'webhookCoinbase']);
 
+// Asaas
+Route::any('webhook/asaas', [AddFundsController::class, 'webhookAsaas']);
+
 // NOWPayments
 Route::post('webhook/nowpayments', [AddFundsController::class, 'webhookNowpayments'])->name('webhook.nowpayments');
 
