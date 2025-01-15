@@ -10,26 +10,59 @@ POST https://fetichlove.shop/webhook/asaas
 accept: application/json
 
 {
-    "id": "evt_05b708f961d739ea7eba7e4db318f621&368604920",
-    "event":"BILL_PAID",
-    "dateCreated": "2024-06-12 16:45:03",
-    "bill": {
-        "object": "bill",
-        "id": "f1bce822-6f37-4905-8de8-f1af9f2f4bab",
-        "status": "PAID",
-        "value": 29.90,
-        "discount": 0.00,
-        "interest": 0.00,
-        "fine": 0.00,
-        "identificationField": "03399.77779 29900.000000 04751.101017 1 81510000002990",
-        "dueDate": "2020-01-31",
-        "scheduleDate": "2020-01-31",
-        "paymentDate": null,
-        "fee": 0.00,
-        "description": "Celular 01/12",
-        "companyName": null,
-        "transactionReceiptUrl": "https://www.asaas.com/comprovantes/00016578",
-        "canBeCancelled": false,
-        "failReasons": null
+    "id": "evt_d26e303b238e509335ac9ba210e51b0f&8173118",
+    "event": "PAYMENT_RECEIVED",
+    "dateCreated": "2025-01-14 14:19:42",
+    "payment": {
+        "object": "payment",
+        "id": "pay_acmhevpbajemltg5",
+        "dateCreated": "2025-01-14",
+        "customer": "cus_000006445162",
+        "paymentLink": null,
+        "value": 17,
+        "netValue": 15.01,
+        "originalValue": null,
+        "interestValue": null,
+        "description": null,
+        "billingType": "PIX",
+        "confirmedDate": "2025-01-14",
+        "pixTransaction": "074248e9-c9e8-4b62-b47f-5af9d55ca189",
+        "pixQrCodeId": "3e8c69bb-ed4f-4faa-bb55-afa5458fa166",
+        "status": "RECEIVED",
+        "dueDate": "2025-01-14",
+        "originalDueDate": "2025-01-14",
+        "paymentDate": "2025-01-14",
+        "clientPaymentDate": "2025-01-14",
+        "installmentNumber": null,
+        "invoiceUrl": "https://sandbox.asaas.com/i/acmhevpbajemltg5",
+        "invoiceNumber": "07403605",
+        "externalReference": "67869c8d3200f",
+        "deleted": false,
+        "anticipated": false,
+        "anticipable": false,
+        "creditDate": "2025-01-14",
+        "estimatedCreditDate": "2025-01-14",
+        "transactionReceiptUrl": "https://sandbox.asaas.com/comprovantes/h/UEFZTUVOVF9SRUNFSVZFRDpwYXlfYWNtaGV2cGJhamVtbHRnNQ%3D%3D",
+        "nossoNumero": null,
+        "bankSlipUrl": null,
+        "lastInvoiceViewedDate": null,
+        "lastBankSlipViewedDate": null,
+        "discount": {
+            "value": 0,
+            "limitDate": null,
+            "dueDateLimitDays": 0,
+            "type": "FIXED"
+        },
+        "fine": {
+            "value": 0,
+            "type": "FIXED"
+        },
+        "interest": {
+            "value": 0,
+            "type": "PERCENTAGE"
+        },
+        "postalService": false,
+        "custody": null,
+        "refunds": null
     }
 }

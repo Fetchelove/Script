@@ -243,14 +243,15 @@ class AddFundsController extends Controller
 	} // sendPayPal
 
 
-	function gerarNumeroCelular() {
+	function gerarNumeroCelular()
+	{
 		$ddd = rand(11, 99);
-	
+
 		$prefixo = '9' . rand(1000, 9999);
-	
+
 		$sufixo = rand(1000, 9999);
-	
-		return $ddd.$prefixo.$sufixo;
+
+		return $ddd . $prefixo . $sufixo;
 	}
 
 
@@ -275,6 +276,7 @@ class AddFundsController extends Controller
 		$path = $payment->webhook_secret;
 		$url = $path . "v3/payments";
 		$urlCustomer = $path . "v3/customers";
+		$orderId = uniqid();
 
 		$httpClient = new HttpClient();
 
@@ -319,7 +321,7 @@ class AddFundsController extends Controller
 							"customer" => $response->id,
 							"value" => $amount,
 							"dueDate" => date("Y-m-d"),
-							"externalReference" => uniqid()
+							"externalReference" => $orderId
 						])
 					]
 				);
@@ -344,7 +346,7 @@ class AddFundsController extends Controller
 				]);
 			}
 		}
-		$orderId = uniqid();
+
 		if ($payment_method == "CREDIT_CARD") {
 			$payload =  [
 				"billingType" => "CREDIT_CARD",
@@ -354,7 +356,7 @@ class AddFundsController extends Controller
 				"externalReference" => $orderId,
 
 				"remoteIp" => $_SERVER['REMOTE_ADDR'],
-				
+
 				"creditCard" => [
 					"holderName" => $card_name,
 					"number" => $card_number,
@@ -1227,51 +1229,47 @@ class AddFundsController extends Controller
 		], 200);
 	}
 
+	function depositUpdate($txnId)
+	{
+		$deposit = Deposits::where('txn_id', $txnId)->first();
+		if (!$deposit) {
+			return response()->json(['error' => 'Deposit not found'], 404);
+		}
+		$deposit->status = 'active';
+		$deposit->save();
+	}
+
 	public function webhookAsaas(Request $request)
 	{
-		// Get Payment Gateway
-		$payment = PaymentGateways::whereName('Asaas')->firstOrFail();
-		$payload = json_decode($request->getContent());
-
-		$verifiedTxnId = Deposits::where('txn_id', '123')->first();
-
-		// if (hash_equals($signature, $request->server('HTTP_X_CC_WEBHOOK_SIGNATURE'))) {
-		//   $metadata = $payload->event->data->metadata ?? null;
-		//   if (isset($metadata->user)) {
-		//     if ($payload->event->type == 'charge:confirmed' || $payload->event->type == 'charge:resolved') {
-		//       $paymentId = $payload->event->data->code;
-		//       // Verify Transaction ID and insert in DB
-		//       $verifiedTxnId = Deposits::where('txn_id', $paymentId)->first();
-
-		//       if (!isset($verifiedTxnId)) {
-		//         // Insert Deposit
-		//         $this->deposit(
-		//           $metadata->user,
-		//           $paymentId,
-		//           $metadata->amount,
-		//           'Coinbase',
-		//           $metadata->taxes ?? null
-		//         );
-		//         // Add Funds to User
-		//         User::find($metadata->user)->increment('wallet', $metadata->amount);
-		//       }
-		//     }
-		//   }
-		// } else {
-
-
-		//   return response()->json([
-		//     'status' => 400
-		//   ], 400);
-		// }
-
-		return response()->json([
-			'status' => 200,
-			'asaas' => $payment,
-			'payload' => $payload,
-			'pagamento' => $verifiedTxnId,
-		], 200);
+		$data = $request->getContent();
+		$data = json_decode($data, true);
+		if (!isset($data['event']) || !isset($data['payment'])) {
+			return response()->json(['message' => 'Invalid webhook payload'], 400);
+		}
+		if ($data['event'] === 'PAYMENT_RECEIVED') {
+			$payment = $data['payment'];
+			$id = $payment['externalReference'];
+			$verifiedTxnId = Deposits::where('txn_id', $id)->first();
+			if (isset($verifiedTxnId)) {
+				$userId = $verifiedTxnId->user_id ?? null;
+				$amount = $payment['value'];
+				$taxes = 0;
+				$this->depositUpdate($id);
+				// $this->deposit(
+				// 	$userId,
+				// 	$payment['id'],
+				// 	$amount,
+				// 	'Asaas',
+				// 	$taxes
+				// );
+				if ($userId) {
+					User::find($userId)->increment('wallet', $amount);
+				}
+			}
+		}
+		return response()->json(['message' => 'Webhook processed successfully'], 200);
 	}
+
 
 	public function sendNowPayments()
 	{
