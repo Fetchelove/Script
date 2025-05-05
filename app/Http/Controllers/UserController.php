@@ -383,7 +383,7 @@ class UserController extends Controller
     $user = User::where('username', '=', $slug)
       ->where('status', 'active')
       ->with([
-        'updatesPostDetail' => fn ($query) =>
+        'updatesPostDetail' => fn($query) =>
         $query->getSelectRelations()
           ->whereId($id)
           ->where('status', '<>', 'encode')
