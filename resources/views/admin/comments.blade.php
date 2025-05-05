@@ -23,6 +23,15 @@
 			<div class="card shadow-custom border-0">
 				<div class="card-body p-lg-4">
 
+					<div class="d-lg-flex justify-content-lg-between align-items-center mb-2 w-100">
+						<!-- form -->
+						<form class="mt-lg-0 mt-2 position-relative" role="search" autocomplete="off"
+							action="{{ url('panel/admin/comments') }}" method="get">
+							<i class="bi bi-search btn-search bar-search"></i>
+							<input type="text" name="q" class="form-control ps-5 w-auto" value="" placeholder="{{ __('general.search') }}">
+						</form><!-- form -->
+					</div>
+
 					<div class="table-responsive p-0">
 						<table class="table table-hover">
 						 <tbody>
@@ -87,7 +96,7 @@
 		</div><!-- card  -->
 
         @if ($data->lastPage() > 1)
-			{{ $data->onEachSide(0)->links() }}
+			{{ $data->appends(['q' => request('q')])->onEachSide(0)->links() }}
 		@endif
 
 	</div><!-- col-lg-12 -->

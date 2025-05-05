@@ -110,9 +110,9 @@
 
 					<button class="dropdown-item mb-1" onclick="$('#url{{$response->id}}').trigger('click')"><i class="feather icon-link mr-2"></i> {{__('general.copy_link')}}</button>
 
-					<button type="button" class="dropdown-item mb-1" data-toggle="modal" data-target="#editPost{{$response->id}}">
+					<a href="{{ route('post.edit', ['id' => $response->id]) }}" class="dropdown-item mb-1">
 						<i class="bi bi-pencil mr-2"></i> {{__('general.edit_post')}}
-					</button>
+					</a>
 
 					{!! Form::open([
 						'method' => 'POST',
@@ -127,97 +127,6 @@
 					{!! Form::button('<i class="feather icon-trash-2 mr-2"></i> '.__('general.delete_post'), ['class' => 'dropdown-item mb-1 actionDelete']) !!}
 					{!! Form::close() !!}
 	      </div>
-
-				<div class="modal fade modalEditPost" id="editPost{{$response->id}}" tabindex="-1" role="dialog" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header border-bottom-0">
-							<h5 class="modal-title">{{__('general.edit_post')}}</h5>
-							<button type="button" class="close close-inherit" data-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">
-									<i class="bi bi-x-lg"></i>
-								</span>
-							</button>
-						</div>
-						<div class="modal-body">
-							<form method="POST" action="{{url('update/edit')}}" enctype="multipart/form-data" class="formUpdateEdit">
-								@csrf
-								<input type="hidden" name="id" value="{{$response->id}}" />
-							<div class="card mb-4">
-								<div class="blocked display-none"></div>
-								<div class="card-body pb-0">
-
-									<div class="media">
-										<div class="media-body">
-										<textarea name="description" rows="{{ mb_strlen($response->description) >= 500 ? 10 : 5 }}" cols="40" placeholder="{{__('general.write_something')}}" class="form-control border-0 updateDescription custom-scrollbar">{{$response->description}}</textarea>
-									</div>
-								</div><!-- media -->
-
-										<input class="custom-control-input d-none customCheckLocked" type="checkbox" {{$response->locked == 'yes' ? 'checked' : ''}}  name="locked" value="yes">
-
-										<!-- Alert -->
-										<div class="alert alert-danger my-3 display-none errorUdpate">
-										 <ul class="list-unstyled m-0 showErrorsUdpate small"></ul>
-									 </div><!-- Alert -->
-
-								</div><!-- card-body -->
-
-								<div class="card-footer bg-white border-0 pt-0">
-									<div class="justify-content-between align-items-center">
-
-										<div class="form-group @if ($response->price == 0.00) display-none @endif price">
-											<div class="input-group mb-2">
-											<div class="input-group-prepend">
-												<span class="input-group-text">{{$settings->currency_symbol}}</span>
-											</div>
-													<input class="form-control isNumber" value="{{$response->price != 0.00 ? $response->price : null}}" autocomplete="off" name="price" placeholder="{{__('general.price')}}" type="text">
-											</div>
-										</div><!-- End form-group -->
-
-										@if ($mediaCount == 0 && $response->locked == 'yes')
-										<div class="form-group @if (! $response->title) display-none @endif titlePost">
-											<div class="input-group mb-2">
-											<div class="input-group-prepend">
-												<span class="input-group-text"><i class="bi-type"></i></span>
-											</div>
-													<input class="form-control @if ($response->title) active @endif" value="{{$response->title ? $response->title : null}}" maxlength="100" autocomplete="off" name="title" placeholder="{{__('admin.title')}}" type="text">
-											</div>
-											<small class="form-text text-muted mb-4 font-13">
-				                {{ __('general.title_post_info', ['numbers' => 100]) }}
-				              </small>
-										</div><!-- End form-group -->
-									@endif
-
-										@if ($response->price == 0.00)
-										<button type="button" class="btn btn-upload btn-tooltip e-none align-bottom setPrice @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill" data-toggle="tooltip" data-placement="top" title="{{__('general.price_post_ppv')}}">
-											<i class="feather icon-tag f-size-25 align-bottom"></i>
-										</button>
-									@endif
-
-									@if ($response->price == 0.00)
-										<button type="button" class="contentLocked btn e-none align-bottom @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill btn-upload btn-tooltip {{$response->locked == 'yes' ? '' : 'unlock'}}" data-toggle="tooltip" data-placement="top" title="{{__('users.locked_content')}}">
-											<i class="feather align-bottom icon-{{$response->locked == 'yes' ? '' : 'un'}}lock f-size-25"></i>
-										</button>
-									@endif
-
-								@if ($mediaCount == 0 && $response->locked == 'yes')
-									<button type="button" class="btn btn-upload btn-tooltip e-none align-bottom @if ($response->title) btn-active-hover @endif setTitle @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill" data-toggle="tooltip" data-placement="top" title="{{__('general.title_post_block')}}">
-										<i class="bi-type align-bottom f-size-25"></i>
-									</button>
-								@endif
-
-										<div class="d-inline-block float-right mt-1">
-											<button type="submit" class="btn btn-sm btn-primary rounded-pill float-right btnEditUpdate"><i></i> {{__('users.save')}}</button>
-										</div>
-
-									</div>
-								</div><!-- card footer -->
-							</div><!-- card -->
-						</form>
-					</div><!-- modal-body -->
-					</div><!-- modal-content -->
-				</div><!-- modal-dialog -->
-			</div><!-- modal -->
 			@endif
 
 				@if(auth()->check()
@@ -413,12 +322,12 @@
 			</div>
 			@endif
 
-			@if ($media->file != '')
+			@if ($media->type == 'file')
 			<a href="{{url('download/file', $response->id)}}" class="d-block text-decoration-none @if ($mediaCount > 1) mt-3 @endif">
 				<div class="card mb-3 mx-3">
 					<div class="row no-gutters">
-						<div class="col-md-2 text-center bg-primary">
-							<i class="far fa-file-archive m-4 text-white" style="font-size: 48px;"></i>
+						<div class="col-md-2 text-center bg-primary rounded-left">
+							<i class="far fa-file-archive m-4 text-white" style="font-size: 40px;"></i>
 						</div>
 						<div class="col-md-10">
 							<div class="card-body">
@@ -434,6 +343,31 @@
 				</div>
 				</a>
 			@endif
+
+			@if ($media->type == 'epub')
+			<a href="{{url('viewer/epub', $media->id)}}" target="_blank" class="d-block text-decoration-none @if ($mediaCount > 1) mt-3 @endif">
+				<div class="card mb-3 mx-3">
+					<div class="row no-gutters">
+						<div class="col-md-2 text-center bg-primary rounded-left">
+							<i class="fas fa-book-open m-4 text-white" style="font-size: 40px;"></i>
+						</div>
+						<div class="col-md-10">
+							<div class="card-body">
+								<h5 class="card-title text-primary text-truncate mb-1">
+									{{ $media->file_name }}.epub
+								</h5>
+								<p class="card-text">
+									<small class="text-muted">
+										<strong>{{ __('general.view_online') }}</strong> <i class="bi-arrow-up-right ml-1"></i>
+									</small>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				</a>
+			@endif
+
 		@endforeach
 
 		@if ($isVideoEmbed)
@@ -509,8 +443,12 @@
 			<li class="list-inline-item"><i class="far fa-file-archive"></i> {{$media->file_size}}</li>
 		@endif
 
+		@if ($media->type == 'epub')
+			<li class="list-inline-item"><i class="bi-book"></i> {{$media->file_size}}</li>
+		@endif
+
 	@endforeach
-	@endif
+@endif
 </ul>
 
 </div><!-- btn-block parent -->
@@ -554,7 +492,7 @@
 				<i class="@if($likeActive)fas @else far @endif fa-heart"></i>
 			</a>
 
-			<span class="@auth @if (auth()->user()->checkRestriction($response->creator->id)) buttonDisabled @else text-muted @endif @else text-muted @endauth disabled mr-14px @auth @if (! isset($inPostDetail) && $buttonLike) pulse-btn toggleComments @endif @endauth">
+			<span class="@auth @if (auth()->user()->checkRestriction($response->creator->id) || !$response->creator->allow_comments) buttonDisabled @else text-muted @endif @else text-muted @endauth disabled mr-14px @auth @if (! isset($inPostDetail) && $buttonLike) pulse-btn toggleComments @endif @endauth">
 				<i class="far fa-comment"></i>
 			</span>
 
@@ -744,12 +682,19 @@
 		</div>
 
 		<div class="media position-relative pt-3 border-top">
-			<div class="blocked display-none"></div>
-			<span href="#" class="float-left">
+			<div @class(['blocked', 'display-none' => $response->creator->allow_comments])></div>
+			<span href="#" @class(['float-left', 'd-none' => !$response->creator->allow_comments])>
 				<img src="{{ Helper::getFile(config('path.avatar').auth()->user()->avatar) }}" class="rounded-circle mr-1 avatarUser" width="40">
 			</span>
 			<div class="media-body">
-				<form action="{{url('comment/store')}}" method="post" class="comments-form">
+
+				@if (!$response->creator->allow_comments)
+				<div class="p-2 text-center">
+					{{ __('general.comments_disabled') }}
+				</div>
+				@endif
+
+				<form action="{{url('comment/store')}}" method="post" @class(['comments-form', 'd-none' => !$response->creator->allow_comments])>
 					@csrf
 					<input type="hidden" name="update_id" value="{{$response->id}}" />
 					<input class="isReply" type="hidden" name="isReply" value="" />
@@ -815,7 +760,6 @@
 if (request()->ajax()) {
 	$getHasPages = $updates->count() < $settings->number_posts_show ? false : true;
 } else {
-
 	if (request()->route()->named('profile')) {
 		$getHasPages = $updates->count() < $settings->number_posts_show ? false : true;
 	} else {
@@ -824,7 +768,7 @@ if (request()->ajax()) {
 }
 @endphp
 
-@if ($getHasPages && ! isset($isPostPinned))
+@if ($getHasPages)
 	<button rel="next" class="btn btn-primary w-100 text-center loadPaginator d-none" id="paginator">
 		{{__('general.loadmore')}}
 	</button>

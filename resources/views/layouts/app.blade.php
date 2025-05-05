@@ -76,6 +76,8 @@
 @if (auth()->guest() && request()->path() == '/' && $settings->home_style == 0
     || auth()->guest() && request()->path() != '/' && $settings->home_style == 0
     || auth()->guest() && request()->path() != '/' && $settings->home_style == 1
+    || auth()->guest() && request()->path() == '/' && $settings->home_style == 2
+    || auth()->guest() && request()->path() != '/' && $settings->home_style == 2
     || auth()->check()
     )
   @include('includes.navbar')
@@ -107,6 +109,7 @@
           @if (auth()->guest() && request()->path() == '/' && $settings->home_style == 0
                 || auth()->guest() && request()->path() != '/' && $settings->home_style == 0
                 || auth()->guest() && request()->path() != '/' && $settings->home_style == 1
+                || auth()->guest() && request()->path() != '/' && $settings->home_style == 2
                 || auth()->check()
                   )
 
@@ -134,6 +137,10 @@
 
     @if ($settings->disable_tips == 'off')
      @include('includes.modal-tip')
+   @endif
+
+   @if ($settings->gifts)
+     @include('includes.modal-gifts')
    @endif
 
     @include('includes.modal-payperview')

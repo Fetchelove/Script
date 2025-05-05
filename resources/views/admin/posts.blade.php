@@ -67,19 +67,23 @@
 												@foreach ($allFiles as $media)
 
 													@if ($media->type == 'image')
-														<i class="far fa-image myicon-right"></i>
+														<i class="far fa-image"></i>
 													@endif
 
 													@if ($media->type == 'video')
-														<i class="far fa-play-circle myicon-right"></i>
+														<i class="far fa-play-circle"></i>
 													@endif
 
 													@if ($media->type == 'music')
-														<i class="fa fa-microphone myicon-right"></i>
+														<i class="fa fa-microphone"></i>
 														@endif
 
 														@if ($media->type == 'file')
 													<i class="far fa-file-archive"></i>
+													@endif
+
+													@if ($media->type == 'epub')
+													<i class="fas fa-book-open"></i>
 													@endif
 
 												@endforeach

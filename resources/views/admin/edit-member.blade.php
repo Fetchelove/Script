@@ -70,6 +70,9 @@
 		            <select name="status" class="form-select">
                   <option @if ($user->status == 'active') selected="selected" @endif value="active">{{ __('admin.active') }}</option>
                   <option @if ($user->status == 'pending') selected="selected" @endif value="pending">{{ __('admin.pending') }}</option>
+				  @if ($user->verified_id == 'yes')
+				  <option @if ($user->status == 'disabled') selected="selected" @endif value="disabled">{{ __('admin.disabled') }}</option>
+				  @endif
                   <option @if ($user->status == 'suspended') selected="suspended" @endif value="suspended">{{ __('admin.suspended') }}</option>
 		           </select>
 		          </div>
@@ -177,6 +180,11 @@
             <li class="list-group-item border-none"> <strong>{{__('general.country')}}</strong>: <span class="pull-right color-strong">@if ($user->countries_id != '') {{ $user->country()->country_name }} @else {{ __('admin.not_established') }} @endif</span></li>
             <li class="list-group-item border-none"> <strong>{{__('general.gender')}}</strong>: <span class="pull-right color-strong">{{ $user->gender ? __('general.'.$user->gender) : __('general.not_specified') }}</span></li>
             <li class="list-group-item border-none"> <strong>{{__('general.birthdate')}}</strong>: <span class="pull-right color-strong">{{ $user->birthdate ? $user->birthdate : __('general.no_available') }}</span></li>
+            <li class="list-group-item border-none"> <strong>{{__('general.city')}}</strong>: <span class="pull-right color-strong">{{ $user->city ?: __('general.not_specified') }}</span></li>
+            <li class="list-group-item border-none"> <strong>{{__('general.address')}}</strong>: <span class="pull-right color-strong">{{ $user->address ?: __('general.not_specified') }}</span></li>
+            <li class="list-group-item border-none"> <strong>{{__('general.zip')}}</strong>: <span class="pull-right color-strong">{{ $user->zip ?: __('general.not_specified') }}</span></li>
+            <li class="list-group-item border-none"> <strong>{{__('general.company')}}</strong>: <span class="pull-right color-strong">{{ $user->company ?: __('general.not_specified') }}</span></li>
+
           </ol>
 
         </div><!-- col-md-3 -->

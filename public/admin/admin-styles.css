@@ -44,22 +44,24 @@ h1, h2, h3, h4, h5, h6 {
     width:260px;
 }
 .scrollbar::-webkit-scrollbar {
-  width:9px;
+  width:7px;
     height: 3px;
     -webkit-transition: all 0.2s ease;
   	        transition: all 0.2s ease;
 }
 .scrollbar::-webkit-scrollbar-track {
-    background-color: #2f3439;
+    background-color: transparent;
     border-radius: 6px;
 }
 .scrollbar::-webkit-scrollbar-thumb {
     background-color: #5f5e5e;
     border-radius: 6px;
 }
-.scrollbar {
-  scrollbar-color: #5f5e5e #2f3439;
-  scrollbar-width: thin;
+@-moz-document url-prefix() {
+  .scrollbar {
+    scrollbar-color: #5f5e5e transparent;
+    scrollbar-width: thin;
+  }
 }
 @media (min-width: 992px) {
 .admin-container,
@@ -487,4 +489,7 @@ h1, h2, h3, h4, h5, h6 {
 [data-bs-theme=dark] .btn-outline-dark {
   border-color: #fff !important;
   color: #fff !important;
+}
+.modal-content {
+  padding: 1rem !important;
 }

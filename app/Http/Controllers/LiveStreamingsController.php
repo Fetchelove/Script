@@ -203,7 +203,7 @@ class LiveStreamingsController extends Controller
       'likeActive' => $likeActive ?? null,
       'paymentRequiredToAccess' => $paymentRequiredToAccess,
       'limitLiveStreaming' => $limitLiveStreaming > 0 ? $limitLiveStreaming : 0,
-      'amountTips' => $live ? $live->comments()->sum('tip_amount') : 0
+      'amountTips' => $live ? $live->comments()->sum('earnings') : 0
     ]);
   } // End method show
 
@@ -266,10 +266,10 @@ class LiveStreamingsController extends Controller
     $allComments = array();
 
     if ($totalComments != 0) {
-
       foreach ($comments as $comment) {
         $allComments[] = view('includes.comments-live', [
-          'comments' => $comments
+          'comments' => $comments,
+          'live' => $live
         ])->render();
       } //<--- foreach
     } //<--- IF != 0
@@ -278,7 +278,7 @@ class LiveStreamingsController extends Controller
     $likes = $live->likes_count;
 
     // Sum all tips
-    $tipsAmount = $live->comments->sum('tip_amount');
+    $tipsAmount = $live->comments->sum('earnings');
 
     return response()->json([
       'success' => true,

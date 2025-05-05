@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Helper;
+use Illuminate\Database\Eloquent\Model;
 
 class Updates extends Model
 {
@@ -69,10 +69,10 @@ class Updates extends Model
                 'updates.price',
                 'updates.status',
                 'updates.video_views',
-				'updates.scheduled_date'
+				'updates.scheduled_date',
                 )
           ->with([
-            'creator:id,name,username,avatar,hide_name,verified_id,plan,free_subscription,cover', 
+            'creator:id,name,username,avatar,hide_name,verified_id,plan,free_subscription,cover,allow_comments', 
             'creator.plans:user_id,name,status', 
             'media', 
             'comments:id,updates_id',

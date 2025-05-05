@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helper;
-use App\Models\User;
 use App\Models\Reports;
 use App\Models\Products;
 use App\Models\TaxRates;
@@ -17,7 +16,6 @@ use App\Models\Notifications;
 use App\Models\ShopCategories;
 use App\Notifications\NewSale;
 use Illuminate\Validation\Rule;
-use App\Models\ReferralTransactions;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -119,12 +117,8 @@ class ProductsController extends Controller
     $path = config('path.shop');
 
     // Currency Position
-    if ($this->settings->currency_position == 'right') {
-      $currencyPosition =  2;
-    } else {
-      $currencyPosition =  null;
-    }
-
+    $currencyPosition =  $this->settings->currency_position == 'right' ? 2 : null;
+    
     $messages = [
       'description.required' => __('validation.required', ['attribute' => __('general.description')]),
       'tags.required' => __('validation.required', ['attribute' => __('general.tags')]),
@@ -135,6 +129,9 @@ class ProductsController extends Controller
       'box_contents.required' => __('validation.required', ['attribute' => __('general.box_contents')]),
       'box_contents.max' => __('validation.max', ['attribute' => __('general.box_contents')]),
       'category.required' => __('validation.required', ['attribute' => __('general.category')]),
+      'external_link.url' => __('validation.url', ['attribute' => __('general.external_link_buy')]),
+      'external_link.max' => __('validation.max', ['attribute' => __('general.external_link_buy')]),
+      
     ];
 
     // Media Files Preview
@@ -158,6 +155,7 @@ class ProductsController extends Controller
       'price'       => 'required|numeric|min:' . $this->settings->min_price_product . '|max:' . $this->settings->max_price_product,
       'quantity' => 'required',
       'box_contents' => 'required|max:100',
+      'external_link' => 'url|max:500',
     ], $messages);
 
     if ($validator->fails()) {
@@ -192,6 +190,7 @@ class ProductsController extends Controller
     $product->name        = $this->request->name;
     $product->type        = 'physical';
     $product->price       = $this->request->price;
+    $product->external_link = $this->request->external_link;
     $product->shipping_fee = $this->request->shipping_fee;
     $product->country_free_shipping = $this->request->shipping_fee ? $this->request->country_free_shipping : false;
     $product->tags        = trim($this->request->tags, ',');
@@ -241,11 +240,7 @@ class ProductsController extends Controller
     $path = config('path.shop');
 
     // Currency Position
-    if ($this->settings->currency_position == 'right') {
-      $currencyPosition =  2;
-    } else {
-      $currencyPosition =  null;
-    }
+    $currencyPosition =  $this->settings->currency_position == 'right' ? 2 : null;
 
     $messages = [
       'description.required' => __('validation.required', ['attribute' => __('general.description')]),
@@ -279,12 +274,14 @@ class ProductsController extends Controller
 
     $input = $this->request->all();
 
+    $minPrice = $this->settings->allow_free_items_shop ? 0 : $this->settings->min_price_product;
+
     $validator = Validator::make($input, [
       'name'     => 'required|min:5|max:100',
       'tags'     => 'required',
       'category' => Rule::requiredIf($categories),
       'description' => 'required|min:10',
-      'price'       => 'required|numeric|min:' . $this->settings->min_price_product . '|max:' . $this->settings->max_price_product,
+      'price'       => 'required|numeric|min:' . $minPrice . '|max:' . $this->settings->max_price_product,
     ], $messages);
 
     if ($validator->fails()) {
@@ -486,11 +483,7 @@ class ProductsController extends Controller
     $product = Products::whereId($this->request->id)->whereUserId(auth()->id())->firstOrFail();
 
     // Currency Position
-    if ($this->settings->currency_position == 'right') {
-      $currencyPosition =  2;
-    } else {
-      $currencyPosition =  null;
-    }
+    $currencyPosition =  $this->settings->currency_position == 'right' ? 2 : null;
 
     $messages = [
       'description.required' => __('validation.required', ['attribute' => __('general.description')]),
@@ -503,17 +496,22 @@ class ProductsController extends Controller
       'box_contents.required' => __('validation.required', ['attribute' => __('general.box_contents')]),
       'box_contents.max' => __('validation.max', ['attribute' => __('general.box_contents')]),
       'category.required' => __('validation.required', ['attribute' => __('general.category')]),
+      'external_link.url' => __('validation.url', ['attribute' => __('general.external_link_buy')]),
+      'external_link.max' => __('validation.max', ['attribute' => __('general.external_link_buy')]),
     ];
 
     $input = $this->request->all();
+
+    $minPrice = $this->settings->allow_free_items_shop ? 0 : $this->settings->min_price_product;
 
     $validator = Validator::make($input, [
       'name'     => 'required|min:5|max:100',
       'tags'     => 'required',
       'description' => 'required|min:10',
-      'price'       => 'required|numeric|min:' . $this->settings->min_price_product . '|max:' . $this->settings->max_price_product,
+      'price'       => 'required|numeric|min:' . $minPrice . '|max:' . $this->settings->max_price_product,
       'category'     => 'required',
       'delivery_time' => Rule::requiredIf($product->type == 'custom'),
+      'external_link' => 'url|max:500',
       'quantity' => Rule::requiredIf($product->type == 'physical'),
       'box_contents' => [
         'max:100',
@@ -542,6 +540,7 @@ class ProductsController extends Controller
 
     $product->name        = $this->request->name;
     $product->price       = $this->request->price;
+    $product->external_link = $this->request->external_link;
     $product->shipping_fee = $this->request->shipping_fee ?? false;
     $product->country_free_shipping = $this->request->country_free_shipping ?? false;
     $product->tags        = trim($this->request->tags, ',');
@@ -712,7 +711,7 @@ class ProductsController extends Controller
 
     // Add Earnings to User
     $item->user()->increment('balance', $earnings['user']);
-!
+
     // Insert Purchase
     $purchase = new Purchases();
     $purchase->transactions_id = $txn->id;
@@ -762,12 +761,14 @@ class ProductsController extends Controller
       ->whereType('digital')
       ->firstOrFail();
 
-    $file = $item->purchases()
-      ->where('user_id', auth()->id())
-      ->first();
+    if ($item->price !== '0.00') {
+      $file = $item->purchases()
+        ->where('user_id', auth()->id())
+        ->first();
 
-    if (!$file && auth()->user()->role != 'admin') {
-      abort(404);
+      if (!$file && auth()->user()->role != 'admin') {
+        abort(404);
+      }
     }
 
     $pathFile = config('path.shop') . $item->file;
@@ -779,8 +780,12 @@ class ProductsController extends Controller
       'Expires' => '0'
     ];
 
+    if ($item->price === '0.00') {
+      $item->increment('downloads');
+    }
+
     return Storage::download($pathFile, $item->name . '.' . $item->extension, $headers);
-  } // End method download
+  }
 
   public function destroy($id)
   {
@@ -916,6 +921,5 @@ class ProductsController extends Controller
         'text' => __('general.reported_success'),
       ]);
     }
-  } // end report
-
+  }
 }

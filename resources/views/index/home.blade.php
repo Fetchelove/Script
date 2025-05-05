@@ -9,101 +9,263 @@
           <h1 class="display-4 pt-5 mb-3 text-white text-center-sm">{{__('general.welcome_title')}}</h1>
           <p class="text-white text-center-sm">{{__('general.subtitle_welcome')}}</p>
           <p>
-            <a href="{{url('creators')}}" class="btn btn-lg btn-main btn-outline-light btn-w-mb px-4 mr-2" role="button">{{__('general.explore')}}</a>
+           <!-- <a href="{{url('creators')}}" class="btn btn-lg btn-main btn-outline-light btn-w-mb px-4 mr-2" role="button">{{__('general.explore')}}</a> -->
 
             <a class="btn btn-lg btn-main btn-light btn-w px-4 toggleRegister btn-arrow" href="{{ $settings->registration_active == '1' ? url('signup') : url('login')}}">
               {{__('general.getting_started')}}</a>
           </p>
         </div>
         <div class="col-lg-8 first">
-          <img src="{{url('public/img', $settings->home_index)}}" class="img-center img-fluid">
+        <!--  <img src="{{url('public/img', $settings->home_index)}}" class="img-center img-fluid"> -->
         </div>
       </div>
     </div>
   </div>
   <!-- ./ jumbotron -->
-
-  <div class="section py-5 py-large">
-    <div class="container">
-        <div class="btn-block text-center mb-5">
-          <h1 class="txt-black">{{__('general.header_box_2')}}</h1>
-          <p>
-            {{__('general.desc_box_2')}}
-          </p>
-          </div>
-
-          <div class="row">
-            <div class="col-lg-4">
-              <div class="text-center">
-                <img src="{{url('public/img', $settings->img_1)}}" class="img-center img-fluid" width="200">
-                <h4 class="mt-1 txt-black">{{__('general.card_1')}}</h4>
-                <p class="text-muted mt-1">{{__('general.desc_card_1')}}</p>
-              </div>
-          </div>
-
-          <div class="col-lg-4">
-            <div class="text-center">
-              <img src="{{url('public/img', $settings->img_2)}}" class="img-center img-fluid" width="200">
-              <h4 class="mt-1 txt-black">{{__('general.card_2')}}</h4>
-              <p class="text-muted mt-1">{{__('general.desc_card_2')}}</p>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-          <div class="text-center">
-            <img src="{{url('public/img', $settings->img_3)}}" class="img-center img-fluid" width="200">
-            <h4 class="mt-1 txt-black">{{__('general.card_3')}}</h4>
-            <p class="text-muted mt-1">{{__('general.desc_card_3')}}</p>
-          </div>
-      </div>
-
-      </div>
+  
+  <div class="category-slider" style="background-color: #000000;">
+    <div class="category-wrapper">
+        @foreach (Categories::where('mode', 'on')->orderBy('name')->get() as $category)
+            <a class="category-slide" href="{{ url('category', $category->slug) }}">
+                <img src="{{ url('public/img-category', $category->image) }}" alt="Category Image" class="category-image" />
+                <span class="category-name">{{ Lang::has('categories.' . $category->slug) ? __('categories.' . $category->slug) : $category->name }}</span>
+            </a>
+        @endforeach
     </div>
-  </div>
-
-  <!-- Create profile -->
-  <div class="section py-5 py-large">
-    <div class="container">
-      <div class="row align-items-center">
-      <div class="col-12 col-lg-7 text-center mb-3">
-        <img src="{{url('public/img', $settings->img_4)}}" alt="User" class="img-fluid">
-      </div>
-      <div class="col-12 col-lg-5">
-        <h1 class="m-0 card-profile txt-black">{{__('general.header_box_3')}}</h1>
-        <div class="col-lg-9 col-xl-8 p-0">
-          <p class="py-4 m-0 text-muted">{{__('general.desc_box_3')}}</p>
-        </div>
-        <a href="{{ $settings->registration_active == '1' ? url('signup') : url('login')}}" class="btn-arrow btn btn-lg btn-main btn-outline-primary btn-w px-4">
-          {{__('general.getting_started')}}
-        </a>
-      </div>
+    <div class="arrow-container">
+        <button class="prev-button">&#10094;</button>
+        <button class="next-button">&#10095;</button>
     </div>
-    </div><!-- End Container -->
-  </div><!-- End Section -->
+</div>
 
-@if ($settings->widget_creators_featured == 'on')
+
+<style>
+   .category-slider {
+    overflow: hidden;
+    position: relative;
+    padding: 10px 0; /* Espaçamento superior e inferior aumentado */
+}
+
+.category-wrapper {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.category-slide {
+    flex: 0 0 auto;
+    margin-right: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: #ffffff;
+    transition: transform 0.3s ease;
+}
+
+.category-slide:last-child {
+    margin-right: 0;
+}
+
+.category-slide:hover {
+    transform: scale(1.1);
+}
+
+.category-image {
+    width: 150px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 5px;
+    transition: transform 0.3s ease;
+}
+
+.category-name {
+    display: block;
+    margin-top: 10px;
+    font-size: 18px;
+    font-family: 'Arial', sans-serif;
+}
+
+.arrow-container {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.prev-button, .next-button {
+    background: none;
+    color: #ffffff;
+    border: none;
+    font-size: 33px;
+    cursor: pointer;
+    outline: none;
+}
+
+.prev-button:hover, .next-button:hover {
+    color: red
+}
+
+
+
+
+.jumbotron {
+    background-color: #000000;
+}
+
+.section {
+    background-color: #000000;
+}
+
+.bg-gradient {
+    background-color: #000000;
+}
+
+.category-slider {
+    background-color: #000000;
+}
+
+body {
+    background-color: #000000;
+    
+  }
+
+
+
+
+</style>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+    const categoryWrapper = document.querySelector('.category-wrapper');
+    const slides = document.querySelectorAll('.category-slide');
+    const nextButton = document.querySelector('.next-button');
+    const prevButton = document.querySelector('.prev-button');
+    let currentPosition = 0;
+    let intervalId;
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    // Clone os primeiros slides e adicione-os ao final do wrapper para criar um loop contínuo
+    const numberOfClones = 3; // Ajuste conforme necessário
+    for (let i = 0; i < numberOfClones; i++) {
+        const clone = slides[i].cloneNode(true);
+        categoryWrapper.appendChild(clone);
+    }
+
+    const calculateSlideMove = () => {
+        const slide = document.querySelector('.category-slide');
+        return slide.offsetWidth + 20; // Espaço entre os slides
+    };
+
+    const resetPositionIfNeeded = () => {
+        const maxOffset = -(categoryWrapper.scrollWidth - window.innerWidth + calculateSlideMove() * numberOfClones);
+        if (currentPosition <= maxOffset) {
+            // Sem transição para resetar a posição e criar um loop contínuo
+            categoryWrapper.style.transition = 'none';
+            currentPosition = 0;
+            categoryWrapper.style.transform = `translateX(${currentPosition}px)`;
+            // Adiciona um delay antes de reativar a transição
+            setTimeout(() => {
+                categoryWrapper.style.transition = 'transform 0.5s ease';
+            }, 20);
+        }
+    };
+
+    const slideCategories = (direction = 'next') => {
+        const moveDistance = calculateSlideMove();
+        if (direction === 'next') {
+            currentPosition -= moveDistance;
+            resetPositionIfNeeded();
+        } else {
+            currentPosition += moveDistance;
+            if (currentPosition > 0) {
+                currentPosition = -(categoryWrapper.scrollWidth - window.innerWidth - calculateSlideMove() * numberOfClones);
+            }
+        }
+        categoryWrapper.style.transform = `translateX(${currentPosition}px)`;
+    };
+
+    const startAutoSlide = () => {
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(() => slideCategories('next'), 3000);
+    };
+
+    const stopAutoSlide = () => clearInterval(intervalId);
+
+    nextButton.addEventListener('click', () => {
+        slideCategories('next');
+        stopAutoSlide();
+    });
+
+    prevButton.addEventListener('click', () => {
+        slideCategories('prev');
+        stopAutoSlide();
+    });
+
+    categoryWrapper.addEventListener('mouseover', stopAutoSlide);
+    categoryWrapper.addEventListener('mouseout', startAutoSlide);
+
+    categoryWrapper.addEventListener('touchstart', (event) => {
+        touchStartX = event.touches[0].clientX;
+    });
+
+    categoryWrapper.addEventListener('touchmove', (event) => {
+        touchEndX = event.touches[0].clientX;
+    });
+
+    categoryWrapper.addEventListener('touchend', () => {
+        if (touchStartX - touchEndX > 50) {
+            // Swipe da direita para a esquerda, mover para a próxima categoria
+            slideCategories('next');
+        } else if (touchEndX - touchStartX > 50) {
+            // Swipe da esquerda para a direita, mover para a categoria anterior
+            slideCategories('prev');
+        }
+    });
+
+    startAutoSlide();
+});
+
+</script>
+
+
+
+
+  
+
+ @if ($settings->widget_creators_featured == 'on')
 
     @if ($users->count() != 0)
     <!-- Users -->
-    <div class="section py-5 py-large">
+    <div class="section py-5 py-large" style="background-color: #000000;">
+        
+        
       <div class="container">
+         
+          
+
+
+
         <div class="btn-block text-center mb-5">
-          <h1 class="txt-black">{{__('general.creators_featured')}}</h1>
-          <p>
+          <h1 class="txt-white" style="color: #FFFFFF;">{{__('general.creators_featured')}}</h1>
+          <p style="color: #FFFFFF;">
             {{__('general.desc_creators_featured')}}
           </p>
         </div>
         <div class="row">
 
-          <div class="owl-carousel owl-theme">
+          <div class="owl-carousel owl-theme" >
             @foreach ($users as $response)
-              @include('includes.listing-creators')
-          @endforeach
+              @include('includes.listing-creators', ['textColor' => '#FFFFFF']) <!-- Assumindo que você possa passar um parâmetro para mudar a cor do texto aqui -->
+            @endforeach
           </div>
 
           @if ($usersTotal > $users->total())
           <div class="w-100 text-center mt-4 px-lg-0 px-3">
-            <a href="{{url('creators')}}" class="btn-arrow btn btn-lg btn-main btn-outline-primary btn-w px-4">
+            <a href="{{url('creators')}}" class="btn-arrow btn btn-lg btn-main btn-outline-primary btn-w px-4" style="color: #FFFFFF; border-color: #FFFFFF;">
               {{__('general.view_all_creators')}}
             </a>
           </div>
@@ -114,10 +276,76 @@
   @endif
 @endif
 
+<!--
+  <div class="section py-5 py-large" style="background-color: #000000; color: #FFFFFF;">
+    <div class="container" style="background-color: #000000;">
+        <div class="btn-block text-center mb-5">
+            <h1>{{__('general.header_box_2')}}</h1>
+            <p>
+                {{__('general.desc_box_2')}}
+            </p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="text-center">
+                    <img src="{{url('public/img', $settings->img_1)}}" class="img-center img-fluid" width="200">
+                    <h4 class="mt-1">{{__('general.card_1')}}</h4>
+                    <p class="text-muted mt-1">{{__('general.desc_card_1')}}</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="text-center">
+                    <img src="{{url('public/img', $settings->img_2)}}" class="img-center img-fluid" width="200">
+                    <h4 class="mt-1">{{__('general.card_2')}}</h4>
+                    <p class="text-muted mt-1">{{__('general.desc_card_2')}}</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4" >
+                <div class="text-center">
+                    <img src="{{url('public/img', $settings->img_3)}}" class="img-center img-fluid" width="200">
+                    <h4 class="mt-1">{{__('general.card_3')}}</h4>
+                    <p class="text-muted mt-1">{{__('general.desc_card_3')}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+
+
+  <!-- Create profile -->
+  
+  
+<div class="section py-5 py-large" style="background-color: #000000; color: #FFFFFF;">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-12 col-lg-7 text-center mb-3">
+        <img src="{{url('public/img', $settings->img_4)}}" alt="User" class="img-fluid">
+      </div>
+      <div class="col-12 col-lg-5">
+        <h1 class="m-0 card-profile">{{__('general.header_box_3')}}</h1>
+        <div class="col-lg-9 col-xl-8 p-0">
+          <p class="py-4 m-0">{{__('general.desc_box_3')}}</p>
+        </div>
+        <a href="{{ $settings->registration_active == '1' ? url('signup') : url('login')}}" class="btn-arrow btn btn-lg btn-main btn-outline-primary btn-w px-4" style="color: #FFFFFF; border-color: #FFFFFF;">
+          {{__('general.getting_started')}}
+        </a>
+      </div>
+    </div>
+  </div>
+</div> 
+<!-- End Section -->
+
+
+
+
   @if ($settings->show_counter == 'on')
   <!-- Counter -->
-  <div class="section py-2 bg-gradient text-white">
-    <div class="container">
+  <div class="section py-2 bg-gradient style="background-color: #000000;"  text-white">
+    <div class="container" style="color: #ffffff;">
       <div class="row">
         <div class="col-md-4">
           <div class="d-flex py-3 my-1 my-lg-0 justify-content-center">
@@ -154,10 +382,10 @@
 
 @if ($settings->earnings_simulator == 'on')
 <!-- Earnings simulator -->
-<div class="section py-5 py-large">
-  <div class="container mb-4">
+<div class="section py-5 py-large" style="background-color: black; color: white;">
+  <div class="container mb-4" style="background-color: #000000; color: #FFFFFF;">
     <div class="btn-block text-center">
-      <h1 class="txt-black">{{__('general.earnings_simulator')}}</h1>
+      <h1>{{__('general.earnings_simulator')}}</h1>
       <p>
         {{__('general.earnings_simulator_subtitle')}}
       </p>
@@ -201,22 +429,25 @@
 </div>
 @endif
 
-    <div class="jumbotron m-0 text-white text-center bg-gradient">
-      <div class="container position-relative">
-        <h1>{{__('general.head_title_bottom')}}</h1>
-        <p>{{__('general.head_title_bottom_desc')}}</p>
-        <p>
-          <a href="{{url('creators')}}" class="btn btn-lg btn-main btn-outline-light btn-w-mb px-4 mr-2" role="button">{{__('general.explore')}}</a>
-          <a class="btn-arrow btn btn-lg btn-main btn-light btn-w px-4 toggleRegister" href="{{ $settings->registration_active == '1' ? url('signup') : url('login')}}" role="button">
-          {{__('general.getting_started')}}
-        </a>
-        </p>
-      </div>
-    </div>
+<div class="jumbotron m-0 text-white text-center bg-gradient" style="background-color: black;">
+  <div class="container position-relative">
+    <h1>{{__('general.head_title_bottom')}}</h1>
+    <p>{{__('general.head_title_bottom_desc')}}</p>
+    <p>
+      <a href="{{url('creators')}}" class="btn btn-lg btn-main btn-outline-light btn-w-mb px-4 mr-2" role="button">{{__('general.explore')}}</a>
+      <a class="btn-arrow btn btn-lg btn-main btn-light btn-w px-4 toggleRegister" href="{{ $settings->registration_active == '1' ? url('signup') : url('login')}}" role="button">
+      {{__('general.getting_started')}}
+    </a>
+    </p>
+  </div>
+</div>
 
 @endsection
 
 @section('javascript')
+
+
+
 
   @if ($settings->earnings_simulator == 'on')
   <script type="text/javascript">
@@ -300,5 +531,6 @@
 		});
     </script>
 	 @endif
+
 
 @endsection

@@ -7,11 +7,13 @@
 					</a>
 				</li>
 
+				@if (!$settings->disable_creators_section)
 				<li class="flex-fill bd-highlight">
 					<a class="p-3 btn-mobile" href="{{url('creators')}}" title="{{trans('general.explore')}}">
 						<i class="far	fa-compass icon-navbar"></i>
 					</a>
 				</li>
+				@endif
 
 			@if ($settings->shop)
 				<li class="flex-fill bd-highlight">

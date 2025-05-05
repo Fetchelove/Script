@@ -40,14 +40,19 @@
               <dd class="col-sm-10">{{$data->account}}</dd>
               @elseif ($data->gateway == 'Western Union')
               <dt class="col-sm-2 text-lg-end">{{ __('auth.full_name') }}</dt>
-              <dd class="col-sm-10">{{$data->user()->name}}</dd>
+              <dd class="col-sm-10">{{ $data->user()->name ?? __('general.no_available') }}</dd>
               <dt class="col-sm-2 text-lg-end">{{ __('general.country') }}</dt>
-              <dd class="col-sm-10">{{ $data->user()->countries_id != '' ? $data->user()->country()->country_name : __('general.no_available')}}</dd>
+              <dd class="col-sm-10">{{ isset($data->user()->countries_id) != '' ? $data->user()->country()->country_name : __('general.no_available')}}</dd>
               <dt class="col-sm-2 text-lg-end">{{ __('general.document_id') }}</dt>
               <dd class="col-sm-10">{{$data->account}}</dd>
               @elseif ($data->gateway == 'Bitcoin')
               <dt class="col-sm-2 text-lg-end">{{ __('general.bitcoin_wallet') }}</dt>
               <dd class="col-sm-10">{{$data->account}}</dd>
+              @elseif ($data->gateway == 'Mercado Pago')
+              <dt class="col-sm-2 text-lg-end">Alias MP</dt>
+              <dd class="col-sm-10">{{$data->account}}</dd>
+              <dt class="col-sm-2 text-lg-end">No. CVU</dt>
+              <dd class="col-sm-10">{{$data->user()->cvu ?? __('general.no_available') }}</dd>
               @else
               <dt class="col-sm-2 text-lg-end">{{ __('general.bank_details') }}</dt>
               <dd class="col-sm-10">{!!Helper::checkText($data->account)!!}</dd>
@@ -69,7 +74,7 @@
 
             </dl>
 
-            @if ($data->status == 'pending')
+            @if ($data->status == 'pending' && isset($data->user()->username))
             <form method="POST" action="{{ url('panel/admin/withdrawals/paid', $data->id) }}" enctype="multipart/form-data">
               @csrf
 						<div class="row mb-3">

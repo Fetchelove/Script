@@ -8,7 +8,7 @@ class Transactions extends Model
 {
     const UPDATED_AT = null;
 
-    protected $fillable = ['approved'];
+    protected $fillable = ['approved', 'gift_id'];
 
     public function user()
     {
@@ -23,5 +23,10 @@ class Transactions extends Model
     public function subscription()
     {
       return $this->belongsTo(Subscriptions::class, 'subscriptions_id')->first();
+    }
+
+    public function gift()
+    {
+      return $this->belongsTo(Gift::class)->where('status', true);
     }
 }

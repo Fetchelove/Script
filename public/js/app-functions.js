@@ -420,7 +420,8 @@ $(document).on('click','#avatar_file',function () {
 				 percent.html(percentVal).removeClass('text-success');
 
 				 $('#updateDescription').val('').css({height: '116px', transition: 'height .6s ease'});
-				  $('#filePhoto').val('');
+				  	$('#filePhoto').val('');
+					$('#ePubFile').val('');
 					$('#fileZip').val('');
 					$('#inputScheduled').val('');
 					$('#textPostPublish').html(publish);
@@ -443,8 +444,8 @@ $(document).on('click','#avatar_file',function () {
 
 					jQuery(".timeAgo").timeago();
 					$('.no-updates').remove();
-					$('#removePhoto, #dateScheduleContainer').hide();
-					$('#previewImage').html('');
+					$('#removePhoto, #dateScheduleContainer, #removeEpub').hide();
+					$('#previewImage, #previewEpub').html('');
 					$('#maximum').html(postLength).css({color: '#666', fontWeight: 'normal'});
 
 					$('#errorUdpate').fadeOut(500);
@@ -513,11 +514,12 @@ $(document).on('click','#avatar_file',function () {
 					 $('#updateDescription').val('').css({height: '116px', transition: 'height .6s ease'});
 					  $('#filePhoto').val('');
 						$('#fileZip').val('');
+						$('#ePubFile').val('');
 						$('#inputScheduled').val('');
 						$('#textPostPublish').html(publish);
 
-						$('#removePhoto, #dateScheduleContainer').hide();
-						$('#previewImage').html('');
+						$('#removePhoto, #dateScheduleContainer, #removeEpub').hide();
+						$('#previewImage, #previewEpub').html('');
 						$('#maximum').html(postLength).css({color: '#666', fontWeight: 'normal'});
 
 						$('#errorUdpate').fadeOut(500);
@@ -778,7 +780,7 @@ $(document).on('click','#avatar_file',function () {
 	  var characterCount = $(this).val().length,
 	      maximum = $('#maximum'),
 	      theCount = $('#the-count'),
-				postLength = $(this).attr('data-post-length');
+		  postLength = $(this).attr('data-post-length');
 
 	  maximum.text(postLength-characterCount);
 
@@ -1703,7 +1705,7 @@ $("#fileZip").on('change', function() {
 		 var ftype = $(this)[0].files[0].type; // get file type
 
 			if(!rFilter.test(oFile.type)) {
-			 $('#fileZip').val('');
+			 $(this).val('');
 				swal({
 				 title: error_oops,
 				 text: formats_available_upload_file,
@@ -1716,6 +1718,7 @@ $("#fileZip").on('change', function() {
 		 var allowed_file_size = file_size_allowed;
 
 		 if(fsize>allowed_file_size){
+			$(this).val('');
 			 swal({
 				title: error_oops,
 				text: max_size_id,
@@ -1725,7 +1728,7 @@ $("#fileZip").on('change', function() {
 			return false;
 		 }
 
-		 $('#previewImage').html('<i class="fa fa-paperclip text-info"></i> <strong>' + oFile.name + '</strong>');
+		 $('#previewImage').html('<strong><em>' + oFile.name + '</em></strong>');
 		 $('#removePhoto').show();
 
 	 }
@@ -1813,30 +1816,23 @@ $(document).on('click','.btnEditUpdate', function(s){
 				$('.popout').removeClass('popout-success').addClass('popout-error').html(error_occurred+' '+xhr+'').fadeIn('500').delay('5000').fadeOut('500');
 					 form.find('.blocked').hide();
 					 element.find('i').removeClass('spinner-border spinner-border-sm align-middle mr-1');
+					 $('#successUpdatePost').hide();
 			 },
 			 success: function(result) {
 
 			 //===== SUCCESS =====//
 			 if (result.success) {
-
-				 $('.modalEditPost').modal('hide');
 				 element.find('i').removeClass('spinner-border spinner-border-sm align-middle mr-1');
 				 element.removeAttr('disabled');
 				 form.find('.blocked').hide();
-
-				 if (result.locked == 'yes') {
-				 	element.parents('.card-updates').find('.type-post').html('<i class="feather icon-lock mr-1"></i> '+result.price+'').attr({'title' : locked_post});
-				} else {
-					element.parents('.card-updates').find('.type-post').html('<i class="iconmoon icon-WorldWide mr-1"></i>').attr({'title' : public_post});
-				}
-
-				 element.parents('.card-updates').find('.update-text').html(result.description);
-
 				 form.find('.errorUdpate').hide();
+
+				 window.location.href = result.url;
 
 				}//<-- e
 			else {
 				form.find('.blocked').hide();
+				$('#successUpdatePost').hide();
 
 				var error = '';
 				var $key = '';
@@ -3035,5 +3031,63 @@ $('.requestLivePrivateModal').on('click', function () {
 	}
 
 	readMoreText();
+
+//======= Upload EPUB File
+$("#ePubFile").on('change', function() {
+
+	$('#previewEpub').html('');
+	$('#removeEpub').hide();
+   
+	var loaded = false;
+	if(window.File && window.FileReader && window.FileList && window.Blob) {
+			//check empty input filed
+		if($(this).val()) {
+			   var oFReader = new FileReader(), rFilter = /^(?:application\/epub\+zip)$/i;
+			if($(this)[0].files.length === 0){return}
+   
+			var oFile = $(this)[0].files[0];
+			var fsize = $(this)[0].files[0].size; //get file size
+			var ftype = $(this)[0].files[0].type; // get file type
+      
+			   if(!rFilter.test(oFile.type)) {
+				$(this).val('');
+				   swal({
+					title: error_oops,
+					text: invalid_format_epub,
+					type: "error",
+					confirmButtonText: ok
+					});
+				return false;
+			}
+   
+			var allowed_file_size = file_size_allowed;
+   
+			if(fsize>allowed_file_size){
+				$(this).val('');
+				swal({
+				   title: error_oops,
+				   text: max_size_id,
+				   type: "error",
+				   confirmButtonText: ok
+				   });
+			   return false;
+			}
+   
+			$('#previewEpub').html('<strong><em>' + oFile.name + '</em></strong>');
+			$('#removeEpub').show();
+   
+		}
+	} else{
+		alert('Can\'t upload! Your browser does not support File API! Try again with modern browsers like Chrome or Firefox.');
+		return false;
+	}
+   });
+   //======= Upload File EPUB
+
+	$('#removeEpub').on('click', function () {
+		$('#ePubFile').val('');
+		$('#previewEpub').html('');
+		$(this).hide();
+	});
 
 })(jQuery);

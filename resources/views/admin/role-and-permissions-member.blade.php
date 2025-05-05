@@ -132,7 +132,7 @@
 						<div class="row mb-3">
 							<div class="col-sm-10 offset-sm-2">
 								<div class="form-check">
-									<input class="form-check-input check" name="permissions[]" value="maintenance" @if (isset($permissions) && in_array('maintenance', $permissions)) checked="checked" @endif type="checkbox" id="gridCheck5">
+									<input class="form-check-input check" name="permissions[]" value="maintenance_mode" @if (isset($permissions) && in_array('maintenance_mode', $permissions)) checked="checked" @endif type="checkbox" id="gridCheck5">
 									<label class="form-check-label" for="gridCheck5">
 										{{ __('admin.maintenance_mode') }}
 									</label>
@@ -377,6 +377,17 @@
 									<input class="form-check-input check" name="permissions[]" value="advertising" @if (isset($permissions) && in_array('advertising', $permissions)) checked="checked" @endif type="checkbox" id="advertising">
 									<label class="form-check-label" for="advertising">
 										{{ __('general.advertising') }}
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div class="row mb-3">
+							<div class="col-sm-10 offset-sm-2">
+								<div class="form-check">
+									<input class="form-check-input check" name="permissions[]" value="gifts" @if (isset($permissions) && in_array('gifts', $permissions)) checked="checked" @endif type="checkbox" id="gifts">
+									<label class="form-check-label" for="gifts">
+										{{ __('general.gifts') }}
 									</label>
 								</div>
 							</div>

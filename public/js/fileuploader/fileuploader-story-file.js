@@ -5,7 +5,45 @@ $(document).ready(function () {
         fileMaxSize: maxSizeInMb,
         extensions: extensionsStories,
 
-        captions: lang,
+        captions: {
+            button: function () {
+                return browse_file;
+            },
+            feedback: function () {
+                return choose_file_to_upload;
+            },
+            feedback2: function (options) {
+                return options.length + ' ' + (options.length > 1 ? more_files_chosen : one_file_chosen);
+            },
+
+            confirmDelete: confirmDelete,
+            cancel: cancelUpload,
+            name: nameFile,
+            type: typeFile,
+            size: sizeFile,
+            dimensions: dimensionsFile,
+            duration: durationFile,
+            crop: cropFile,
+            rotate: rotateFile,
+            sort: sortFiles,
+            download: downloadFile,
+            remove: removeFile,
+            drop: dropFiles,
+            paste: '<div class="fileuploader-pending-loader"></div> ' + pasteFiles,
+            removeConfirmation: removeConfirmation,
+            errors: {
+                filesLimit: function (options) {
+                    return filesLimit + ' ${limit} ' + (options.limit == 1 ? iFile : iFiles)
+                },
+                filesType: filesType + ' ${extensions}',
+                fileSize: '${name} ' + fileSize + ' ${fileMaxSize}MB.',
+                filesSizeAll: filesSizeAll + ' ${maxSize} MB.',
+                fileName: fileName + ' (${name})',
+                remoteFile: remoteFile,
+                folderUpload: folderUpload
+            }
+        },
+
         dialogs: {
             // alert dialog
             alert: function (text) {

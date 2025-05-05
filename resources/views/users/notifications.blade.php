@@ -223,6 +223,12 @@
                 $iconNotify      = 'bi-bug';
                 $notyNormal      = false;
                 break;
+
+              case 26:
+        				$action          = __('general.he_sent_you_tip');
+        				$linkDestination = url('my/payments/received');
+                $text_link       = __('general.gift');
+        				break;
         		}
 
         ?>
@@ -271,8 +277,7 @@
 
     <?php } //foreach ?>
 
-    @if (count($notifications) == 0)
-
+    @if ($notifications->isEmpty())
       <div class="my-5 text-center">
         <span class="btn-block mb-3">
           <i class="far fa-bell-slash ico-no-result"></i>
@@ -357,12 +362,10 @@
               </small>
               @endif
               
-              @if (auth()->user()->verified_id == 'yes' && $settings->disable_new_post_notification || ! $settings->disable_new_post_notification)
                 <div class="mt-3">
                   <h6 class="position-relative">{{__('general.email_notification')}}
                   </h6>
                 </div>
-              @endif
 
                 @if (auth()->user()->verified_id == 'yes')
                   <div class="custom-control custom-switch">
@@ -387,6 +390,11 @@
                   <label class="custom-control-label switch" for="customSwitch6">{{ __('general.new_post_creators_subscribed') }}</label>
                 </div>
               @endif
+
+              <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" name="email_new_message" value="1" @checked(auth()->user()->email_new_message) id="customNewMessageEmail">
+                <label class="custom-control-label switch" for="customNewMessageEmail">{{ __('general.someone_sent_message') }}</label>
+              </div>
 
                 <button type="submit" id="save" data-msg-success="{{ __('admin.success_update') }}" class="btn btn-primary btn-sm mt-3 w-100" data-msg="{{__('admin.save')}}">
                   {{__('admin.save')}}

@@ -18,6 +18,7 @@
       var yes = "{{__('general.yes')}}";
       var cancel_confirm = "{{__('general.cancel_confirm')}}";
       var timezone = "{{config('app.timezone')}}";
+      var please_wait = "{{__('general.please_wait')}}";
       var add_tag = "{{ __("general.add_tag") }}";
       var choose_image = '{{__('general.choose_image')}}';
       var formats_available = "{{ __('general.formats_available_verification_form_w9', ['formats' => 'JPG, PNG, GIF, SVG']) }}";
@@ -194,6 +195,14 @@
               </li><!-- /end list -->
               @endif
 
+              @if (auth()->user()->hasPermission('gifts'))
+              <li class="nav-item">
+                  <a href="{{ url('panel/admin/gifts') }}" class="nav-link text-truncate @if (request()->is('panel/admin/gifts')) active @endif">
+                      <i class="bi-gift me-2"></i> {{ __('general.gifts') }}
+                  </a>
+              </li><!-- /end list -->
+              @endif
+
               @if (auth()->user()->hasPermission('comments_replies'))
               <li class="nav-item">
                   <a href="#comments_replies" data-bs-toggle="collapse" class="nav-link text-truncate dropdown-toggle @if (request()->is(['panel/admin/comments', 'panel/admin/replies'])) active @endif" @if (request()->is(['panel/admin/comments', 'panel/admin/replies'])) aria-expanded="true" @endif>
@@ -232,7 +241,7 @@
               </li><!-- /end list -->
             @endif
 
-              @if (auth()->user()->hasPermission('maintenance'))
+              @if (auth()->user()->hasPermission('maintenance_mode'))
               <li class="nav-item">
                   <a href="{{ url('panel/admin/maintenance/mode') }}" class="nav-link text-truncate @if (request()->is('panel/admin/maintenance/mode')) active @endif">
                       <i class="bi bi-tools me-2"></i> {{ __('admin.maintenance_mode') }}

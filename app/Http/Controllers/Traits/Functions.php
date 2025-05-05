@@ -6,23 +6,30 @@ use DB;
 use App\Helper;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Media;
 use App\Models\Plans;
+use App\Models\Updates;
 use App\Models\Deposits;
 use App\Models\Messages;
 use App\Models\TaxRates;
+use App\Jobs\EncodeVideo;
 use App\Models\Countries;
 use App\Models\Referrals;
 use App\Models\PayPerViews;
 use App\Models\Withdrawals;
+use Illuminate\Support\Str;
 use App\Models\Transactions;
 use App\Models\AdminSettings;
 use App\Models\LoginSessions;
+use App\Models\MediaMessages;
 use App\Models\Notifications;
 use App\Models\Subscriptions;
 use App\Models\TwoFactorCodes;
 use App\Models\PaymentGateways;
 use App\Notifications\TipReceived;
 use App\Models\ReferralTransactions;
+use App\Services\CoconutVideoService;
+use Illuminate\Support\Facades\Storage;
 use App\Notifications\SendTwoFactorCode;
 use App\Actions\SendWelcomeMessageAction;
 use App\Notifications\PayPerViewReceived;
@@ -42,10 +49,6 @@ trait Functions
 				->whereFreeSubscription('yes')
 				->whereHideProfile('no')
 				->where('blocked_countries', 'NOT LIKE', '%' . Helper::userCountry() . '%')
-				->with([
-					'media' => fn ($q) =>
-					$q->select('type')
-				])
 				->orderByRaw('rand( ' . time() . ' * ' . time() . ')')
 				->take(3)
 				->get();
@@ -68,10 +71,6 @@ trait Functions
 			->whereFreeSubscription('yes')
 			->whereHideProfile('no')
 			->where('blocked_countries', 'NOT LIKE', '%' . Helper::userCountry() . '%')
-			->with([
-				'media' => fn ($q) =>
-				$q->select('type')
-			])
 			->orderByRaw('rand( ' . time() . ' * ' . time() . ')')
 			->take(3)
 			->get();
@@ -440,7 +439,6 @@ trait Functions
 						}
 
 						if ($earningNetUser != 0) {
-							// Insert User Earning
 							$newTransaction = new ReferralTransactions();
 							$newTransaction->referrals_id = $referred->id;
 							$newTransaction->user_id = $referred->user_id;
@@ -572,12 +570,14 @@ trait Functions
 		}
 
 		// Insert DB
-		$sql          = new Subscriptions();
+		$sql = new Subscriptions();
 		$sql->creator_id = $admin->id;
 		$sql->user_id = $user;
 		$sql->stripe_price = $admin->plan;
 		$sql->free = 'yes';
 		$sql->save();
+
+		$this->sendWelcomeMessageAction($admin, $user);
 
 		if ($admin->notify_new_subscriber == 'yes') {
 			// Send Notification to User --- destination, author, type, target
@@ -668,12 +668,12 @@ trait Functions
 	{
 		$message = new Messages();
 		$message->conversations_id = 0;
-		$message->from_user_id    = $fromUserId;
-		$message->to_user_id      = $userId;
-		$message->message         = '';
-		$message->updated_at      = now();
-		$message->tip             = 'yes';
-		$message->tip_amount      = $amount;
+		$message->from_user_id = $fromUserId;
+		$message->to_user_id = $userId;
+		$message->message = '';
+		$message->updated_at = now();
+		$message->tip = 'yes';
+		$message->tip_amount = $amount;
 		$message->save();
 	}
 
@@ -726,5 +726,121 @@ trait Functions
 	public function sendWelcomeMessageAction($creator, $userId)
 	{
 		(new SendWelcomeMessageAction())->execute($creator, $userId);
+	}
+
+	public function uploadMediaFileMsg($request, $msgId, $type = 'zip')
+	{
+		$file = $this->getDataMedia($request)->file;
+
+		$request->storePubliclyAs(config('path.messages'), $file);
+
+		MediaMessages::create([
+			'messages_id' => $msgId,
+			'type' => $type,
+			'file' => $file,
+			'file_name' => $this->getDataMedia($request)->originalName,
+			'file_size' => $this->getDataMedia($request)->size,
+			'token' => $this->mediaToken(),
+			'status' => 'active',
+			'created_at' => now()
+		  ]);
+	}
+
+	public function uploadMediaFile($request, $postId, $type = 'file')
+	{
+		$this->deleteOldMediaFile($postId, $type);
+
+		$file = $this->getDataMedia($request)->file;
+
+		$request->storePubliclyAs(config('path.files'), $file);
+
+		Media::create([
+			'updates_id' => $postId,
+			'user_id' => auth()->id(),
+			'type' => $type,
+			'image' => '',
+			'video' => '',
+			'video_embed' => '',
+			'music' => '',
+			'file' => $file,
+			'file_name' => $this->getDataMedia($request)->originalName,
+			'file_size' => $this->getDataMedia($request)->size,
+			'img_type' => '',
+			'token' => $this->mediaToken(),
+			'status' => 'active',
+			'created_at' => now()
+		]);
+	}
+
+	protected function deleteOldMediaFile($postId, $type)
+	{
+		$query = Media::whereUpdatesId($postId)->whereType($type)->first();
+
+		if ($query) {
+			Storage::delete(config('path.files') . $query->file);
+
+			$query->delete();
+		}
+	}
+
+	public function getDataMedia($request)
+	{
+		$file = $request;
+		$extension = $file->getClientOriginalExtension();
+		$size = Helper::formatBytes($file->getSize(), 1);
+		$originalName = Helper::fileNameOriginal($file->getClientOriginalName());
+		$fileName = strtolower(auth()->id() . time() . Str::random(20) . '.' . $extension);
+
+		$data = [
+			'size' => $size,
+			'originalName' => $originalName,
+			'file' => $fileName
+		];
+
+		return (object) $data;
+	}
+
+	protected function mediaToken()
+	{
+		return Str::random(150) . uniqid() . now()->timestamp;
+	}
+
+	public function getAllVideosEncode($videos, $postId, $editing = false)
+	{
+		try {
+			foreach ($videos as $video) {
+				if (config('settings.encoding_method') == 'ffmpeg') {
+					$this->dispatch(new EncodeVideo($video));
+				} else {
+					CoconutVideoService::handle($video, 'post');
+				}
+			}
+
+			// Change status Pending to Encode
+			Updates::whereId($postId)->update([
+				'status' => 'encode',
+				'editing' => $editing ? 1 : 0
+			]);
+
+			if ($editing) {
+				return response()->json([
+					'success' => true,
+					'url' => route('post.edit.pending'),
+				]);
+			}
+
+			return response()->json([
+				'success' => true,
+				'pending' => true,
+				'encode' => true
+			]);
+		} catch (\Exception $e) {
+			\Log::info($e->getMessage());
+
+			return response()->json([
+				'success' => false,
+				'errors' => ['error' => $e->getMessage()],
+			]);
+		}
 	}
 }

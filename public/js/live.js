@@ -215,12 +215,11 @@
 
 	// Hide Top Menu y Chat
 	$(document).on('click', '#full-screen-video', function (e) {
-
 		if ($(window).width() <= 767) {
 			$('.liveContainerFullScreen').toggleClass('controls-hidden');
 
 			if ($('.liveContainerFullScreen').hasClass('controls-hidden')) {
-				$(".live-top-menu").animate({ "top": "-80px" }, "fast");
+				$(".live-top-menu").animate({ "top": "-90px" }, "fast");
 				$(".wrapper-live-chat").animate({ "bottom": "-250px" }, "fast");
 
 			} else {

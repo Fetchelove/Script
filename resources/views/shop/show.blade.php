@@ -112,27 +112,57 @@
     	</div><!-- end card -->
 
       <h3>
-        {{ Helper::amountFormatDecimal($product->price) }} <small>{{ $settings->currency_code }}</small>
+        @if  ($product->price === '0.00')
+        {{ __('general.free') }}
+        @else
+          {{ Helper::amountFormatDecimal($product->price) }} 
+          <small>{{ $settings->currency_code }}</small>
+        @endif
       </h3>
 
       @if (auth()->check()
           && auth()->id() != $product->user()->id
           && ! $verifyPurchaseUser
+          && $product->price !== '0.00'
           || auth()->check()
           && auth()->id() != $product->user()->id
           && $verifyPurchaseUser
           && $product->type == 'custom'
+          && $product->price !== '0.00'
           || auth()->check()
           && auth()->id() != $product->user()->id
           && $verifyPurchaseUser
           && $product->type == 'physical'
+          && $product->price !== '0.00'          
           || auth()->guest()
           )
-      <button class="btn btn-1 btn-primary btn-block mt-4" @if ($product->quantity == 0 && $product->type == 'physical') disabled @endif type="button" data-toggle="modal" @auth data-target="#buyNowForm" @else data-target="#loginFormModal" @endauth>
-        {{ $product->quantity == 0 && $product->type == 'physical' ? __('general.sold_out') : __('general.buy_now') }}
-      </button>
 
-    @elseif (auth()->check() && auth()->id() != $product->user()->id && $verifyPurchaseUser && $product->type == 'digital')
+          @if ($product->external_link ==  '')
+            <button class="btn btn-1 btn-primary btn-block mt-4" @if ($product->quantity == 0 && $product->type == 'physical') disabled @endif type="button" data-toggle="modal" @auth data-target="#buyNowForm" @else data-target="#loginFormModal" @endauth>
+
+              @if  ($product->price === '0.00')
+              {{ __('general.download') }}
+              @else
+              {{ $product->quantity == 0 && $product->type == 'physical' ? __('general.sold_out') : __('general.buy_now') }}
+              @endif
+            </button>
+          @endif
+
+          @if ($product->external_link !=  '')
+              <a class="btn btn-1 btn-primary btn-block mt-4" href="{{ $product->external_link }}" target="_blank">
+                {{ __('general.buy_now') }} <i class="bi-box-arrow-up-right ml-1"></i>
+              </a>
+              <div class="d-block small w-100 text-center mt-1">
+                <i class="bi-exclamation-triangle mr-1"></i> {{ __('general.info_external_link') }}
+              </div>
+          @endif
+
+      @elseif (auth()->check() && auth()->id() != $product->user()->id && $verifyPurchaseUser && $product->type == 'digital')
+      <a class="btn btn-1 btn-primary btn-block mt-4" href="{{ url('product/download', $product->id) }}">
+        {{ __('general.download') }}
+      </a>
+
+    @elseif (auth()->check() && auth()->id() != $product->user()->id && $product->price === '0.00')
       <a class="btn btn-1 btn-primary btn-block mt-4" href="{{ url('product/download', $product->id) }}">
         {{ __('general.download') }}
       </a>
@@ -153,9 +183,17 @@
 
     @endif
 
+    @if ($product->price !== '0.00' && $product->external_link ==  '')
       <div class="w-100 d-block mt-3">
         <i class="bi-cart2 mr-2"></i> {{ __('general.purchases') }} ({{ $product->purchases()->count() }})
       </div>
+      @endif
+
+      @if ($product->price === '0.00')
+      <div class="w-100 d-block mt-3">
+        <i class="bi-download mr-2"></i> {{ __('general.downloads') }} ({{ $product->downloads }})
+      </div>
+      @endif
 
       @if ($product->type == 'digital')
         <div class="w-100 d-block mt-3">
@@ -322,7 +360,7 @@
 
     	 </div>
 
-       @foreach ($userProducts->where('id', '<>', $product->id)->take(3)->inRandomOrder()->get() as $product)
+       @foreach ($userProducts->where('id', '<>', $product->id)->take(3)->latest()->get() as $product)
        <div class="col-md-4 mb-4">
          @include('shop.listing-products')
        </div><!-- end col-md-4 -->

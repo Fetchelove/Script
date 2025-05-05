@@ -133,6 +133,17 @@ class UserController extends Controller
       ->whereSubscribed(auth()->id())
       ->sum('earning_net_user');
 
+    $subscriptions = auth()->user()->mySubscriptions()
+      ->with('subscriber:id,username,avatar,name')
+      ->latest()
+      ->take(3)
+      ->get();
+
+    $transactions = auth()->user()->myPaymentsReceived()
+      ->orderBy('id', 'desc')
+      ->take(4)
+      ->get();
+
     return view('users.dashboard', [
       'earningNetUser' => $earningNetUser,
       'earningNetSubscriptions' => $earningNetSubscriptions,
@@ -146,29 +157,23 @@ class UserController extends Controller
       'stat_revenue_week' => $stat_revenue_week,
       'stat_revenue_last_week' => $stat_revenue_last_week,
       'stat_revenue_month' => $stat_revenue_month,
-      'stat_revenue_last_month' => $stat_revenue_last_month
+      'stat_revenue_last_month' => $stat_revenue_last_month,
+      'subscriptions' => $subscriptions,
+      'transactions' => $transactions
     ]);
   }
 
   public function profile($slug, $media = null)
   {
-    $media = request('media');
-    $mediaTitle = null;
-    $sortPostByTypeMedia = null;
+    $user = User::whereUsername($slug)
+      ->whereStatus('active')
+      ->orWhere('status', 'disabled')
+      ->whereUsername($slug)
+      ->firstOrFail();
 
-    if (isset($media)) {
-      $mediaTitle = __('general.' . $media . '') . ' - ';
-      $sortPostByTypeMedia = '&media=' . $media;
-      $media = '/' . $media;
+    if ($user->status == 'disabled') {
+      return view('errors.profile-disabled');
     }
-
-    // All Payments
-    $allPayment = PaymentGateways::where('enabled', '1')->whereSubscription('yes')->get();
-
-    // Stripe Key
-    $_stripe = PaymentGateways::whereName('Stripe')->where('enabled', '1')->select('key')->first();
-
-    $user = User::where('username', $slug)->whereStatus('active')->firstOrFail();
 
     if ($media && $user->verified_id != 'yes') {
       abort(404);
@@ -200,6 +205,21 @@ class UserController extends Controller
     ) {
       abort(404);
     }
+    $media = request('media');
+    $mediaTitle = null;
+    $sortPostByTypeMedia = null;
+
+    if (isset($media)) {
+      $mediaTitle = __('general.' . $media . '') . ' - ';
+      $sortPostByTypeMedia = '&media=' . $media;
+      $media = '/' . $media;
+    }
+
+    // All Payments
+    $allPayment = PaymentGateways::where('enabled', '1')->whereSubscription('yes')->get();
+
+    // Stripe Key
+    $_stripe = PaymentGateways::whereName('Stripe')->where('enabled', '1')->select('key')->first();
 
     if (isset($media)) {
       $query = $user->media();
@@ -235,7 +255,12 @@ class UserController extends Controller
 
     //=== Files
     $query->when(request('media') == 'files', function ($q) {
-      $q->where('media.file', '<>', '');
+      $q->where('media.type', 'file');
+    });
+
+    //=== Epub
+    $query->when(request('media') == 'epub', function ($q) {
+      $q->where('media.type', 'epub');
     });
 
     // Sort by older
@@ -360,6 +385,7 @@ class UserController extends Controller
       'totalVideos' => $user->media()->where('media.type', 'video')->count(),
       'totalMusic' => $user->media()->where('media.type', 'music')->count(),
       'totalFiles' => $user->media()->where('media.type', 'file')->count(),
+      'totalEpub' => $user->media()->where('media.type', 'epub')->count(),
       '_stripe' => $_stripe,
       'checkSubscription' => $checkSubscription ?? null,
       'media' => $media,
@@ -383,7 +409,7 @@ class UserController extends Controller
     $user = User::where('username', '=', $slug)
       ->where('status', 'active')
       ->with([
-        'updatesPostDetail' => fn($query) =>
+        'updatesPostDetail' => fn ($query) =>
         $query->getSelectRelations()
           ->whereId($id)
           ->where('status', '<>', 'encode')
@@ -570,6 +596,7 @@ class UserController extends Controller
     $user->email_new_ppv = $this->request->email_new_ppv ?? 'no';
     $user->notify_live_streaming = $this->request->notify_live_streaming ?? 'no';
     $user->notify_mentions = $this->request->notify_mentions ?? 'no';
+    $user->email_new_message = $this->request->email_new_message;
     $user->save();
 
     return response()->json([
@@ -634,6 +661,9 @@ class UserController extends Controller
     $subscriptions = auth()->user()->userSubscriptions()
       ->with('creator:id,avatar,username,name,plan')
       ->latest()
+      ->whereIn('id', function ($q) {
+        $q->selectRaw('MAX(id) FROM subscriptions GROUP BY creator_id, user_id');
+      })
       ->paginate(20)->onEachSide(1);
 
     return view('users.my_subscriptions')->withSubscriptions($subscriptions);
@@ -669,6 +699,7 @@ class UserController extends Controller
       && $this->request->type != 'zelle'
       && $this->request->type != 'western'
       && $this->request->type != 'bitcoin'
+      && $this->request->type != 'mercadopago'
     ) {
       return redirect('settings/payout/method');
     }
@@ -768,6 +799,30 @@ class UserController extends Controller
       return redirect('settings/payout/method')->withInput();
     } // Validate Bitcoin
 
+    // Validate Western
+    elseif ($this->request->type == 'mercadopago') {
+      $messages = [
+        'alias_mp.required' => __('validation.required', ['attribute' => 'Alias MP']),
+        'cvu.required' => __('validation.required', ['attribute' => 'Nro. CVU']),
+      ];
+
+      $rules = [
+        'alias_mp' => 'required',
+        'cvu' => 'required',
+      ];
+
+      $this->validate($this->request, $rules, $messages);
+
+      auth()->user()->update([
+        'alias_mp' => $this->request->alias_mp,
+        'cvu' => $this->request->cvu,
+        'payment_gateway' => 'Mercado Pago'
+      ]);
+
+      \Session::flash('status', __('admin.success_update'));
+      return redirect('settings/payout/method')->withInput();
+    } // Validate Western
+
     // Validate Bank
     elseif ($this->request->type == 'bank') {
 
@@ -845,6 +900,7 @@ class UserController extends Controller
       'reddit' => 'url',
       'spotify' => 'url',
       'threads' => 'url',
+      'kick' => 'url',
       'story' => 'required_if:is_creator,==,0|max:' . $this->settings->story_length . '',
       'countries_id' => 'required',
       'city' => 'max:100',
@@ -893,6 +949,7 @@ class UserController extends Controller
     $user->reddit          = trim($this->request->reddit) ?? '';
     $user->spotify         = trim($this->request->spotify) ?? '';
     $user->threads         = trim($this->request->threads) ?? '';
+    $user->kick            = trim($this->request->kick) ?? '';
     $user->plan            = 'user_' . auth()->id();
     $user->gender          = $this->request->gender;
     $user->birthdate       = auth()->user()->birthdate_changed == 'no' ? Carbon::createFromFormat(Helper::formatDatepicker(), $this->request->birthdate)->format('m/d/Y') : auth()->user()->birthdate;
@@ -1146,7 +1203,7 @@ class UserController extends Controller
     //<--- HASFILE PHOTO
     if ($this->request->hasFile('avatar')) {
       $photo     = $this->request->file('avatar');
-      $extension = $this->request->file('avatar')->getClientOriginalExtension();
+      $extension = $this->request->file('avatar')->extension();
       $avatar    = strtolower(auth()->user()->username . '-' . auth()->id() . time() . str_random(10) . '.' . $extension);
 
       $imgAvatar = Image::make($photo)->orientate()->fit(200, 200, function ($constraint) {
@@ -1172,12 +1229,10 @@ class UserController extends Controller
     } //<--- HASFILE PHOTO
   }
 
-  public function uploadCover(Request $request)
+  public function uploadCover()
   {
-    $settings  = AdminSettings::first();
-
     $validator = Validator::make($this->request->all(), [
-      'image' => 'required|mimes:jpg,gif,png,jpe,jpeg|dimensions:min_width=800,min_height=400|max:' . $settings->file_size_allowed . '',
+      'image' => 'required|mimes:jpg,gif,png,jpe,jpeg|dimensions:min_width=800,min_height=400|max:' . config('settings.file_size_allowed') . '',
     ]);
 
     if ($validator->fails()) {
@@ -1187,28 +1242,21 @@ class UserController extends Controller
       ]);
     }
 
-    // PATHS
-    $path = config('path.cover');
-
     //<--- HASFILE PHOTO
     if ($this->request->hasFile('image')) {
-      $photo       = $this->request->file('image');
+      $photo = $this->request->file('image');
       $widthHeight = getimagesize($photo);
-      $extension   = $photo->getClientOriginalExtension();
-      $cover       = strtolower(auth()->user()->username . '-' . auth()->id() . time() . str_random(10) . '.' . $extension);
+      $extension = $photo->extension();
+      $cover = strtolower(auth()->user()->username . '-' . auth()->id() . time() . str_random(10) . '.' . $extension);
 
       //=============== Image Large =================//
-      $width     = $widthHeight[0];
-      $height    = $widthHeight[1];
+      $width = $widthHeight[0];
+      $height = $widthHeight[1];
       $max_width = $width < $height ? 800 : 1900;
 
-      if ($width > $max_width) {
-        $coverScale = $max_width / $width;
-      } else {
-        $coverScale = 1;
-      }
+      $coverScale = $width > $max_width ? $max_width / $width : 1;
 
-      $scale    = $coverScale;
+      $scale = $coverScale;
       $widthCover = ceil($width * $scale);
 
       $imgCover = Image::make($photo)->orientate()->resize($widthCover, null, function ($constraint) {
@@ -1217,10 +1265,9 @@ class UserController extends Controller
       })->encode($extension);
 
       // Copy folder
-      Storage::put($path . $cover, $imgCover);
+      Storage::put(config('path.cover') . $cover, $imgCover);
 
       if (auth()->user()->cover != $this->settings->cover_default) {
-        //<<<-- Delete old image -->>>/
         Storage::delete(config('path.cover') . auth()->user()->cover);
       }
 
@@ -1229,9 +1276,9 @@ class UserController extends Controller
 
       return response()->json([
         'success' => true,
-        'cover' => Helper::getFile($path . $cover),
+        'cover' => Helper::getFile(config('path.cover') . $cover),
       ]);
-    } //<--- HASFILE PHOTO
+    }
   }
 
   public function withdrawals()
@@ -1269,6 +1316,10 @@ class UserController extends Controller
 
         case 'Bitcoin':
           $_account = auth()->user()->crypto_wallet;
+          break;
+
+        case 'Mercado Pago':
+          $_account = auth()->user()->alias_mp;
           break;
 
         case 'Bank':
@@ -1364,27 +1415,26 @@ class UserController extends Controller
 
   public function deleteImageCover()
   {
-    $path  = config('path.cover');
-    $cover = auth()->user()->cover;
+    $user = auth()->user();
+    $cover = $user->cover;
     $coverDefault = config('settings.cover_default');
 
-    if ($cover == $coverDefault || empty($cover)) {
+    if (empty($cover)) {
       return response()->json([
         'error' => true,
         'message' => __('general.action_not_allowed')
       ]);
     }
 
-    // Image Cover
-    \Storage::delete($path . $cover);
+    if ($cover !== $coverDefault) {
+      \Storage::delete(config('path.cover') . $cover);
+    }
 
-    auth()->user()->update([
-      'cover' => $coverDefault ?? ''
-    ]);
+    $user->update(['cover' => '']);
 
     return response()->json([
       'success' => true,
-      'cover' => $coverDefault ? Helper::getFile($path . $coverDefault) : null
+      'cover' => null
     ]);
   }
 
@@ -1501,12 +1551,12 @@ class UserController extends Controller
     } else {
       return response()->json(['error' => 1]);
     }
-  } //<---- * End Method
+  }
 
   public function verifyAccount()
   {
     return view('users.verify_account');
-  } //<---- * End Method
+  }
 
   public function verifyAccountSend()
   {
@@ -1544,6 +1594,7 @@ class UserController extends Controller
       'image_reverse' => 'required|mimes:jpg,gif,png,jpe,jpeg,zip|max:' . $this->settings->file_size_allowed_verify_account . '',
       'image_selfie' => 'required|mimes:jpg,gif,png,jpe,jpeg,zip|max:' . $this->settings->file_size_allowed_verify_account . '',
       'form_w9'  => 'required_if:isUSCitizen,==,1|mimes:pdf|max:' . $this->settings->file_size_allowed_verify_account . '',
+      'agree_terms_privacy' => 'required',
     ], $messages);
 
     if ($validator->fails()) {
@@ -1557,28 +1608,28 @@ class UserController extends Controller
 
     // Image ID (Front)
     if ($this->request->hasFile('image')) {
-      $extension = $this->request->file('image')->getClientOriginalExtension();
+      $extension = $this->request->file('image')->extension();
       $fileImage = strtolower(auth()->id() . time() . Str::random(40) . '.' . $extension);
       $this->request->file('image')->storePubliclyAs($path, $fileImage);
     } //<====== End HasFile
 
     // Image ID (Reverse)
     if ($this->request->hasFile('image_reverse')) {
-      $extension = $this->request->file('image_reverse')->getClientOriginalExtension();
+      $extension = $this->request->file('image_reverse')->extension();
       $fileImageReverse = 'reverse-' . strtolower(auth()->id() . time() . Str::random(40) . '.' . $extension);
       $this->request->file('image_reverse')->storePubliclyAs($path, $fileImageReverse);
     } //<====== End HasFile
 
     // Image ID (Selfie)
     if ($this->request->hasFile('image_selfie')) {
-      $extension = $this->request->file('image_selfie')->getClientOriginalExtension();
+      $extension = $this->request->file('image_selfie')->extension();
       $fileImageSelfie = 'selfie-' . strtolower(auth()->id() . time() . Str::random(40) . '.' . $extension);
       $this->request->file('image_selfie')->storePubliclyAs($path, $fileImageSelfie);
     } //<====== End HasFile
 
     // Form W9 US citizen
     if ($this->request->hasFile('form_w9')) {
-      $extension = $this->request->file('form_w9')->getClientOriginalExtension();
+      $extension = $this->request->file('form_w9')->extension();
       $fileFormW9 = strtolower(auth()->id() . time() . Str::random(40) . '.' . $extension);
       $this->request->file('form_w9')->storePubliclyAs($path, $fileFormW9);
     } //<====== End HasFile
@@ -1695,7 +1746,6 @@ class UserController extends Controller
     return redirect($creator->username);
   }
 
-  // Delete Account
   public function deleteAccount()
   {
     if (auth()->user()->isSuperAdmin()) {
@@ -1711,7 +1761,6 @@ class UserController extends Controller
     return redirect('/');
   }
 
-  // My Bookmarks
   public function myBookmarks()
   {
     $bookmarks = auth()->user()->bookmarks()
@@ -1752,7 +1801,7 @@ class UserController extends Controller
       }
     }
 
-    $media = Media::whereUpdatesId($post->id)->where('file', '<>', '')->firstOrFail();
+    $media = Media::whereUpdatesId($post->id)->whereType('file')->firstOrFail();
 
     $pathFile = config('path.files') . $media->file;
     $headers = [
@@ -1842,6 +1891,7 @@ class UserController extends Controller
     $user->active_status_online = $this->request->active_status_online ?? 'no';
     $user->two_factor_auth = $this->request->two_factor_auth ?? 'no';
     $user->posts_privacy = $this->request->posts_privacy;
+    $user->allow_comments = $this->request->allow_comments;
     $user->save();
 
     return redirect('privacy/security')->withStatus(__('admin.success_update'));
@@ -1936,12 +1986,11 @@ class UserController extends Controller
         $query->where('status', 'schedule');
       })
       ->when(request('sort') == 'pending', function ($query) {
-        $query->where('status', 'pending');
+        $query->whereIn('status', ['pending', 'encode']);
       })
       ->when(request('sort') == 'ppv', function ($query) {
         $query->where('price', '<>', 0.00);
       })
-      ->where('status', '<>', 'encode')
       ->orderBy('id', 'desc')
       ->paginate(15)->withQueryString();
 
@@ -2442,5 +2491,26 @@ class UserController extends Controller
     }
 
     return redirect()->back()->withStatus(__('admin.success_update'));
+  }
+
+  public function deactivateAccount()
+  {
+    if (auth()->user()->isSuperAdmin()) {
+      return redirect('privacy/security');
+    }
+
+    auth()->user()->update([
+      'status' => 'disabled'
+    ]);
+
+    auth()->logout();
+
+    return redirect('/');
+  }
+
+  public function postEditing()
+  {
+    return redirect()->route('my.posts', ['sort' => 'pending'])
+      ->withNotify(__('general.video_processed_info'));
   }
 }

@@ -4,6 +4,7 @@ namespace App\Listeners;
 
 use App\Helper;
 use App\Models\Messages;
+use Illuminate\Support\Str;
 use App\Models\MediaMessages;
 use App\Events\MassMessagesEvent;
 use Illuminate\Queue\InteractsWithQueue;
@@ -39,7 +40,11 @@ class MassMessagesListener implements ShouldQueue
     $file = $event->file;
     $originalName = $event->originalName;
     $size = $event->size;
-    $token = $event->token;
+
+    $hasFileEpub = $event->hasFileEpub;
+    $fileEpub = $event->fileEpub;
+    $originalNameEpub = $event->originalNameEpub;
+    $sizeEpub = $event->sizeEpub;
 
     // Get Subscriptions Active
     $subscriptionsActive = $user->mySubscriptions()
@@ -100,7 +105,21 @@ class MassMessagesListener implements ShouldQueue
           'file' => $file,
           'file_name' => $originalName,
           'file_size' => $size,
-          'token' => $token,
+          'token' => Str::random(150) . uniqid() . now()->timestamp,
+          'status' => 'active',
+          'created_at' => now()
+        ]);
+      }
+
+      if ($hasFileEpub) {
+        // We insert the file into the database
+        MediaMessages::create([
+          'messages_id' => $message->id,
+          'type' => 'epub',
+          'file' => $fileEpub,
+          'file_name' => $originalNameEpub,
+          'file_size' => $sizeEpub,
+          'token' => Str::random(150) . uniqid() . now()->timestamp,
           'status' => 'active',
           'created_at' => now()
         ]);

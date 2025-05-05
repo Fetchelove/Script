@@ -14,7 +14,7 @@
 			@if ($product->type == 'physical' && $product->quantity == 0)
 				{{ __('general.sold_out') }}
 			@else
-				{{ Helper::amountFormatDecimal($product->price) }}
+				{{ $product->price === '0.00' ? __('general.free') : Helper::amountFormatDecimal($product->price) }}
 			@endif
 		</span>
 	</div>

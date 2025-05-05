@@ -773,7 +773,7 @@ main>div.section:nth-child(odd){
  background-color:white;
 }
 main>div.section:nth-child(even){
- background-color:#fbfafd!important;
+ background-color:#000000!important;
 }
 .fixed-top {
   -webkit-transition: all 0.3s ease-out;
@@ -1312,9 +1312,6 @@ a:hover.button-avatar-upload {
 .message.bg-primary > a {
   color: #FFF !important;
   text-decoration: underline !important;
-}
-.content::-webkit-scrollbar {
-display: none;
 }
 .d-scrollbars {
   scrollbar-width: none; /* Firefox */

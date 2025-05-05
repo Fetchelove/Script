@@ -8,6 +8,7 @@ use App\Jobs\RebillWallet;
 use App\Jobs\PostScheduled;
 use App\Jobs\RebillCardinity;
 use App\Jobs\ExpiredAdvertising;
+use App\Jobs\DeleteInactiveUsers;
 use App\Jobs\LiveStreamingPrivateExpired;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -45,6 +46,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new RebillCardinity)->hourly();
         $schedule->job(new PostScheduled)->everyMinute();
         $schedule->job(new SalesRefund)->daily();
+        $schedule->job(new DeleteInactiveUsers)->everySixHours();
         $schedule->job(new ExpiredAdvertising)->hourly();
         $schedule->job(new LiveStreamingPrivateExpired)->everySixHours();
         

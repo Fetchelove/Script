@@ -47,9 +47,10 @@ class SubscriptionsController extends Controller
     }
 
     // Check if subscription exists
-    $checkSubscription = auth()->user()->mySubscriptions()
+    $checkSubscription = auth()->user()->userSubscriptions()
       ->whereStripePrice($plan->name)
-      ->where('ends_at', '>=', now())->first();
+      ->where('ends_at', '>=', now())
+      ->first();
 
     if ($checkSubscription) {
       return response()->json([

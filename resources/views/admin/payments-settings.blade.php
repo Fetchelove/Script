@@ -281,6 +281,17 @@
 					</div>
 				  </div>
 
+				  <div class="row mb-3">
+					<label class="col-sm-2 col-form-labe text-lg-end">{{ __('users.payout_method') }} (Mercado Pago)</label>
+					<div class="col-sm-10">
+					  <select name="payout_method_mercadopago" class="form-select">
+					<option @selected($settings->payout_method_mercadopago == 'on') value="on">{{ __('general.enabled') }}</option>
+					<option @selected($settings->payout_method_mercadopago == 'off') value="off">{{ __('general.disabled') }}</option>
+				  </select>
+					  <small class="d-block">{{ trans('general.payout_method_desc') }}</small>
+					</div>
+				  </div>
+
 						<div class="row mb-3">
 		          <label class="col-sm-2 col-form-labe text-lg-end">{{ __('general.wallet') }}</label>
 		          <div class="col-sm-10">

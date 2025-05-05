@@ -26,23 +26,33 @@ class RebillWallet implements ShouldQueue
   public function handle()
   {
     Cache::lock('rebill', 10)->get(function () {
-
       $subscriptions = Subscriptions::with(['creator:id,username,free_subscription,custom_fee,balance', 'subscriber:id,username,wallet'])
         ->where('ends_at', '<=', now())
         ->whereRebillWallet('on')
         ->whereCancelled('no')
+        ->latest()
+        ->whereIn('id', function ($q) {
+          $q->selectRaw('MAX(id) FROM subscriptions GROUP BY creator_id, user_id');
+        })
         ->get();
 
       if ($subscriptions) {
         foreach ($subscriptions as $subscription) {
+          if (!$subscription->creator || !$subscription->subscriber) {
+            info('Rebill error - Creator or Subscriber does not exist -- Subscription ID: ' . $subscription->id);
+            $subscription->update([
+              'cancelled' => 'yes'
+            ]);
+            return;
+          }
           // Get price of Plan
           $plan = Plans::whereName($subscription->stripe_price)->first();
 
           if ($plan) {
             // Get Taxes
-            $taxes = TaxRates::whereIn('id', collect(explode('_', $subscription->taxes)))->get();
+            $taxes = TaxRates::whereIntegerInRaw('id', collect(explode('_', $subscription->taxes)))->get();
             $totalTaxes = ($plan->price * $taxes->sum('percentage') / 100);
-            $planPrice = ($plan->price + $totalTaxes);
+            $planPrice = number_format($plan->price + $totalTaxes, 2, '.', '');
 
             if ($subscription->subscriber->wallet >= $planPrice && $subscription->creator->free_subscription == 'no') {
               // Admin and user earnings calculation

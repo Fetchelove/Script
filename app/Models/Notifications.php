@@ -164,6 +164,11 @@ class Notifications extends Model
 					$msg             = __('general.error_video_encoding_welcome_msg');
 					$linkDestination = url('settings/conversations');
 					break;
+
+				case 26:
+					$msg             = $authorName . ' ' . __('general.has_sent_you_gift');
+					$linkDestination = url('my/payments/received');
+					break;
 			}
 
 			try {

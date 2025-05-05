@@ -14,7 +14,12 @@
   <script src="{{ asset('public/js/fileuploader/jquery.fileuploader.min.js') }}"></script>
   <script src="{{ asset('public/js/fileuploader/fileuploader-post.js') }}?v={{$settings->version}}"></script>
   <script src="{{ asset('public/js/jquery-ui/jquery-ui.min.js') }}"></script>
-  @if (request()->path() == '/' && auth()->user()->verified_id == 'yes' || request()->route()->named('profile') && request()->path() == auth()->user()->username  && auth()->user()->verified_id == 'yes')
+  @if (request()->path() == '/' 
+  		&& auth()->user()->verified_id == 'yes' 
+		|| request()->route()->named('profile') 
+		&& request()->path() == auth()->user()->username  
+		&& auth()->user()->verified_id == 'yes'
+		)
   <script src="{{ asset('public/js/jquery-ui/mentions.js') }}"></script>
 @endif
 
@@ -31,6 +36,7 @@
 <script src="{{ asset('public/js/payment.js') }}?v={{$settings->version}}"></script>
 <script src="{{ asset('public/js/payments-ppv.js') }}?v={{$settings->version}}"></script>
 @endif
+<script src="{{ asset('public/js/send-gift.js') }}?v={{$settings->version}}"></script>
 @endauth
 
 @if ($settings->custom_js)
@@ -50,6 +56,13 @@ const lightbox = GLightbox({
 $('.btnMultipleUpload').on('click', function() {
   $('.fileuploader').toggleClass('d-block');
 });
+
+	@if (request()->route()->named('post.edit') && $preloadedFile)
+	$(document).ready(function() {
+		$('.fileuploader').addClass('d-block');
+	});
+	@endif
+
 @endauth
 </script>
 

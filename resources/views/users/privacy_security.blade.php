@@ -76,7 +76,6 @@
               </div>
 
           @if (auth()->user()->verified_id == 'yes')
-
             <h5>{{ __('general.privacy') }}</h5>
 
             <form method="POST" action="{{ url('privacy/security') }}">
@@ -133,6 +132,13 @@
                   </div>
                 </div>
 
+                <div class="btn-block mb-4">
+                  <div class="custom-control custom-switch custom-switch-lg">
+                    <input type="checkbox" class="custom-control-input" name="allow_comments" value="1" @checked(auth()->user()->allow_comments) id="allow_comments">
+                    <label class="custom-control-label switch" for="allow_comments">{{ __('general.allow_comments') }}</label>
+                  </div>
+                </div>
+
                 <h5 class="mt-5">{{ __('general.security') }}</h5>
 
                 <div class="btn-block mb-4">
@@ -160,10 +166,55 @@
               <i class="feather icon-user-x mr-1"></i> {{ __('general.delete_account') }}</small>
             </a>
           </div>
+
+            @if (auth()->user()->verified_id == 'yes' && auth()->user()->free_subscription == 'yes' && $settings->allow_creators_deactivate_profile)
+            <h5 class="mt-5">{{ __('general.deactivate_your_account') }}</h5>
+            <small class="w-100">{{ __('general.deactivate_your_account_alert') }}</small>
+
+            <div class="w-100 d-block mt-2 mb-5">
+              <form action="{{ route('deactivate.account') }}" method="POST">
+                @csrf
+                <button class="btn btn-main btn-warning pr-3 pl-3" id="actionDeactivate">
+                  <i class="bi-person-slash mr-1"></i> {{ __('general.deactivate_your_account') }}</small>
+                </button>
+              </form>
+              
+            </div>
+          @endif
         @endif
 
         </div><!-- end col-md-6 -->
       </div>
     </div>
   </section>
+@endsection
+
+@section('javascript')
+<script type="text/javascript">
+    $("#actionDeactivate").on('click', function (e) {
+		e.preventDefault();
+
+		var element = $(this);
+		var form = $(element).parents('form');
+
+		element.blur();
+
+		swal(
+			{
+				title: delete_confirm,
+				type: "warning",
+				showLoaderOnConfirm: true,
+				showCancelButton: true,
+				confirmButtonColor: "#ffc107",
+				confirmButtonText: "{{ __('general.yes_confirm_deactivate') }}",
+				cancelButtonText: cancel_confirm,
+				closeOnConfirm: false,
+			},
+			function (isConfirm) {
+				if (isConfirm) {
+					form.submit();
+				}
+			});
+	});
+</script>
 @endsection

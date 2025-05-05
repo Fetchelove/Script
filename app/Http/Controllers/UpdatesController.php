@@ -10,7 +10,6 @@ use App\Models\Media;
 use App\Models\Reports;
 use App\Models\Updates;
 use App\Models\Messages;
-use App\Jobs\EncodeVideo;
 use App\Models\VideoViews;
 use Illuminate\Support\Str;
 use App\Events\NewPostEvent;
@@ -18,8 +17,6 @@ use Illuminate\Http\Request;
 use App\Models\AdminSettings;
 use App\Models\MediaMessages;
 use App\Models\Notifications;
-use App\Notifications\NewPost;
-use App\Services\CoconutVideoService;
 use League\Glide\ServerFactory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -57,6 +54,7 @@ class UpdatesController extends Controller
       '_description.required_if' => __('general.please_write_something_2'),
       'description.min' => __('validation.update_min_length'),
       'description.max' => __('validation.update_max_length'),
+      'epub.mimes' => __('general.invalid_format', ['formats' => 'EPUB']),
       'title.max' => __('validation.max', ['attribute' => __('admin.title')]),
       'price.min' => __('general.amount_minimum' . $currencyPosition, ['symbol' => $this->settings->currency_symbol, 'code' => $this->settings->currency_code]),
       'price.max' => __('general.amount_maximum' . $currencyPosition, ['symbol' => $this->settings->currency_symbol, 'code' => $this->settings->currency_code]),
@@ -84,6 +82,7 @@ class UpdatesController extends Controller
 
     $validator = Validator::make($input, [
       'zip'         => 'mimes:zip|max:' . $this->settings->file_size_allowed . '',
+      'epub'         => 'mimes:epub,zip|max:' . $this->settings->file_size_allowed . '',
       'description' => 'required|min:1|max:' . $this->settings->update_length . '',
       '_description' => 'required_if:_isVideoEmbed,==,yes|min:1|max:' . $this->settings->update_length . '',
       'title'       => 'max:100',
@@ -111,16 +110,17 @@ class UpdatesController extends Controller
 
     $post               = new Updates();
     $post->description  = trim(Helper::checkTextDb($this->request->description));
-    $post->title        = $locked == 'yes' && !$fileuploader && !$this->request->hasFile('zip') ? $this->request->title : null;
+    $post->title        = $locked == 'yes' && !$fileuploader && !$this->request->hasFile('zip') && !$this->request->hasFile('epub') ? $this->request->title : null;
     $post->user_id      = auth()->id();
     $post->date         = Carbon::now();
     $post->token_id     = Str::random(150);
-    $post->locked       = $locked;
+    $post->locked       = $this->settings->disable_free_post ? 'yes' : $locked;
     $post->price        = $this->request->price;
     $post->status       = $this->settings->auto_approve_post == 'on' ? $statusPost : 'pending';
     $post->schedule     = $this->request->scheduled_date ? true : false;
     $post->scheduled_date = $this->request->scheduled_date ?? '';
-    $post->ip           = request()->ip();
+    $post->can_media_edit = true;
+    $post->ip = request()->ip();
     $post->save();
 
     // Save blocked post option
@@ -166,67 +166,20 @@ class UpdatesController extends Controller
 
     // Insert File Zip
     if ($this->request->hasFile('zip')) {
-      $pathFiles        = config('path.files');
-      $fileZip         = $this->request->file('zip');
-      $extension       = $fileZip->getClientOriginalExtension();
-      $fileSizeZip     = Helper::formatBytes($fileZip->getSize(), 1);
-      $originalNameZip = Helper::fileNameOriginal($fileZip->getClientOriginalName());
-      $file            = strtolower(auth()->id() . time() . Str::random(20) . '.' . $extension);
+      $this->uploadMediaFile($this->request->file('zip'), $post->id);
+    }
 
-      $fileZip->storePubliclyAs($pathFiles, $file);
-      $zipFile = $file;
-      $token = Str::random(150) . uniqid() . now()->timestamp;
-
-      Media::create([
-        'updates_id' => $post->id,
-        'user_id' => auth()->id(),
-        'type' => 'file',
-        'image' => '',
-        'video' => '',
-        'video_embed' => '',
-        'music' => '',
-        'file' => $zipFile,
-        'file_name' => $originalNameZip,
-        'file_size' => $fileSizeZip,
-        'img_type' => '',
-        'token' => $token,
-        'status' => 'active',
-        'created_at' => now()
-      ]);
-    } // End Insert File Zip
+    // Insert EPUB File
+    if ($this->request->hasFile('epub')) {
+      $this->uploadMediaFile($this->request->file('epub'), $post->id, 'epub');
+    }
 
     // Get all videos of the post
     $videos = Media::whereUpdatesId($post->id)->where('video', '<>', '')->get();
 
-    if ($videos->count() && $this->settings->video_encoding == 'on') {
-      try {
-        foreach ($videos as $video) {
-          if ($this->settings->encoding_method == 'ffmpeg') {
-            $this->dispatch(new EncodeVideo($video));
-          } else {
-            CoconutVideoService::handle($video, 'post');
-          }
-        }
-
-        // Change status Pending to Encode
-        Updates::whereId($post->id)->update([
-          'status' => 'encode'
-        ]);
-
-        return response()->json([
-          'success' => true,
-          'pending' => true,
-          'encode' => true
-        ]);
-      } catch (\Exception $e) {
-        \Log::info($e->getMessage());
-
-        return response()->json([
-          'success' => false,
-          'errors' => ['error' => $e->getMessage()],
-        ]);
-      }
-    } // End Videos->count
+    if ($videos->count() && config('settings.video_encoding') == 'on') {
+      return $this->getAllVideosEncode($videos, $post->id);
+    }
 
     if ($this->settings->auto_approve_post == 'off') {
       return response()->json([
@@ -266,92 +219,72 @@ class UpdatesController extends Controller
     ]);
   } //<---- End Method
 
-  public function ajaxUpdates()
-  {
-    $id = $this->request->input('id');
-    $skip = $this->request->input('skip');
-    $media = $this->request->input('media');
-    $mediaArray = ['photos', 'videos', 'audio', 'files'];
-
-    $user = User::findOrFail($id);
-
-    if (isset($media) && !in_array($media, $mediaArray)) {
-      abort(500);
-    }
-
-    if (isset($media)) {
-      $query = $user->media();
-    } else {
-      $query = $user->updates();
-    }
-
-    //=== Photos
-    $query->when($this->request->input('media') == 'photos', function ($q) {
-      $q->where('media.image', '<>', '');
-    });
-
-    //=== Videos
-    $query->when($this->request->input('media') == 'videos', function ($q) use ($user) {
-      $q->where('media.video', '<>', '')
-        ->where(function ($query) {
-          $query->when(request('sort') == 'unlockable', function ($q) {
-            $q->where('updates.price', '<>', 0.00);
-          });
-
-          $query->when(request('sort') == 'free', function ($q) {
-            $q->where('updates.locked', 'no');
-          });
-        })
-        ->orWhere('media.video_embed', '<>', '')
-        ->where('media.user_id', $user->id);
-    });
-
-    //=== Audio
-    $query->when($this->request->input('media') == 'audio', function ($q) {
-      $q->where('media.music', '<>', '');
-    });
-
-    //=== Files
-    $query->when($this->request->input('media') == 'files', function ($q) {
-      $q->where('media.file', '<>', '');
-    });
-
-    // Sort by older
-    $query->when(request('sort') == 'oldest', function ($q) {
-      $q->orderBy('updates.id', 'asc');
-    });
-
-    // Sort by unlockable
-    $query->when(request('sort') == 'unlockable', function ($q) {
-      $q->where('updates.price', '<>', 0.00);
-    });
-
-    // Sort by free
-    $query->when(request('sort') == 'free', function ($q) {
-      $q->where('updates.locked', 'no');
-    });
-
-    $data = $query->orderBy('updates.fixed_post', 'desc')
-      ->orderBy('updates.id', 'desc')
-      ->groupBy('updates.id')
-      ->skip($skip)
-      ->take(config('settings.number_posts_show'))
-      ->get();
-
-    return view('includes.updates', ['updates' => $data])->render();
-  }
-
   public function edit($id)
   {
-    $data = auth()->user()->updates()->findOrFail($id);
+    abort_if(config('settings.users_can_edit_post') == 'off', 404);
 
-    return view('users.edit-update')->withData($data);
+    $data = auth()->user()->updates()
+      ->with('media')
+      ->findOrFail($id);
+
+    $mediaCount = $data->media->isNotEmpty() ?? false;
+    $fileZip = $data->media->where('type', 'file')->first();
+    $fileEpub = $data->media->where('type', 'epub')->first();
+
+    $filePreload = $data->media()
+      ->where('video_embed', '')
+      ->whereNotNull('mime')
+      ->get();
+
+    $preloadedFile = [];
+
+    if ($filePreload) {
+      foreach ($filePreload as $file) {
+        switch ($file->type) {
+          case 'image':
+            $pathFile = Helper::getFile(config('path.images') . $file->image);
+            $name = $file->image;
+            break;
+
+          case 'video':
+            $pathFile = Helper::getFile(config('path.videos') . $file->video);
+            $name = $file->video;
+            break;
+
+          case 'music':
+            $pathFile = Helper::getFile(config('path.music') . $file->music);
+            $name = $file->music;
+            break;
+        }
+
+        $preloadedFile[] = [
+          "name" => $name,
+          "type" => $file->mime,
+          "size" => $file->bytes,
+          "file" => $pathFile,
+          "data" => [
+            "readerForce" => true
+          ],
+        ];
+      }
+      // convert our array into json string
+      $preloadedFile = $preloadedFile ? json_encode($preloadedFile) : false;
+    }
+
+    return view('users.edit-update')->with([
+      'data' => $data,
+      'mediaCount' => $mediaCount,
+      'preloadedFile' => $preloadedFile,
+      'filePreload' => $filePreload,
+      'fileZip' => $fileZip,
+      'fileEpub' => $fileEpub
+    ]);
   }
 
   public function postEdit()
   {
     $id  = $this->request->input('id');
-    $sql = Updates::whereId($id)->whereUserId(auth()->id())->firstOrFail();
+    $post = Updates::whereId($id)->whereUserId(auth()->id())->firstOrFail();
     $videoUrl = '';
 
     // Currency Position
@@ -366,6 +299,7 @@ class UpdatesController extends Controller
       '_description.required_if' => __('general.please_write_something_2'),
       'description.min' => __('validation.update_min_length'),
       'description.max' => __('validation.update_max_length'),
+      'epub.mimes' => __('general.invalid_format', ['formats' => 'EPUB']),
       'title.max' => __('validation.max', ['attribute' => __('admin.title')]),
       'price.min' => __('general.amount_minimum' . $currencyPosition, ['symbol' => $this->settings->currency_symbol, 'code' => $this->settings->currency_code]),
       'price.max' => __('general.amount_maximum' . $currencyPosition, ['symbol' => $this->settings->currency_symbol, 'code' => $this->settings->currency_code]),
@@ -373,15 +307,15 @@ class UpdatesController extends Controller
     ];
 
     $input = $this->request->all();
-    $mediaFiles = $sql->media()->where('video_embed', '=', '')->count();
+    $mediaFiles = $post->media()->where('video_embed', '=', '')->count();
 
-    $getAllMedia = $sql->media()
-      ->where('image', '=', '')
-      ->orWhere('video', '=', '')
+    $getAllMedia = $post->media()
+      ->where('image', '')
+      ->orWhere('video', '')
       ->whereUpdatesId($id)
-      ->orWhere('music', '=', '')
+      ->orWhere('music', '')
       ->whereUpdatesId($id)
-      ->orWhere('file', '=', '')
+      ->orWhere('file', '')
       ->whereUpdatesId($id)
       ->first();
 
@@ -396,9 +330,11 @@ class UpdatesController extends Controller
       $input['_isVideoEmbed'] = $videoUrl ? 'yes' : 'no';
     }
 
-    $input['is_ppv'] = $sql->price == 0.00 ? 'no' : 'yes';
+    $input['is_ppv'] = $post->price == 0.00 ? 'no' : 'yes';
 
     $validator = Validator::make($input, [
+      'zip'         => 'mimes:zip|max:' . $this->settings->file_size_allowed . '',
+      'epub'         => 'mimes:epub,zip|max:' . $this->settings->file_size_allowed . '',
       'description'  => 'required|min:1|max:' . $this->settings->update_length . '',
       '_description' => 'required_if:_isVideoEmbed,==,yes|min:1|max:' . $this->settings->update_length . '',
       'price'       => 'required_if:is_ppv,==,yes|numeric|min:' . $this->settings->min_ppv_amount . '|max:' . $this->settings->max_ppv_amount,
@@ -422,24 +358,21 @@ class UpdatesController extends Controller
       $this->request->locked = 'no';
     }
 
-    $sql->description  = trim(Helper::checkTextDb($this->request->description));
-    $sql->title        = $this->request->title ?? null;
-    $sql->user_id      = auth()->id();
-    $sql->token_id     = Str::random(150);
-    $sql->locked       = $this->request->locked;
-    $sql->price        = $this->request->price;
-    $sql->save();
+    $post->description  = trim(Helper::checkTextDb($this->request->description));
+    $post->title        = $this->request->locked == 'yes' && !$getAllMedia && !$this->request->hasFile('zip') && !$this->request->hasFile('epub') ? $this->request->title : null;
+    $post->user_id      = auth()->id();
+    $post->token_id     = Str::random(150);
+    $post->locked       = $this->settings->disable_free_post ? 'yes' : $this->request->locked;
+    $post->price        = $this->request->price;
+    $post->save();
 
-    $videoEmbed = $sql->media()->where('video_embed', '<>', '')->first();
-    $isVideoEmbed = false;
-
+    $videoEmbed = $post->media()->where('video_embed', '<>', '')->first();
     // Insert Video Embed Youtube or Vimeo
     if ($videoUrl && !$getAllMedia && !$videoEmbed) {
-
       $token = Str::random(150) . uniqid() . now()->timestamp;
 
       Media::create([
-        'updates_id' => $sql->id,
+        'updates_id' => $post->id,
         'user_id' => auth()->id(),
         'type' => 'video',
         'image' => '',
@@ -454,8 +387,6 @@ class UpdatesController extends Controller
         'status' => 'active',
         'created_at' => now()
       ]);
-
-      $isVideoEmbed = $urlVideo;
     }
 
     if ($videoEmbed) {
@@ -464,20 +395,32 @@ class UpdatesController extends Controller
         $videoEmbed->video_embed = $urlVideo;
         $videoEmbed->save();
       }
-
-      $isVideoEmbed = $videoEmbed->video_embed;
     }
 
     if ($videoEmbed && !$videoUrl) {
       $videoEmbed->delete();
-      $isVideoEmbed = null;
+    }
+
+    // Insert File Zip
+    if ($this->request->hasFile('zip')) {
+      $this->uploadMediaFile($this->request->file('zip'), $post->id);
+    }
+
+    // Insert EPUB File
+    if ($this->request->hasFile('epub')) {
+      $this->uploadMediaFile($this->request->file('epub'), $post->id, 'epub');
+    }
+
+    // Get all videos of the post
+    $videos = Media::whereUpdatesId($post->id)->where('video', '<>', '')->where('encoded', 'no')->get();
+
+    if ($videos->count() && config('settings.video_encoding') == 'on') {
+      return $this->getAllVideosEncode($videos, $post->id, true);
     }
 
     return response()->json([
       'success' => true,
-      'description' => Helper::linkText(Helper::checkText($sql->description, $isVideoEmbed)),
-      'price' => $this->request->price ? Helper::amountFormatDecimal($this->request->price) : '',
-      'locked' => $this->request->locked
+      'url' => url(auth()->user()->username, ['post', $post->id])
     ]);
   } //<---- End Method
 
@@ -586,6 +529,86 @@ class UpdatesController extends Controller
         'success' => true
       ]);
     }
+  }
+
+  public function ajaxUpdates()
+  {
+    $id = $this->request->input('id');
+    $skip = $this->request->input('skip');
+    $media = $this->request->input('media');
+    $mediaArray = ['photos', 'videos', 'audio', 'files', 'epub'];
+
+    $user = User::findOrFail($id);
+
+    if (isset($media) && !in_array($media, $mediaArray)) {
+      abort(500);
+    }
+
+    if (isset($media)) {
+      $query = $user->media();
+    } else {
+      $query = $user->updates();
+    }
+
+    //=== Photos
+    $query->when($this->request->input('media') == 'photos', function ($q) {
+      $q->where('media.image', '<>', '');
+    });
+
+    //=== Videos
+    $query->when($this->request->input('media') == 'videos', function ($q) use ($user) {
+      $q->where('media.video', '<>', '')
+        ->where(function ($query) {
+          $query->when(request('sort') == 'unlockable', function ($q) {
+            $q->where('updates.price', '<>', 0.00);
+          });
+
+          $query->when(request('sort') == 'free', function ($q) {
+            $q->where('updates.locked', 'no');
+          });
+        })
+        ->orWhere('media.video_embed', '<>', '')
+        ->where('media.user_id', $user->id);
+    });
+
+    //=== Audio
+    $query->when($this->request->input('media') == 'audio', function ($q) {
+      $q->where('media.music', '<>', '');
+    });
+
+    //=== Files
+    $query->when($this->request->input('media') == 'files', function ($q) {
+      $q->where('media.type', 'file');
+    });
+
+    //=== Epub
+    $query->when($this->request->input('media') == 'epub', function ($q) {
+      $q->where('media.type', 'epub');
+    });
+
+    // Sort by older
+    $query->when(request('sort') == 'oldest', function ($q) {
+      $q->orderBy('updates.id', 'asc');
+    });
+
+    // Sort by unlockable
+    $query->when(request('sort') == 'unlockable', function ($q) {
+      $q->where('updates.price', '<>', 0.00);
+    });
+
+    // Sort by free
+    $query->when(request('sort') == 'free', function ($q) {
+      $q->where('updates.locked', 'no');
+    });
+
+    $data = $query->orderBy('updates.fixed_post', 'desc')
+      ->orderBy('updates.id', 'desc')
+      ->groupBy('updates.id')
+      ->skip($skip)
+      ->take(config('settings.number_posts_show'))
+      ->get();
+
+    return view('includes.updates', ['updates' => $data])->render();
   }
 
   public function report(Request $request)
@@ -772,6 +795,10 @@ class UpdatesController extends Controller
 
   public function explore()
   {
+    if ($this->settings->disable_explore_section) {
+      return redirect('/');
+    }
+
     $updates = Updates::verifyCountryBlocking();
 
     // Filter by hashtag
@@ -906,7 +933,6 @@ class UpdatesController extends Controller
   /**
    * Insert Video Views
    * @param int $id
-   * @return void
    */
   public function videoViews($id): void
   {
@@ -944,5 +970,30 @@ class UpdatesController extends Controller
         $post->increment('video_views');
       }
     }
+  }
+
+  public function viewEpub($id)
+  {
+    $epub = Media::with(['updates'])->whereId($id)->firstOrfail();
+
+    $checkUserSubscription = auth()->user()->checkSubscription($epub->user());
+
+    if ($epub->updates->locked == 'yes') {
+      if (
+        !$checkUserSubscription
+        && !auth()->user()->payPerView()->whereUpdatesId($epub->updates_id)->first()
+        && $epub->user()->id != auth()->id()
+        || $checkUserSubscription
+        && $epub->updates->price != 0.00
+        && $checkUserSubscription->free == 'yes'
+        && !auth()->user()->payPerView()->whereUpdatesId($epub->updates_id)->first()
+      ) {
+        abort(404);
+      }
+    }
+
+    return view('users.epub-viewer', [
+      'urlFile' => Helper::getFile(config('path.files') . $epub->file)
+    ]);
   }
 }

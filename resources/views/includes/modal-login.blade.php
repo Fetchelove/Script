@@ -17,7 +17,7 @@
 
 							@if ($settings->twitter_login == 'on')
 							<a href="{{url('oauth/twitter')}}" class="btn btn-twitter auth-form-btn mb-2 w-100">
-								<i class="bi-twitter-x mr-2"></i> <span class="loginRegisterWith">{{ __('auth.login_with') }}</span> Twitter
+								<i class="bi-twitter-x mr-2"></i> <span class="loginRegisterWith">{{ __('auth.login_with') }}</span> X
 							</a>
 						@endif
 

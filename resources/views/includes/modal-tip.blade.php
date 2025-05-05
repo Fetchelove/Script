@@ -35,7 +35,10 @@
 
 							<input type="hidden" id="cardholder-name" value="{{ auth()->user()->name }}"  />
 							<input type="hidden" id="cardholder-email" value="{{ auth()->user()->email }}"  />
-							<input type="number" min="{{$settings->min_tip_amount}}" max="{{$settings->max_tip_amount}}" required data-min-tip="{{$settings->min_tip_amount}}" data-max-tip="{{$settings->max_tip_amount}}" autocomplete="off" id="onlyNumber" class="form-control mb-3 tipAmount" name="amount" placeholder="{{__('general.tip_amount')}} ({{ __('general.minimum') }} {{ Helper::priceWithoutFormat($settings->min_tip_amount) }})">
+							<input type="number" min="{{$settings->min_tip_amount}}" max="{{$settings->max_tip_amount}}" required data-min-tip="{{$settings->min_tip_amount}}" data-max-tip="{{$settings->max_tip_amount}}" autocomplete="off" id="onlyNumber" class="form-control mb-1 tipAmount" name="amount" placeholder="{{__('general.tip_amount')}} ({{ __('general.minimum') }} {{ Helper::priceWithoutFormat($settings->min_tip_amount) }})">
+							<small class="d-block w-100 mb-3">
+								<i class="bi-arrow-up-square mr-1"></i> <i class="bi-arrow-down-square mr-1"></i> {{ __('general.increase_decrease_amount') }}
+							  </small>
 							@csrf
 
 							@if (! request()->route()->named('live'))

@@ -35,7 +35,7 @@
 
                 @if ($settings->twitter_login == 'on')
                 <a href="{{url('oauth/twitter')}}" class="btn btn-twitter auth-form-btn mb-2 w-100">
-                  <i class="bi-twitter-x mr-2"></i> {{ __('auth.sign_up_with') }} Twitter
+                  <i class="bi-twitter-x mr-2"></i> {{ __('auth.sign_up_with') }} X
                 </a>
               @endif
 

@@ -38,8 +38,7 @@
 						</div>
 
 						<div class="row mb-3">
-							<label for="select" class="col-sm-2 col-form-labe text-lg-end">{{
-								__('general.select_your_country') }}</label>
+							<label for="select" class="col-sm-2 col-form-labe text-lg-end">{{ __('general.select_your_country') }}</label>
 							<div class="col-sm-10">
 								<select name="country" class="form-select" id="select">
 									<option value="">{{trans('general.select_your_country')}}</option>
@@ -76,6 +75,13 @@
 							<label class="col-sm-2 col-form-label text-lg-end">{{ __('general.vat') }}</label>
 							<div class="col-sm-10">
 								<input type="text" value="{{ $settings->vat }}" name="vat" class="form-control">
+							</div>
+						</div>
+
+						<div class="row mb-3">
+							<label class="col-sm-2 col-form-label text-lg-end">{{ __('general.phone') }}</label>
+							<div class="col-sm-10">
+								<input type="text" value="{{ $settings->phone }}" name="phone" class="form-control">
 							</div>
 						</div>
 

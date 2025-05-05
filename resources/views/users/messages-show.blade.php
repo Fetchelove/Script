@@ -88,7 +88,7 @@
 
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown_options">
 
-        @if ($messages->count() != 0)
+        @if ($messages->count() != 0 && $settings->users_can_delete_messages)
 					{!! Form::open([
 						'method' => 'POST',
 						'url' => "conversation/delete/$user->id",
@@ -116,7 +116,7 @@
 
     </div>
 
-    <div class="content px-4 py-3 d-scrollbars container-msg" id="contentDIV" data="{{$user->id}}">
+    <div class="content px-4 py-3 custom-scrollbar container-msg" id="contentDIV" data="{{$user->id}}">
 
       @if ($messages->count() != 0)
       <div class="flex-column d-flex justify-content-center text-center h-100">
@@ -173,9 +173,14 @@
                 </div>
               </div><!-- End form-group -->
 
-              <div class="w-100">
-                <span id="previewImage"></span>
-                <a href="javascript:void(0)" id="removePhoto" class="text-danger p-1 px-2 display-none btn-tooltip" data-toggle="tooltip" data-placement="top" title="{{__('general.delete')}}"><i class="fa fa-times-circle"></i></a>
+              <div class="w-100 mb-2">
+                <small id="previewImage"></small>
+                <a href="javascript:void(0)" id="removePhoto" class="text-danger p-1 small display-none btn-tooltip" data-toggle="tooltip" data-placement="top" title="{{__('general.delete')}}"><i class="fa fa-times-circle"></i></a>
+              </div>
+
+              <div class="w-100 mb-2">
+                <small id="previewEpub"></small>
+                <a href="javascript:void(0)" id="removeEpub" class="text-danger p-1 small display-none btn-tooltip-form" data-toggle="tooltip" data-placement="top" title="{{__('general.delete')}}"><i class="fa fa-times-circle"></i></a>
               </div>
 
               <input type="file" name="media[]" id="file" accept="image/*,video/mp4,video/x-m4v,video/quicktime,audio/mp3" multiple class="visibility-hidden filepond">
@@ -191,6 +196,14 @@
                       <i class="bi bi-file-earmark-zip align-bottom f-size-25"></i>
                     </button>
                   @endif
+
+                  @if (auth()->user()->verified_id == 'yes' && $settings->allow_epub_files)
+                  <input type="file" name="epub" id="ePubFile" accept="application/epub+zip" class="visibility-hidden">
+
+                  <button type="button" class="btn btn-upload btn-tooltip e-none align-bottom @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill" data-toggle="tooltip" data-placement="top" title="{{__('general.upload_epub_file')}}" onclick="$('#ePubFile').trigger('click')">
+                    <i class="bi-book f-size-25 align-bottom"></i>
+                  </button>
+                @endif
 
                   @if (auth()->user()->verified_id == 'yes')
                   <button type="button" id="setPrice" class="btn btn-upload btn-tooltip e-none align-bottom @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill" data-toggle="tooltip" data-placement="top" title="{{__('general.set_price_for_msg')}}">
@@ -208,9 +221,15 @@
                   </button>
                 @endif
 
+                @if ($user->verified_id == 'yes' && $settings->gifts)
+                <button type="button" data-toggle="modal" title="{{__('general.gifts')}}" data-target="#giftsForm" class="btn btn-upload btn-tooltip e-none align-bottom @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill">
+                  <i class="bi-gift f-size-25 align-bottom"></i>
+                </button>
+                @endif
+
           <div class="d-inline-block float-right rounded-pill mt-1 position-relative">
             <div class="btn-blocked display-none"></div>
-            <button type="submit" id="button-reply-msg" disabled data-send="{{ __('auth.send') }}" data-wait="{{ __('general.send_wait') }}" class="btn btn-sm btn-primary rounded-pill float-right e-none">
+            <button type="submit" id="button-reply-msg" disabled data-send="{{ __('auth.send') }}" data-wait="{{ __('general.send_wait') }}" class="btn btn-sm btn-primary rounded-pill float-right e-none w-100-mobile">
               <i class="far fa-paper-plane"></i>
             </button>
             </div>

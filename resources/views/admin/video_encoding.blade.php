@@ -96,7 +96,7 @@
  		            <input value="{{ config('laravel-ffmpeg.ffmpeg.binaries') }}" name="ffmpeg_path" type="text" class="form-control">
                      <p class="d-block m-0">
                       <span class="me-1 text-muted">/usr/bin/ffmpeg - </span>
-                        <a href="{{ url('ffmpeg.php') }}" target="_blank" rel="noopener noreferrer">
+                        <a href="{{ url('panel/admin/ffmpeg') }}" target="_blank" rel="noopener noreferrer">
                             {{ __('general.verify_ffmpeg_path') }} <i class="bi-box-arrow-up-right ms-1"></i>
                         </a>
                     </p>

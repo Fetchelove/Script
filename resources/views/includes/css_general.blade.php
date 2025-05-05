@@ -161,10 +161,12 @@
   var sign_up_with = "{{ __('auth.sign_up_with') }}";
   var currentPage = "{!! url()->full() !!}";
   var requestGender = {{ request()->get('gender') ? 'true' : 'false' }};
-@auth
   var is_bookmarks = {{ request()->is('my/bookmarks') ? 'true' : 'false' }};
   var is_likes = {{ request()->is('my/likes') ? 'true' : 'false' }};
   var is_purchases = {{ request()->is('my/purchases') ? 'true' : 'false' }};
+  var is_explore = {{ request()->is(['explore', '/']) ? 'true' : 'false' }};
+
+@auth
   var isMessageChat = {{ request()->is('messages/*') ? 'true' : 'false' }};
   var delete_confirm = "{{__('general.delete_confirm')}}";
   var confirm_delete_comment = "{{__('general.confirm_delete_comment')}}";
@@ -213,7 +215,6 @@
   var maximum_files_msg = {{$settings->maximum_files_msg}};
   var great = "{{__('general.great')}}";
   var msg_success_sent_all_subscribers = "{{__('general.msg_success_sent_all_subscribers')}}";
-  var is_explore = {{ request()->is('explore') ? 'true' : 'false' }};
   var video_on_way = "{{__('general.video_on_way')}}";
   var story_on_way = "{{__('general.story_on_way')}}";
   var video_processed_info = "{{__('general.video_processed_info')}}";
@@ -250,6 +251,39 @@
   var schedule = "{{ __('general.schedule') }}";
   var reject_request = "{{ __('general.reject_request') }}";
   var advertising = {{ $advertising->count() ? 'true' : 'false'  }};
+  var invalid_format_epub = "{{__('general.invalid_format', ['formats' => 'EPUB'])}}";
+  var gift_sent_success = "{{ __('general.gift_sent_success') }}";
+
+  var choose_file_to_upload = "{{ __('general.choose_file_to_upload') }}";
+  var browse_file = "{{ __('general.browse_file') }}";
+  var one_file_chosen = "{{ __('general.one_file_chosen') }}";
+  var more_files_chosen = "{{ __('general.more_files_chosen') }}";
+
+  var confirmDelete = "{{ __('general.confirm') }}";
+  var cancelUpload = "{{ __('admin.cancel') }}";
+  var nameFile = "{{ __('auth.name') }}";
+  var typeFile = "{{ __('general.type') }}";
+  var sizeFile = "{{ __('general.size') }}";
+  var dimensionsFile = "{{ __('general.dimensions') }}";
+  var durationFile = "{{ __('general.duration') }}";
+  var cropFile = "{{ __('general.crop') }}";
+  var rotateFile = "{{ __('general.rotate') }}";
+  var sortFiles = "{{ __('general.sort') }}";
+  var downloadFile = "{{ __('general.download') }}";
+  var removeFile = "{{ __('general.delete') }}";
+  var dropFiles = "{{ __('general.drop_files') }}";
+  var pasteFiles = "{{ __('general.paste_files') }}";
+  var removeConfirmation = "{{ __('general.removeConfirmation') }}";
+  var filesLimit = "{{ __('general.filesLimit') }}";
+  var iFile = "{{ __('general.file') }}";
+  var iFiles = "{{ __('general.files') }}";
+  var filesType = "{{ __('general.filesType') }}";
+  var fileSize = "{{ __('general.fileSize') }}";
+  var filesSizeAll = "{{ __('general.filesSizeAll') }}";
+  var fileName = "{{ __('general.fileName') }}";
+  var remoteFile = "{{ __('general.remoteFile') }}";
+  var folderUpload = "{{ __('general.folderUpload') }}";
+
 @endauth
 </script>
 
@@ -466,14 +500,9 @@ color:grey;
 @endif
 
 @if ($settings->color_default <> '')
-
 :root {
   --plyr-color-main: {{$settings->color_default}};
-}
-:root {
   --swiper-theme-color: {{$settings->color_default}};
-}
-:root {
   --color-media-wrapper: @if (auth()->check() && auth()->user()->dark_mode == 'off') #f1f1f1 @else #454545 @endif;
   --color-pulse-media-wrapper: @if (auth()->check() && auth()->user()->dark_mode == 'off') #f8f8f8 @else #373737 @endif;
 }
@@ -1112,16 +1141,12 @@ input[type=number] {
   	        transition: all 0.2s ease;
 }
 .wrapper-msg-inbox::-webkit-scrollbar-track {
-    background-color: @if (auth()->check() && auth()->user()->dark_mode == 'on') #313131 @else #ebebeb @endif;
+    background-color: transparent;
     border-radius: 6px;
 }
 .wrapper-msg-inbox::-webkit-scrollbar-thumb {
     background-color: #ccc;
     border-radius: 6px;
-}
-.wrapper-msg-inbox {
-  scrollbar-color: #ccc @if (auth()->check() && auth()->user()->dark_mode == 'on') #313131 @else #ebebeb @endif;
-  scrollbar-width: 5px;
 }
 .msg-inbox {
   border: 0;
@@ -1852,16 +1877,12 @@ a:hover.choose-type-sale {
   	        transition: all 0.2s ease;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-    background-color: @if (auth()->check() && auth()->user()->dark_mode == 'on') #313131 @else #ebebeb @endif;
+    background-color: transparent;
     border-radius: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: #ccc;
     border-radius: 6px;
-}
-.custom-scrollbar {
-  scrollbar-color: #ccc @if (auth()->check() && auth()->user()->dark_mode == 'on') #313131 @else #ebebeb @endif;
-  scrollbar-width: 5px;
 }
 .icon--dashboard {
     color: rgb(0 0 0 / {{ auth()->check() && auth()->user()->dark_mode == 'on' ? '5%' : '2%' }}) !important;
@@ -2023,6 +2044,9 @@ a:hover.choose-type-sale {
 .modalStoryViews {
   max-height: 400px;
 }
+.modalGifts {
+  max-height: 600px;
+}
 .modal-text-story {
   color: #fff;
   position: absolute;
@@ -2140,5 +2164,38 @@ height: auto;
   border-radius: 0.8rem !important;
 }
 .gslide-image {background-color: #fff !important;}
+@if (auth()->check() && auth()->user()->dark_mode == 'on')
+.card-updates .data-link {
+  text-decoration: underline !important;
+}
 @endif
+
+@-moz-document url-prefix() {
+  .custom-scrollbar {
+    scrollbar-color: #ccc transparent;
+    scrollbar-width: thin;
+  }
+
+  .wrapper-msg-inbox {
+    scrollbar-color: #ccc transparent;
+    scrollbar-width: thin;
+  }
+}
+@endif
+
+@auth
+.btn-radio {
+  border-radius: 15px !important;
+  margin: 0 10px 10px 0 !important;
+  border: 1px solid {{ auth()->user()->dark_mode == 'on' ? '#5b5a5a' : '#ccc' }};
+  color: {{ auth()->user()->dark_mode == 'on' ? '#fff' : '#212529' }} !important;
+}
+.btn-radio.active {
+  border-color:{{ auth()->user()->dark_mode == 'on' ? '#fff' : $settings->color_default }};
+}
+.btn-group-radio > .btn:not(:disabled):not(.disabled).active {
+  box-shadow: inset 0px 0px 0px 1px {{ auth()->user()->dark_mode == 'on' ? '#fff' : $settings->color_default }} !important;
+}
+@endauth
+
 </style>

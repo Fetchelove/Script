@@ -155,7 +155,7 @@ class LiveStreamingPrivateController extends Controller
             'likeActive' => $likeActive ?? null,
             'paymentRequiredToAccess' => $paymentRequiredToAccess,
             'limitLiveStreaming' => $limitLiveStreaming > 0 ? $limitLiveStreaming : 0,
-            'amountTips' => $live->comments()->sum('tip_amount') ?: 0
+            'amountTips' => $live->comments()->sum('earnings') ?: 0
         ]);
     }
 

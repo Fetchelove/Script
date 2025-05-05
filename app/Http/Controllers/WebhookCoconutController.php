@@ -28,6 +28,7 @@ final class WebhookCoconutController extends Controller
         $webhook = json_decode($body, true);
 
         $post = Updates::whereId($this->request->resourceId)->where('status', '!=', 'active')->first();
+        $date = $post->editing ? $post->date : now();
 
         if (!$post) {
             return;
@@ -60,7 +61,7 @@ final class WebhookCoconutController extends Controller
             if ($videos->count() == 0) {
                 // Update date the post and status
                 $post->update([
-                    'date' => now(),
+                    'date' => $date,
                     'status' => config('settings.auto_approve_post') == 'on' ? $statusPost : 'pending'
                 ]);
 
@@ -72,7 +73,7 @@ final class WebhookCoconutController extends Controller
             }
         } else {
             $post->update([
-                'date' => now(),
+                'date' => $date,
                 'status' => config('settings.auto_approve_post') == 'on' ? $statusPost : 'pending'
             ]);
 

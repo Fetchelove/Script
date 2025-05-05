@@ -15,6 +15,16 @@
 
         <div class="col-md-12 mb-5 mb-lg-0">
 
+          @if (session('notify'))
+          <div class="alert alert-primary">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">×</span>
+              </button>
+
+            <i class="bi-info-circle mr-1"></i> {{ session('notify') }}
+          </div>
+          @endif
+
           @if ($posts->count() != 0)
           <div class="btn-block mb-3 text-right">
             <span>
@@ -60,7 +70,6 @@
                 @foreach ($posts as $post)
                   <tr>
                     <td>{{ $post->id }}</td>
-
                     <td>
                       @if ($post->media_count)
                       {{ $post->media_count }} {{trans_choice('general.files', $post->media_count )}}

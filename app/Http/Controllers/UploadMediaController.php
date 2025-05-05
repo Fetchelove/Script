@@ -8,28 +8,28 @@ use FileUploader;
 use App\Models\Media;
 use Illuminate\Http\File;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
 class UploadMediaController extends Controller
 {
-
 	public function __construct(Request $request)
 	{
 		$this->request = $request;
+		$this->status = $this->request->postId ? 'active' : 'pending';
+		$this->postId = $this->request->postId ?: 0;
 	}
 
 	/**
-     * submit the form
-     *
-     * @return void
-     */
-	public function store() 
+	 * submit the form
+	 */
+	public function store(): JsonResponse
 	{
 		$publicPath = public_path('temp/');
-		$file = strtolower(auth()->id().uniqid().time().str_random(20));
+		$file = strtolower(auth()->id() . uniqid() . time() . str_random(20));
 
 		if (config('settings.video_encoding') == 'off') {
-			$extensions = ['png','jpeg','jpg','gif','ief','video/mp4','audio/x-matroska','audio/mpeg'];
+			$extensions = ['png', 'jpeg', 'jpg', 'gif', 'ief', 'video/mp4', 'audio/x-matroska', 'audio/mpeg'];
 		} else {
 			$extensions = [
 				'png',
@@ -48,7 +48,7 @@ class UploadMediaController extends Controller
 				'video/x-flv',
 				'audio/x-matroska',
 				'audio/mpeg'
-	    	];
+			];
 		}
 
 		// initialize FileUploader
@@ -64,7 +64,7 @@ class UploadMediaController extends Controller
 		$upload = $FileUploader->upload();
 
 		if ($upload['isSuccess']) {
-			foreach($upload['files'] as $key=>$item) {
+			foreach ($upload['files'] as $key => $item) {
 				$upload['files'][$key] = [
 					'extension' => $item['extension'],
 					'format' => $item['format'],
@@ -78,264 +78,257 @@ class UploadMediaController extends Controller
 
 				switch ($item['format']) {
 					case 'image':
-							$this->resizeImage($item['name'], $item['extension']);
+						$this->resizeImage($item);
 						break;
 
 					case 'video':
-							$this->uploadVideo($item['name']);
+						$this->uploadVideo($item);
 						break;
 
 					case 'audio':
-							$this->uploadMusic($item['name']);
+						$this->uploadMusic($item);
 						break;
 				}
-			}// foreach
-
-		}// upload isSuccess
+			}
+		}
 
 		return response()->json($upload);
 	}
 
 	/**
-     * Resize image and add watermark
-     *
-     * @return void
-     */
-		 protected function resizeImage($image, $extension)
-		 {
-			 $fileName = $image;
-			 $image = public_path('temp/').$image;
-			 $img   = Image::make($image);
-			 $token = str_random(150).uniqid().now()->timestamp;
-			 $url   = ucfirst(Helper::urlToDomain(url('/')));
-			 $path  = config('path.images');
+	 * Resize image and add watermark
+	 */
+	protected function resizeImage($image): void
+	{
+		$fileName = $image['name'];
+		$pathImage = public_path('temp/') . $image['name'];
+		$img   = Image::make($pathImage);
+		$token = str_random(150) . uniqid() . now()->timestamp;
+		$url   = ucfirst(Helper::urlToDomain(url('/')));
+		$path  = config('path.images');
 
-			 $width     = $img->width();
-			 $height    = $img->height();
+		$width = $img->width();
+		$height = $img->height();
 
-			 if ($extension == 'gif') {
-				 $this->insertImage($fileName, $width, $height, 'gif', $token);
+		if ($image['extension'] == 'gif') {
+			$this->insertImage($fileName, $width, $height, 'gif', $token, $image);
 
-				 // Move file to Storage
-				 $this->moveFileStorage($fileName, $path);
-
-			 } else {
-				 //=============== Image Large =================//
-				 if ($width > 2000) {
-					 $scale = 2000;
-				 } else {
-					 $scale = $width;
-				 }
-
-				 // Calculate font size
-				 if ($width >= 400 && $width < 900) {
-					 $fontSize = 18;
-				 } elseif ($width >= 800 && $width < 1200) {
-					 $fontSize = 24;
-				 } elseif ($width >= 1200 && $width < 2000) {
-					 $fontSize = 32;
-				 } elseif ($width >= 2000 && $width < 3000) {
-					 $fontSize = 50;
-				 } elseif ($width >= 3000) {
-					 $fontSize = 75;
-				 } else {
-					 $fontSize = 0;
-				 }
-
-				 if (config('settings.watermark') == 'on') {
-					 $img->orientate()->resize($scale, null, function ($constraint) {
-						 $constraint->aspectRatio();
-						 $constraint->upsize();
-					 })->text($url.'/'.auth()->user()->username, $img->width() - 30, $img->height() - 30, function($font)
-							 use ($fontSize) {
-							 $font->file(public_path('webfonts/arial.TTF'));
-							 $font->size($fontSize);
-							 $font->color('#eaeaea');
-							 $font->align('right');
-							 $font->valign('bottom');
-					 })->save();
-				 } else {
-					 $img->orientate()->resize($scale, null, function ($constraint) {
-						 $constraint->aspectRatio();
-						 $constraint->upsize();
-					 })->save();
-				 }
-
-				 // Insert in Database
-				 $this->insertImage($fileName, $width, $height, null, $token);
-
-				 // Move file to Storage
-				 $this->moveFileStorage($fileName, $path);
-		 }
-
-	 }// End method resizeImage
-
-
-		 /**
-	      * Insert Image to Database
-	      *
-	      * @return void
-	      */
-		 protected function insertImage($image, $width, $height, $imgType, $token)
-		 {
-			 Media::create([
-				 'updates_id' => 0,
-				 'user_id' => auth()->id(),
-				 'type' => 'image',
-				 'image' => $image,
-				 'width' => $width,
-				 'height' => $height,
-				 'video' => '',
-				 'video_embed' => '',
-				 'music' => '',
-				 'file' => '',
-				 'file_name' => '',
-				 'file_size' => '',
-				 'img_type' => $imgType ?? '',
-				 'token' => $token,
-				 'status' => 'pending',
-				 'created_at' => now()
-			 ]);
-
-		 }// end method insertImage
-
-		 /**
-	      * Upload Video
-	      *
-	      * @return void
-	      */
-			protected function uploadVideo($video)
-			{
-				$path = config('path.videos');
-				$token = str_random(150).uniqid().now()->timestamp;
-
-				// We insert the file into the database with a status 'pending'
-				Media::create([
-					'updates_id' => 0,
-					'user_id' => auth()->id(),
-					'type' => 'video',
-					'image' => '',
-					'video' => $video,
-					'video_poster' => '',
-					'video_embed' => '',
-					'music' => '',
-					'file' => '',
-					'file_name' => '',
-					'file_size' => '',
-					'img_type' => '',
-					'token' => $token,
-					'status' => 'pending',
-					'created_at' => now()
-				]);
-
-					// Move file to Storage
-					if (config('settings.video_encoding') == 'off') {
-						$this->moveFileStorage($video, $path);
-					}
+			// Move file to Storage
+			$this->moveFileStorage($fileName, $path);
+		} else {
+			// Image Large
+			if ($width > 2000) {
+				$scale = 2000;
+			} else {
+				$scale = $width;
 			}
 
-				/**
-	 	      * Upload Music
-	 	      *
-	 	      * @return void
-	 	      */
-				protected function uploadMusic($music)
-				{
-					$path = config('path.music');
-					$token = str_random(150).uniqid().now()->timestamp;
+			// Calculate font size
+			if ($width >= 400 && $width < 900) {
+				$fontSize = 18;
+			} elseif ($width >= 800 && $width < 1200) {
+				$fontSize = 24;
+			} elseif ($width >= 1200 && $width < 2000) {
+				$fontSize = 32;
+			} elseif ($width >= 2000 && $width < 3000) {
+				$fontSize = 50;
+			} elseif ($width >= 3000) {
+				$fontSize = 75;
+			} else {
+				$fontSize = 0;
+			}
 
-					// We insert the file into the database with a status 'pending'
-					Media::create([
-					'updates_id' => 0,
-					'user_id' => auth()->id(),
-					'type' => 'music',
-					'image' => '',
-					'video' => '',
-					'video_embed' => '',
-					'music' => $music,
-					'file' => '',
-					'file_name' => '',
-					'file_size' => '',
-					'img_type' => '',
-					'token' => $token,
-					'status' => 'pending',
-					'created_at' => now()
-					]);
+			if (config('settings.watermark') == 'on') {
+				$img->orientate()->resize($scale, null, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				})->text($url . '/' . auth()->user()->username, $img->width() - 30, $img->height() - 30, function ($font)
+				use ($fontSize) {
+					$font->file(public_path('webfonts/arial.TTF'));
+					$font->size($fontSize);
+					$font->color('#eaeaea');
+					$font->align('right');
+					$font->valign('bottom');
+				})->save();
+			} else {
+				$img->orientate()->resize($scale, null, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+				})->save();
+			}
 
-					// Move file to Storage
-					$this->moveFileStorage($music, $path);
-				}
+			// Insert in Database
+			$this->insertImage($fileName, $width, $height, null, $token, $image);
 
-		 /**
-	      * Move file to Storage
-	      *
-	      * @return void
-	      */
-		 protected function moveFileStorage($file, $path)
-		 {
-			$localFile = public_path('temp/'.$file);
+			// Move file to Storage
+			$this->moveFileStorage($fileName, $path);
+		}
+	}
 
-			// Move the file...
-			Storage::putFileAs($path, new File($localFile), $file);
-
-			 // Delete temp file
-			unlink($localFile);
-
-		} // end method moveFileStorage
 
 	/**
-     * delete a file
-     *
-     * @return void
-     */
+	 * Insert Image to Database
+	 */
+	protected function insertImage($fileName, $width, $height, $imgType, $token, $image): void
+	{
+		Media::create([
+			'updates_id' => $this->postId,
+			'user_id' => auth()->id(),
+			'type' => 'image',
+			'image' => $fileName,
+			'width' => $width,
+			'height' => $height,
+			'video' => '',
+			'video_embed' => '',
+			'music' => '',
+			'file' => '',
+			'file_name' => '',
+			'file_size' => '',
+			'bytes' => $image['size'],
+			'mime' => $image['type'],
+			'img_type' => $imgType ?? '',
+			'token' => $token,
+			'status' => $this->status,
+			'created_at' => now()
+		]);
+	}
+
+	/**
+	 * Upload Video
+	 */
+	protected function uploadVideo($video): void
+	{
+		Media::create([
+			'updates_id' => $this->postId,
+			'user_id' => auth()->id(),
+			'type' => 'video',
+			'image' => '',
+			'video' => $video['name'],
+			'video_poster' => '',
+			'video_embed' => '',
+			'music' => '',
+			'file' => '',
+			'file_name' => '',
+			'file_size' => '',
+			'bytes' => $video['size'],
+			'mime' => $video['type'],
+			'img_type' => '',
+			'token' => $this->getToken(),
+			'status' => $this->status,
+			'created_at' => now()
+		]);
+
+		// Move file to Storage
+		if (config('settings.video_encoding') == 'off') {
+			$this->moveFileStorage($video['name'], config('path.videos'));
+		}
+	}
+
+	/**
+	 * Upload Music
+	 */
+	protected function uploadMusic($music): void
+	{
+		Media::create([
+			'updates_id' => $this->postId,
+			'user_id' => auth()->id(),
+			'type' => 'music',
+			'image' => '',
+			'video' => '',
+			'video_embed' => '',
+			'music' => $music['name'],
+			'file' => '',
+			'file_name' => '',
+			'file_size' => '',
+			'bytes' => $music['size'],
+			'mime' => $music['type'],
+			'img_type' => '',
+			'token' => $this->getToken(),
+			'status' => $this->status,
+			'created_at' => now()
+		]);
+
+		// Move file to Storage
+		$this->moveFileStorage($music['name'], config('path.music'));
+	}
+
+	/**
+	 * Move file to Storage
+	 */
+	protected function moveFileStorage($file, $path): void
+	{
+		$localFile = public_path('temp/' . $file);
+
+		// Move the file...
+		Storage::putFileAs($path, new File($localFile), $file);
+
+		// Delete temp file
+		unlink($localFile);
+	}
+
+	protected function getToken(): mixed
+	{
+		return str_random(150) . uniqid() . now()->timestamp;
+	}
+
+	/**
+	 * delete a file
+	 */
 	public function delete()
 	{
-		// PATHS
-    $path      = config('path.images');
-    $pathVideo = config('path.videos');
-    $pathMusic = config('path.music');
-		$local     = 'temp/';
+		$path = config('path.images');
+		$pathVideo = config('path.videos');
+		$pathMusic = config('path.music');
+		$pathFile = config('path.files');
+		$local = 'temp/';
 
-    $media = Media::whereImage($this->request->file)
-    ->orWhere('video', $this->request->file)
-    ->orWhere('music', $this->request->file)
-    ->first();
+		$media = Media::whereUserId(auth()->id())
+			->whereImage($this->request->file)
+			->orWhere('video', $this->request->file)
+			->whereUserId(auth()->id())
+			->orWhere('music', $this->request->file)
+			->whereUserId(auth()->id())
+			->orWhere('file', $this->request->file)
+			->whereUserId(auth()->id())
+			->first();
 
-    if (! $media) {
-      return false;
-    }
+		if (!$media) {
+			return false;
+		}
 
-    if ($media->image) {
-      Storage::delete($path.$media->image);
-
+		if ($media->image) {
+			Storage::delete($path . $media->image);
 			// Delete local file (if exist)
-      Storage::disk('default')->delete($local.$media->image);
+			Storage::disk('default')->delete($local . $media->image);
 
-      $media->delete();
-    }
+			$media->delete();
+		}
 
-    if ($media->video) {
-      Storage::delete($pathVideo.$media->video);
-      Storage::delete($pathVideo.$media->video_poster);
-
+		if ($media->video) {
+			Storage::delete($pathVideo . $media->video);
+			Storage::delete($pathVideo . $media->video_poster);
 			// Delete local file (if exist)
-      Storage::disk('default')->delete($local.$media->video);
+			Storage::disk('default')->delete($local . $media->video);
 
-      $media->delete();
-    }
+			$media->delete();
+		}
 
-    if ($media->music) {
-      Storage::delete($pathMusic.$media->music);
-
+		if ($media->music) {
+			Storage::delete($pathMusic . $media->music);
 			// Delete local file (if exist)
-      Storage::disk('default')->delete($local.$media->music);
+			Storage::disk('default')->delete($local . $media->music);
 
-      $media->delete();
-    }
+			$media->delete();
+		}
 
-    return response()->json([
-        'success' => true
-    ]);
-	}// End method
+		if ($media->file) {
+			Storage::delete($pathFile . $media->file);
 
+			$media->delete();
+		}
+
+		return response()->json([
+			'success' => true
+		]);
+	}
 }

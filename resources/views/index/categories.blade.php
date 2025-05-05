@@ -20,7 +20,9 @@
 
 <div class="col-md-3 mb-4">
 
-  @include('includes.menu-filters-creators')
+  @if (!$settings->disable_creators_section)
+    @include('includes.menu-filters-creators')
+  @endif
 
     @include('includes.listing-categories')
 

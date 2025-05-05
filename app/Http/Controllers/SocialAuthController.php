@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Socialite;
-use Illuminate\Http\Request;
 use App\Services\SocialAccountService;
 
 class SocialAuthController extends Controller
@@ -14,7 +13,7 @@ class SocialAuthController extends Controller
     return Socialite::driver($provider)->redirect();
   }
   // Callback function
-  public function callback(SocialAccountService $service, Request $request, $provider)
+  public function callback(SocialAccountService $service, $provider)
   {
     try {
       $user = $service->createOrGetUser(Socialite::driver($provider)->user(), $provider);
@@ -26,7 +25,7 @@ class SocialAuthController extends Controller
         auth()->login($user);
       }
     } catch (\Exception $e) {
-      return redirect('login')->with(['login_required' => $e->getMessage()]);
+      return redirect('login')->with(['error_social_login' => $e->getMessage()]);
     }
 
     return redirect()->to('/');

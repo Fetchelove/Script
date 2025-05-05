@@ -12,6 +12,8 @@
 
 		<div class="col-lg-12">
 
+			@include('errors.errors-forms')
+
 			@if (session('success_message'))
       <div class="alert alert-success alert-dismissible fade show" role="alert">
               <i class="bi bi-check2 me-1"></i>	{{ session('success_message') }}
@@ -49,8 +51,13 @@
 							(Log File: {{ Helper::formatBytes(filesize(storage_path("logs".DIRECTORY_SEPARATOR."laravel.log"))) }})
 						</small>
 						@endif
-						
 					</a>
+
+					@if (auth()->user()->isSuperAdmin() && file_exists(storage_path("logs".DIRECTORY_SEPARATOR."laravel.log")))
+						<a href="{{ url('panel/admin/download/logs') }}" class="btn btn-link text-reset mt-3 px-3 e-none text-decoration-none">
+							<i class="bi-download me-1"></i> {{ __('general.download') }} Laravel.log
+						</a>
+					@endif
 		          </div>
 		        </div>
 

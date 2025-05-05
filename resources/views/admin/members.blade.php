@@ -103,34 +103,35 @@
  											@endif
                      </td>
 
-										 @php
-
-										 if ($user->verified_id == 'no' ) {
-		                        			$verified    = 'warning';
-		  								$_verified = __('admin.pending');
-		               } elseif ($user->verified_id == 'yes' ) {
-		                        			$verified = 'success';
-		  								$_verified = __('admin.verified');
-		                        		} else {
-		                        			$verified = 'danger';
-		  								$_verified = __('admin.reject');
-		                        		}
-		                   @endphp
+						@php
+							if ($user->verified_id == 'no' ) {
+							$verified    = 'warning';
+							$_verified = __('admin.pending');
+							} elseif ($user->verified_id == 'yes' ) {
+								$verified = 'success';
+							$_verified = __('admin.verified');
+							} else {
+								$verified = 'danger';
+							$_verified = __('admin.reject');
+							}
+						@endphp
 
 		                        <td><span class="rounded-pill badge bg-{{$verified}}">{{ $_verified }}</span></td>
 
                     @php
-
-										if ($user->status == 'pending') {
-					                  $mode    = 'info';
-					                  $_status = __('admin.pending');
-					                           } elseif ($user->status == 'active') {
-					                  $mode = 'success';
-					                  $_status = __('admin.active');
-					                           } else {
-					                 $mode = 'warning';
-					                 $_status = __('admin.suspended');
-                         }
+						if ($user->status == 'pending') {
+						$mode    = 'info';
+						$_status = __('admin.pending');
+						} elseif ($user->status == 'active') {
+						$mode = 'success';
+						$_status = __('admin.active');
+						} elseif ($user->status == 'disabled') {
+						$mode = 'secondary';
+						$_status = __('admin.disabled');
+						} else {
+						$mode = 'warning';
+						$_status = __('admin.suspended');
+                        }
                     @endphp
 
                      <td><span class="rounded-pill badge bg-{{$mode}}">{{ $_status }}</span></td>

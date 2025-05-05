@@ -61,15 +61,40 @@ class Helper
 		$str = str_replace(array(chr(10), chr(13)), '', $str);
 		$url = preg_replace('#^https?://#', '', url('') . '/');
 
-		// Hashtags and @Mentions
-		$str = preg_replace_callback(
-			'~([#@])([^\s#@!\"\$\%&\'\(\)\*\+\,\./\:\;\<\=\>?\[/\/\/\\]\^\`\{\|\}\~]+)~',
-			function ($matches) use ($url) {
-				$url = $matches[1] == "#" ? "" . $url . "explore?q=%23" . $matches[2] . "" : $url . $matches[2];
-				return "<a href=\"//" . $url . "\">$matches[0]</a>";
-			},
-			$str
-		);
+		// Hashtags and @Mentions / proper identation by AMR
+        $str = preg_replace_callback(
+            '~([#@])([^\s#@!\"\$\%&\'\(\)\*\+\,\./\:\;\<\=\>?\[/\/\/\\]\^\`\{\|\}\~]+)~',
+            function ($matches) use($url, $str) {
+                $url   = $matches[1] == "#"? "".$url."explore?q=%23".$matches[2]."" : $url.$matches[2];
+                $regex = '~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i';
+                preg_match_all($regex, $str, $result, PREG_PATTERN_ORDER); // for URL
+                $A     = $result[0];
+                $pass  = false;
+                foreach($A as $B) {
+                    if (!empty($matches[0]) && str_contains($B, $matches[0])) {
+                        $pass = true;
+                        break;
+                    }
+                }
+                // This regular expression extracts all emails from a string:
+                $regexp = '/([a-z0-9_\.\-])+\@(([a-z0-9\-])+\.)+([a-z0-9]{2,4})+/i';
+                preg_match_all($regexp, $str, $m);
+                $email_array = ($m[0]) ? $m[0] : array();
+                $C = $email_array;
+                foreach($C as $D) {
+                    if (!empty($matches[0]) && str_contains($D, $matches[0])) {
+                        $pass = true;
+                        break;
+                    }
+                }
+                if ($pass === false) {
+                    return "<a href=\"//".$url."\">$matches[0]</a>";
+                } else {
+                    return $matches[0];
+                }
+            },
+            $str
+        );
 
 		$str = stripslashes($str);
 		return $str;
@@ -407,28 +432,15 @@ class Helper
 	public static function getYoutubeId($url)
 	{
 		$pattern =
-			'%^# Match any youtube URL
-			(?:https?://)?
-			(?:www\.)?
-			(?:
-				youtu\.be/
-			| youtube\.com
-				(?:
-					/embed/
-				| /v/
-				| .*v=
-				)
-			)
-			([\w-]{10,12})
-			($|&).*
-			$%x';
+			'/(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtu\.be\/|youtube\.com\/(?:(?:watch)?\?(?:\S*&)?vi?=|(?:embed|v|vi|user|shorts)\/))([^?&\"\'>\s]+)/';
 
-		$result = preg_match($pattern, $url, $matches);
+		preg_match($pattern, $url, $matches);
+		
 		if ($matches) {
 			return $matches[1];
 		}
 		return false;
-	} //<<<-- End
+	}
 
 	public static function getVimeoId($url)
 	{
@@ -504,7 +516,7 @@ class Helper
 			$decimalDot = ',';
 			$decimalComma = '.';
 		}
-
+		
 		switch (config('settings.currency_position')) {
 			case 'left':
 				$amount = config('settings.currency_symbol') . number_format($value, 2, $decimalDot, $decimalComma);
@@ -636,7 +648,7 @@ class Helper
 
 	public static function calculatePercentage($value, $percentage)
 	{
-		return number_format(($value * $percentage / 100), 2);
+		return number_format(($value * $percentage / 100), 2, '.', '');
 	}
 
 	public static function envUpdate($key, $value, $comma = false)
@@ -949,9 +961,7 @@ class Helper
 
 	public static function referralLink()
 	{
-		if (auth()->check() && config('settings.referral_system') == 'on') {
-			return '?ref=' . auth()->user()->id;
-		}
+		return auth()->check() && config('settings.referral_system') == 'on' ? '?ref=' . auth()->id() : null;
 	}
 
 	public static function pages()
@@ -1265,7 +1275,7 @@ class Helper
 
 	public static function showLoginFormModal()
 	{
-		return request()->is('/') && config('settings.home_style') == 0
+		return request()->is('/') && in_array(config('settings.home_style'), [0, 2])
 			|| request()->route()->named('profile')
 			|| request()->is([
 				'creators',

@@ -67,9 +67,14 @@
               </small>
             </div><!-- End form-group -->
 
-            <div class="w-100">
-              <span id="previewImage"></span>
-              <a href="javascript:void(0)" id="removePhoto" class="text-danger p-1 px-2 display-none btn-tooltip-form" data-toggle="tooltip" data-placement="top" title="{{__('general.delete')}}"><i class="fa fa-times-circle"></i></a>
+            <div class="w-100 mb-2">
+              <small id="previewImage"></small>
+              <a href="javascript:void(0)" id="removePhoto" class="text-danger p-1 small display-none btn-tooltip-form" data-toggle="tooltip" data-placement="top" title="{{__('general.delete')}}"><i class="fa fa-times-circle"></i></a>
+            </div>
+
+            <div class="w-100 mb-2">
+              <small id="previewEpub"></small>
+              <a href="javascript:void(0)" id="removeEpub" class="text-danger p-1 small display-none btn-tooltip-form" data-toggle="tooltip" data-placement="top" title="{{__('general.delete')}}"><i class="fa fa-times-circle"></i></a>
             </div>
 
             <input type="file" name="photo[]" id="filePhoto" accept="image/*,video/mp4,video/x-m4v,video/quicktime,audio/mp3" multiple class="visibility-hidden filepond">
@@ -82,7 +87,15 @@
             <input type="file" name="zip" id="fileZip" accept="application/x-zip-compressed" class="visibility-hidden">
 
             <button type="button" class="btn btn-post btn-tooltip-form p-bottom-8 e-none @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill" data-toggle="tooltip" data-placement="top" title="{{__('general.upload_file_zip')}}" onclick="$('#fileZip').trigger('click')">
-              <i class="bi bi-file-earmark-zip f-size-20 align-bottom"></i>
+              <i class="bi-file-earmark-zip f-size-20 align-bottom"></i>
+            </button>
+          @endif
+
+          @if ($settings->allow_epub_files)
+            <input type="file" name="epub" id="ePubFile" accept="application/epub+zip" class="visibility-hidden">
+
+            <button type="button" class="btn btn-post btn-tooltip-form p-bottom-8 e-none @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill" data-toggle="tooltip" data-placement="top" title="{{__('general.upload_epub_file')}}" onclick="$('#ePubFile').trigger('click')">
+              <i class="bi-book f-size-20 align-bottom"></i>
             </button>
           @endif
 
@@ -90,9 +103,11 @@
               <i class="feather icon-tag f-size-20 align-bottom"></i>
             </button>
 
+            @if (!$settings->disable_free_post)
             <button type="button" id="contentLocked" class="btn btn-post btn-tooltip-form e-none @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill {{auth()->user()->post_locked == 'yes' ? '' : 'unlock'}}" data-toggle="tooltip" data-placement="top" title="{{__('users.locked_content')}}">
               <i class="feather icon-{{auth()->user()->post_locked == 'yes' ? '' : 'un'}}lock f-size-20 align-bottom"></i>
             </button>
+            @endif
 
             @if ($settings->live_streaming_status == 'on')
               <button type="button" data-toggle="tooltip" data-placement="top" title="{{__('general.stream_live')}}" class="btn btn-post p-bottom-8 btn-tooltip-form e-none btnCreateLive @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill">

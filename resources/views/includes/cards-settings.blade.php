@@ -288,7 +288,7 @@
 				</a>
 				@endif
 
-				@if (auth()->user()->verified_id == 'yes' || $settings->referral_system == 'on' || auth()->user()->balance != 0.00)
+				@if (auth()->user()->verified_id == 'yes')
 				<a href="{{url('settings/payout/method')}}" class="list-group-item list-group-item-action d-flex justify-content-between @if (request()->is('settings/payout/method')) active @endif">
 						<div>
 								<i class="bi bi-credit-card mr-2"></i>

@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Mail;
 use App\Helper;
-use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Updates;
 use App\Models\Deposits;
@@ -16,8 +14,6 @@ use App\Models\Notifications;
 use App\Models\Subscriptions;
 use App\Models\PaymentGateways;
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class CCBillController extends Controller
 {
@@ -30,7 +26,7 @@ class CCBillController extends Controller
   }
 
   /**
-   * Show/Send form PayPal
+   * Show/Send form CCBill
    *
    * @return response
    */
@@ -205,6 +201,11 @@ class CCBillController extends Controller
             $subscription->save();
 
             $this->sendWelcomeMessageAction($creator, $userID);
+
+            // Send Notification
+            if ($creator->notify_new_subscriber == 'yes') {
+              Notifications::send($creator->id, $userID, 1, $userID);
+            }
           }
 
           // Admin and user earnings calculation
@@ -227,7 +228,6 @@ class CCBillController extends Controller
 
           // Add Earnings to User
           $creator->increment('balance', $earnings['user']);
-          
         } elseif ($request->{'X-type'} == 'tip') {
 
           // Amount

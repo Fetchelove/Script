@@ -38,6 +38,10 @@ class RebillCardinity implements ShouldQueue
       ->where('ends_at', '<=', now())
       ->whereNotNull('payment_id')
       ->whereCancelled('no')
+      ->latest()
+        ->whereIn('id', function ($q) {
+          $q->selectRaw('MAX(id) FROM subscriptions GROUP BY creator_id, user_id');
+        })
       ->get();
 
     if ($subscriptions) {

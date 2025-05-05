@@ -9,14 +9,14 @@ class Messages extends Model
 {
   protected $guarded = [];
 
-  public static function conversations() 
+  public static function conversations()
   {
-    $fields = 'id,avatar,name,username,hide_name,verified_id,active_status_online';
+    $fields = 'id,avatar,name,username,hide_name,status,verified_id,active_status_online';
 
     return self::from('messages as m1')
       ->select('m1.*')
       ->join(DB::raw(
-          '(
+        '(
           SELECT
               LEAST(from_user_id, to_user_id) AS from_user_id,
               GREATEST(from_user_id, to_user_id) AS to_user_id,
@@ -26,15 +26,15 @@ class Messages extends Model
               LEAST(from_user_id, to_user_id),
               GREATEST(from_user_id, to_user_id)
       ) AS m2'
-      ), fn($join) => $join
-          ->on(DB::raw('LEAST(m1.from_user_id, m1.to_user_id)'), '=', 'm2.from_user_id')
-          ->on(DB::raw('GREATEST(m1.from_user_id, m1.to_user_id)'), '=', 'm2.to_user_id')
-          ->on('m1.id', '=', 'm2.max_id'))
+      ), fn ($join) => $join
+        ->on(DB::raw('LEAST(m1.from_user_id, m1.to_user_id)'), '=', 'm2.from_user_id')
+        ->on(DB::raw('GREATEST(m1.from_user_id, m1.to_user_id)'), '=', 'm2.to_user_id')
+        ->on('m1.id', '=', 'm2.max_id'))
       ->where('m1.from_user_id', auth()->id())
       ->orWhere('m1.to_user_id', auth()->id())
       ->orderByDesc('m1.created_at')
       ->orderByDesc('m1.id')
-      ->with(['sender:'.$fields, 'receiver:'.$fields, 'media'])
+      ->with(['sender:' . $fields, 'receiver:' . $fields, 'media'])
       ->simplePaginate(10);
   }
 
@@ -52,15 +52,15 @@ class Messages extends Model
   {
     if ($this->from_user_id == auth()->id()) {
       return $this->receiver;
-    } 
+    }
 
     return $this->sender;
   }
 
   public function remitterName()
   {
-    return $this->remitter()->hide_name == 'yes' 
-      ? $this->remitter()->username 
+    return $this->remitter()->hide_name == 'yes'
+      ? $this->remitter()->username
       : $this->remitter()->name;
   }
 
@@ -68,7 +68,7 @@ class Messages extends Model
   {
     return $this->where('from_user_id', $this->remitter()->id)
       ->where('to_user_id', auth()->id())
-      ->where('status','new')
+      ->where('status', 'new')
       ->count();
   }
 
@@ -84,10 +84,10 @@ class Messages extends Model
     $this->save();
   }
 
-  public function media() 
+  public function media()
   {
-		return $this->hasMany(MediaMessages::class)->where('status', 'active')->orderBy('id','asc');
-	}
+    return $this->hasMany(MediaMessages::class)->where('status', 'active')->orderBy('id', 'asc');
+  }
 
   public function scopeGetMessageChat($query, $id, $skip = null)
   {
@@ -96,19 +96,26 @@ class Messages extends Model
     $query->where('to_user_id', auth()->id())
       ->where('from_user_id', $id)
       ->whereMode('active')
-      ->orWhere( 'from_user_id', auth()->id() )
+      ->orWhere('from_user_id', auth()->id())
       ->where('to_user_id', $id)
       ->whereMode('active');
 
-      $query->when($skip, fn ($q) => 
-  			$q->skip($skip)
-  		);
+    $query->when(
+      $skip,
+      fn ($q) =>
+      $q->skip($skip)
+    );
 
-      $query = $query->take(10)
+    $query = $query->take(10)
       ->orderBy('messages.id', 'DESC')
-      ->with(['sender:'.$fields, 'receiver:'.$fields, 'media'])
+      ->with(['sender:' . $fields, 'receiver:' . $fields, 'media'])
       ->get();
 
-      return $query;
+    return $query;
+  }
+
+  public function gift()
+  {
+    return $this->belongsTo(Gift::class)->where('status', true);
   }
 }

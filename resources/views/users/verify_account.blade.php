@@ -115,6 +115,17 @@
                     <span class="btn-block mb-2 previewImage" id="previewImage"></span>
                 </div>
 
+                <div class="custom-control custom-control-alternative custom-checkbox">
+                  <input class="custom-control-input" required id="agreeTermsPrivacy" name="agree_terms_privacy" type="checkbox">
+                  <label class="custom-control-label" for="agreeTermsPrivacy">
+                    <span>{{__('general.i_agree_with')}} 
+                      <a href="{{$settings->link_terms}}" target="_blank">{{__('admin.terms_conditions')}}</a>
+                      {{ __('general.and') }}
+                        <a href="{{$settings->link_privacy}}" target="_blank">{{__('admin.privacy_policy')}}</a>
+                    </span>
+                  </label>
+                </div>
+
                 <button class="btn btn-1 btn-success btn-block mt-5" id="sendData" type="submit">{{trans('general.send_approval')}}</button>
           </form>
 

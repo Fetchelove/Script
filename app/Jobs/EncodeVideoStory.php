@@ -138,21 +138,8 @@ class EncodeVideoStory implements ShouldQueue
 
       // Notify to user - destination, author, type, target
       Notifications::send($story->user->id, $story->user->id, 17, 0);
-
     } catch (\Exception $e) {
-      Stories::whereId($this->video->stories_id)->delete();
-
-      MediaStories::whereId($this->video->id)->delete();
-
-      // Notify to user (ERROR) - destination, author, type, target
-      Notifications::send($story->user->id, $story->user->id, 22, 0);
-
-      // Delete file
-      $this->deleteFile($videoPathDisk);
-
-      if ($videoPoster) {
-        $this->deleteFile($videoPoster);
-      }
+      $this->handleFailedJob($story, $videoPathDisk, $videoPoster);
     }
   } // End Handle
 
@@ -172,6 +159,31 @@ class EncodeVideoStory implements ShouldQueue
 
     // Delete temp file
     unlink($localFile);
+  }
+
+  public function handleFailedJob($story, $videoPathDisk, $videoPoster = null)
+  {
+    MediaStories::whereId($this->video->id)->delete();
+
+    // Notify to user (ERROR) - destination, author, type, target
+    Notifications::send($story->user->id, $story->user->id, 22, 0);
+
+    Stories::whereId($this->video->stories_id)->delete();
+
+    // Delete file
+    $this->deleteFile($videoPathDisk);
+
+    if ($videoPoster) {
+      $this->deleteFile($videoPoster);
+    }
+  }
+
+  /**
+   * Handle a job failure.
+   */
+  public function failed($story, $videoPathDisk, $videoPoster): void
+  {
+    self::handleFailedJob($story, $videoPathDisk, $videoPoster);
   }
 
   /**

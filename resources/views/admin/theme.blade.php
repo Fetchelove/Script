@@ -34,17 +34,24 @@
 			         <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.home_style') }}</legend>
 			         <div class="col-sm-10">
 			           <div class="form-check mb-3">
-			             <input class="form-check-input" type="radio" name="home_style" id="radio1" @if ($settings->home_style == 0) checked="checked" @endif value="0">
+			             <input class="form-check-input" type="radio" name="home_style" id="radio1" @checked($settings->home_style == 0) value="0">
 			             <label class="form-check-label" for="radio1">
 			               <img class="border" src="{{url('/public/img/homepage-1.jpg')}}">
 			             </label>
 			           </div>
-			           <div class="form-check">
-			             <input class="form-check-input" type="radio" name="home_style" id="radio2" @if ($settings->home_style == 1) checked="checked" @endif value="1">
+			           <div class="form-check mb-3">
+			             <input class="form-check-input" type="radio" name="home_style" id="radio2" @checked($settings->home_style == 1) value="1">
 			             <label class="form-check-label" for="radio2">
 							<img class="border" src="{{url('/public/img/homepage-2.jpg')}}">
 			             </label>
 			           </div>
+
+					   <div class="form-check">
+						<input class="form-check-input" type="radio" name="home_style" id="radio3" @checked($settings->home_style == 2) value="2">
+						<label class="form-check-label" for="radio3">
+						   <img class="border" src="{{url('/public/img/homepage-explore.jpg')}}">
+						</label>
+					  </div>
 			         </div>
 			       </fieldset><!-- end row -->
 

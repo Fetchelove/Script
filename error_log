@@ -1,0 +1,68 @@
+[14-Mar-2024 04:22:25 UTC] {"message":"currency_id invalid","error":"invalid_items","status":400,"cause":null}
+[14-Mar-2024 04:26:49 UTC] {"message":"currency_id invalid","error":"invalid_items","status":400,"cause":null}
+[14-Mar-2024 04:50:33 UTC] {"message":"currency_id invalid","error":"invalid_items","status":400,"cause":null}
+[14-Mar-2024 15:01:17 UTC] {"message":"currency_id invalid","error":"invalid_items","status":400,"cause":null}
+[16-Jan-2025 14:57:10 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 14:57:37 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 14:58:10 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 14:58:37 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 14:59:10 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 14:59:37 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:00:10 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:00:37 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:01:10 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:01:37 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:02:10 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:02:37 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:03:10 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:03:37 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:04:10 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34
+[16-Jan-2025 15:04:37 America/Fortaleza] PHP Fatal error:  Uncaught Error: Failed opening required '/home3/fetich53/public_html/vendor/autoload.php' (include_path='.:/opt/cpanel/ea-php82/root/usr/share/pear') in /home3/fetich53/public_html/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home3/fetich53/public_html/index.php on line 34

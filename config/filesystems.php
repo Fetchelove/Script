@@ -102,6 +102,18 @@ return [
             'visibility' => 'public',
             'endpoint' => env('VULTR_ENDPOINT'),
         ],
+
+        'pushr' => [
+            'driver' => 's3',
+            'key'=> env('PUSHR_ACCESS_KEY'),
+            'secret' => env('PUSHR_SECRET_KEY'),
+            'region' => 'us-east-1',
+            'bucket' => env('PUSHR_BUCKET'),
+            'url' => env('PUSHR_URL'),
+            'endpoint' => env('PUSHR_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'visibility' => 'public',
+        ],
     ],
 
     /*

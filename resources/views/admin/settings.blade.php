@@ -131,6 +131,24 @@
          </div>
        </fieldset><!-- end row -->
 
+       <fieldset class="row mb-3">
+        <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.default_theme') }}</legend>
+        <div class="col-sm-10">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="theme" id="light_mode" @if ($settings->theme == 'light') checked="checked" @endif value="light">
+            <label class="form-check-label" for="light_mode">
+              {{ __('general.light_mode') }}
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="theme" id="dark_mode" @if ($settings->theme == 'dark') checked="checked" @endif value="dark">
+            <label class="form-check-label" for="dark_mode">
+              {{ __('general.dark_mode') }}
+            </label>
+          </div>
+        </div>
+      </fieldset><!-- end row -->
+
 			 <fieldset class="row mb-3">
          <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.who_can_see_content') }}</legend>
          <div class="col-sm-10">
@@ -365,7 +383,7 @@
          <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.allow_zip_files') }}</legend>
          <div class="col-sm-10">
            <div class="form-check form-switch form-switch-md">
-            <input class="form-check-input" type="checkbox" name="allow_zip_files" @if ($settings->allow_zip_files) checked="checked" @endif value="1" role="switch">
+            <input class="form-check-input" type="checkbox" name="allow_zip_files" @checked($settings->allow_zip_files) value="1" role="switch">
           </div>
          </div>
        </fieldset><!-- end row -->
@@ -374,7 +392,7 @@
         <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.zip_verification_creator') }}</legend>
         <div class="col-sm-10">
           <div class="form-check form-switch form-switch-md">
-           <input class="form-check-input" type="checkbox" name="zip_verification_creator" @if ($settings->zip_verification_creator) checked="checked" @endif value="1" role="switch">
+           <input class="form-check-input" type="checkbox" name="zip_verification_creator" @checked($settings->zip_verification_creator) value="1" role="switch">
          </div>
         </div>
       </fieldset><!-- end row -->
@@ -383,7 +401,79 @@
         <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.allow_scheduled_posts') }}</legend>
         <div class="col-sm-10">
           <div class="form-check form-switch form-switch-md">
-           <input class="form-check-input" type="checkbox" name="allow_scheduled_posts" @if ($settings->allow_scheduled_posts) checked="checked" @endif value="1" role="switch">
+           <input class="form-check-input" type="checkbox" name="allow_scheduled_posts" @checked($settings->allow_scheduled_posts) value="1" role="switch">
+         </div>
+        </div>
+      </fieldset><!-- end row -->
+
+      <fieldset class="row mb-4">
+        <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.allow_creators_deactivate_profile') }} ({{ __('general.free_subscription') }})</legend>
+        <div class="col-sm-10">
+          <div class="form-check form-switch form-switch-md">
+           <input class="form-check-input" type="checkbox" name="allow_creators_deactivate_profile" @checked($settings->allow_creators_deactivate_profile) value="1" role="switch">
+         </div>
+        </div>
+      </fieldset><!-- end row -->
+
+      <fieldset class="row mb-4">
+        <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.allow_epub_files') }}</legend>
+        <div class="col-sm-10">
+          <div class="form-check form-switch form-switch-md">
+           <input class="form-check-input" type="checkbox" name="allow_epub_files" @checked($settings->allow_epub_files) value="1" role="switch">
+         </div>
+        </div>
+      </fieldset><!-- end row -->
+
+      <fieldset class="row mb-4">
+        <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.allow_sending_gifts') }}</legend>
+        <div class="col-sm-10">
+          <div class="form-check form-switch form-switch-md">
+           <input class="form-check-input" type="checkbox" name="gifts" @checked($settings->gifts) value="1" role="switch">
+         </div>
+        </div>
+      </fieldset><!-- end row -->
+
+      <fieldset class="row mb-4">
+        <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.disable_free_post') }}</legend>
+        <div class="col-sm-10">
+          <div class="form-check form-switch form-switch-md">
+           <input class="form-check-input" type="checkbox" name="disable_free_post" @checked($settings->disable_free_post) value="1" role="switch">
+         </div>
+        </div>
+      </fieldset><!-- end row -->
+
+      <fieldset class="row mb-4">
+        <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.disable_explore_section') }}</legend>
+        <div class="col-sm-10">
+          <div class="form-check form-switch form-switch-md">
+           <input class="form-check-input" type="checkbox" name="disable_explore_section" @checked($settings->disable_explore_section) value="1" role="switch">
+         </div>
+        </div>
+      </fieldset><!-- end row -->
+
+      <fieldset class="row mb-4">
+        <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.disable_creators_section') }}</legend>
+        <div class="col-sm-10">
+          <div class="form-check form-switch form-switch-md">
+           <input class="form-check-input" type="checkbox" name="disable_creators_section" @checked($settings->disable_creators_section) value="1" role="switch">
+         </div>
+        </div>
+      </fieldset><!-- end row -->
+
+      <fieldset class="row mb-4">
+        <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.users_can_delete_messages') }}</legend>
+        <div class="col-sm-10">
+          <div class="form-check form-switch form-switch-md">
+           <input class="form-check-input" type="checkbox" name="users_can_delete_messages" @checked($settings->users_can_delete_messages) value="1" role="switch">
+         </div>
+        </div>
+      </fieldset><!-- end row -->
+
+      <fieldset class="row mb-4">
+        <legend class="col-form-label col-sm-2 pt-0 text-lg-end">{{ __('general.delete_old_users_inactive') }}</legend>
+        <div class="col-sm-10">
+          <div class="form-check form-switch form-switch-md">
+           <input class="form-check-input" type="checkbox" name="delete_old_users_inactive" @checked($settings->delete_old_users_inactive) value="1" role="switch">
          </div>
         </div>
       </fieldset><!-- end row -->

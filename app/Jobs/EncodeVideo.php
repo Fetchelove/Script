@@ -50,6 +50,7 @@ class EncodeVideo implements ShouldQueue
 
     // Get post
     $getPost = Updates::whereId($this->video->updates_id)->first();
+    $date = $getPost->editing ? $getPost->date : now();
 
     // Status final post
     $statusPost = $getPost->schedule ? 'schedule' : 'active';
@@ -141,7 +142,7 @@ class EncodeVideo implements ShouldQueue
         ->whereEncoded('no')
         ->get();
 
-        // Move Video File to Storage
+      // Move Video File to Storage
       $this->moveFileStorage($videoPathDiskMp4);
 
       // Move Video Poster to Storage
@@ -151,8 +152,8 @@ class EncodeVideo implements ShouldQueue
 
       if ($videos->count() == 0) {
         // Update date the post and status
-        Updates::whereId($this->video->updates_id)->update([
-          'date' => now(),
+        $getPost->update([
+          'date' => $date,
           'status' => $settings->auto_approve_post == 'on' ? $statusPost : 'pending'
         ]);
 
@@ -164,32 +165,8 @@ class EncodeVideo implements ShouldQueue
           event(new NewPostEvent($getPost));
         }
       }
-
     } catch (\Exception $e) {
-      // Update date the post and status
-      $post = Updates::whereId($this->video->updates_id)
-        ->whereStatus('encode')
-        ->update([
-          'date' => now(),
-          'status' => $settings->auto_approve_post == 'on' ? $statusPost : 'pending'
-        ]);
-
-      if ($post) {
-        // Notify to user (ERROR) - destination, author, type, target
-        Notifications::send($this->video->user_id, $this->video->user_id, 20, $this->video->updates_id);
-
-        // Delete file
-        $this->deleteFile($this->video->video);
-
-        $this->deleteFile($videoPathDiskMp4);
-
-        if ($videoPoster) {
-          $this->deleteFile($videoPoster);
-        }
-
-        // Delete Media
-        Media::whereUpdatesId($this->video->updates_id)->delete();
-      }
+      $this->handleFailedJob($getPost, $date, $settings, $statusPost, $videoPathDiskMp4, $videoPoster);
     }
   } // End Handle
 
@@ -209,6 +186,41 @@ class EncodeVideo implements ShouldQueue
 
     // Delete temp file
     unlink($localFile);
+  }
+
+  public function handleFailedJob($getPost, $date, $settings, $statusPost, $videoPathDiskMp4, $videoPoster = null)
+  {
+    // Update date the post and status
+    $post = $getPost->whereStatus('encode')
+      ->update([
+        'date' => $date,
+        'status' => $settings->auto_approve_post == 'on' ? $statusPost : 'pending'
+      ]);
+
+    if ($post) {
+      // Notify to user (ERROR) - destination, author, type, target
+      Notifications::send($this->video->user_id, $this->video->user_id, 20, $this->video->updates_id);
+
+      // Delete file
+      $this->deleteFile($this->video->video);
+
+      $this->deleteFile($videoPathDiskMp4);
+
+      if ($videoPoster) {
+        $this->deleteFile($videoPoster);
+      }
+
+      // Delete Media
+      Media::whereUpdatesId($this->video->updates_id)->delete();
+    }
+  }
+
+  /**
+   * Handle a job failure.
+   */
+  public function failed($getPost, $date, $settings, $statusPost, $videoPathDiskMp4, $videoPoster): void
+  {
+    self::handleFailedJob($getPost, $date, $settings, $statusPost, $videoPathDiskMp4, $videoPoster);
   }
 
   /**

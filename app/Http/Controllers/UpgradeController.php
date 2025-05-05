@@ -66,6 +66,7 @@ class UpgradeController extends Controller
 		$ROOT = base_path() . $DS;
 		$APP = app_path() . $DS;
 		$BOOTSTRAP_CACHE = base_path('bootstrap' . $DS . 'cache') . $DS;
+		$ACTIONS = app_path('Actions') . $DS;
 		$MODELS = app_path('Models') . $DS;
 		$NOTIFICATIONS = app_path('Notifications') . $DS;
 		$CONTROLLERS = app_path('Http' . $DS . 'Controllers') . $DS;
@@ -77,6 +78,7 @@ class UpgradeController extends Controller
 		$SERVICES = app_path('Services') . $DS;
 		$EVENTS = app_path('Events') . $DS;
 		$LISTENERS = app_path('Listeners') . $DS;
+		$RULES = app_path('Rules') . $DS;
 
 		$CONFIG = config_path() . $DS;
 		$ROUTES = base_path('routes') . $DS;
@@ -7957,221 +7959,221 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 
 			//============== Files Affected ================//
 			$files = [
-				'ffmpeg.php' => $ROOT,//5.0
-				
-				'web.php' => $ROUTES,//5.0
+				'ffmpeg.php' => $ROOT, //5.0
 
-				'captcha.php' => $CONFIG,//5.0
-				'livewire.php' => $CONFIG,//5.0
-				'path.php' => $CONFIG,//5.0
+				'web.php' => $ROUTES, //5.0
 
-				'Helper.php' => $APP,//5.0
+				'captcha.php' => $CONFIG, //5.0
+				'livewire.php' => $CONFIG, //5.0
+				'path.php' => $CONFIG, //5.0
 
-				'ViewServiceProvider.php' => $PROVIDERS,//5.0
-				
-				'Kernel.php' => app_path('Console') . $DS,//5.0
+				'Helper.php' => $APP, //5.0
+
+				'ViewServiceProvider.php' => $PROVIDERS, //5.0
+
+				'Kernel.php' => app_path('Console') . $DS, //5.0
 
 				//======== JOBS ==========//
-				'DeleteMedia.php' => $JOBS,//5.0
-				'RebillCardinity.php' => $JOBS,//5.0
-				'EncodeVideo.php' => $JOBS,//5.0
-				'EncodeVideoMessages.php' => $JOBS,//5.0
-				'EncodeVideoWelcomeMessage.php' => $JOBS,//5.0
-				'EncodeVideoStory.php' => $JOBS,//5.0
-				'ExpiredAdvertising.php' => $JOBS,//5.0
-				'PostScheduled.php' => $JOBS,//5.0
-				'SalesRefund.php' => $JOBS,//5.0
-				'LiveStreamingPrivateExpired.php' => $JOBS,//5.0
-				
+				'DeleteMedia.php' => $JOBS, //5.0
+				'RebillCardinity.php' => $JOBS, //5.0
+				'EncodeVideo.php' => $JOBS, //5.0
+				'EncodeVideoMessages.php' => $JOBS, //5.0
+				'EncodeVideoWelcomeMessage.php' => $JOBS, //5.0
+				'EncodeVideoStory.php' => $JOBS, //5.0
+				'ExpiredAdvertising.php' => $JOBS, //5.0
+				'PostScheduled.php' => $JOBS, //5.0
+				'SalesRefund.php' => $JOBS, //5.0
+				'LiveStreamingPrivateExpired.php' => $JOBS, //5.0
 
-				'MassMessagesListener.php' => $LISTENERS,//5.0
+
+				'MassMessagesListener.php' => $LISTENERS, //5.0
 
 				//======= MODELS ============//
-				'Advertising.php' => $MODELS,//5.0
-				'AdClickImpression.php' => $MODELS,//5.0
-				'Updates.php' => $MODELS,//5.0
-				'Reports.php' => $MODELS,//5.0
-				'LoginSessions.php' => $MODELS,//5.0
-				'LiveStreamings.php' => $MODELS,//5.0
-				'LiveStreamingPrivateRequest.php' => $MODELS,//5.0
-				'Replies.php' => $MODELS,//5.0
-				'Notifications.php' => $MODELS,//5.0
-				'Transactions.php' => $MODELS,//5.0
-				'Subscriptions.php' => $MODELS,//5.0
-				'SubscriptionDeleted.php' => $MODELS,//5.0
-				'MediaMessages.php' => $MODELS,//5.0
-				'MediaWelcomeMessage.php' => $MODELS,//5.0
-				
-				'User.php' => $MODELS,//5.0
+				'Advertising.php' => $MODELS, //5.0
+				'AdClickImpression.php' => $MODELS, //5.0
+				'Updates.php' => $MODELS, //5.0
+				'Reports.php' => $MODELS, //5.0
+				'LoginSessions.php' => $MODELS, //5.0
+				'LiveStreamings.php' => $MODELS, //5.0
+				'LiveStreamingPrivateRequest.php' => $MODELS, //5.0
+				'Replies.php' => $MODELS, //5.0
+				'Notifications.php' => $MODELS, //5.0
+				'Transactions.php' => $MODELS, //5.0
+				'Subscriptions.php' => $MODELS, //5.0
+				'SubscriptionDeleted.php' => $MODELS, //5.0
+				'MediaMessages.php' => $MODELS, //5.0
+				'MediaWelcomeMessage.php' => $MODELS, //5.0
 
-				'Functions.php' => $TRAITS,//5.0
-				
+				'User.php' => $MODELS, //5.0
+
+				'Functions.php' => $TRAITS, //5.0
+
 				//======= CONTROLLERS ============//
-				'RegisterController.php' => $CONTROLLERS_AUTH,//5.0
+				'RegisterController.php' => $CONTROLLERS_AUTH, //5.0
 
-				'AdvertisingController.php' => $CONTROLLERS,//5.0
-				'AddFundsController.php' => $CONTROLLERS,//5.0
-				'AdminController.php' => $CONTROLLERS,//5.0
-				'CCBillController.php' => $CONTROLLERS,//5.0
-				'CoconutController.php' => $CONTROLLERS,//5.0
-				'CardinityController.php' => $CONTROLLERS,//5.0
-				'HomeController.php' => $CONTROLLERS,//5.0
-				'LiveStreamingsController.php' => $CONTROLLERS,//5.0
-				'LiveStreamingPrivateController.php' => $CONTROLLERS,//5.0
-				'TipController.php' => $CONTROLLERS,//5.0
-				'PayPerViewController.php' => $CONTROLLERS,//5.0
-				'PaystackController.php' => $CONTROLLERS,//5.0
-				'PayPalController.php' => $CONTROLLERS,//5.0
-				'ProductsController.php' => $CONTROLLERS,//5.0
-				'MessagesController.php' => $CONTROLLERS,//5.0
-				'StripeWebHookController.php' => $CONTROLLERS,//5.0
-				'StripeController.php' => $CONTROLLERS,//5.0
-				'StoriesController.php' => $CONTROLLERS,//5.0
-				'SocialAuthController.php' => $CONTROLLERS,//5.0
-				'SubscriptionsController.php' => $CONTROLLERS,//5.0
-				'UpdatesController.php' => $CONTROLLERS,//5.0
-				'UploadMediaController.php' => $CONTROLLERS,//5.0
-				'UploadMediaMessageController.php' => $CONTROLLERS,//5.0
-				'UploadMediaWelcomeMessageController.php' => $CONTROLLERS,//5.0
-				'UserController.php' => $CONTROLLERS,//5.0
+				'AdvertisingController.php' => $CONTROLLERS, //5.0
+				'AddFundsController.php' => $CONTROLLERS, //5.0
+				'AdminController.php' => $CONTROLLERS, //5.0
+				'CCBillController.php' => $CONTROLLERS, //5.0
+				'CoconutController.php' => $CONTROLLERS, //5.0
+				'CardinityController.php' => $CONTROLLERS, //5.0
+				'HomeController.php' => $CONTROLLERS, //5.0
+				'LiveStreamingsController.php' => $CONTROLLERS, //5.0
+				'LiveStreamingPrivateController.php' => $CONTROLLERS, //5.0
+				'TipController.php' => $CONTROLLERS, //5.0
+				'PayPerViewController.php' => $CONTROLLERS, //5.0
+				'PaystackController.php' => $CONTROLLERS, //5.0
+				'PayPalController.php' => $CONTROLLERS, //5.0
+				'ProductsController.php' => $CONTROLLERS, //5.0
+				'MessagesController.php' => $CONTROLLERS, //5.0
+				'StripeWebHookController.php' => $CONTROLLERS, //5.0
+				'StripeController.php' => $CONTROLLERS, //5.0
+				'StoriesController.php' => $CONTROLLERS, //5.0
+				'SocialAuthController.php' => $CONTROLLERS, //5.0
+				'SubscriptionsController.php' => $CONTROLLERS, //5.0
+				'UpdatesController.php' => $CONTROLLERS, //5.0
+				'UploadMediaController.php' => $CONTROLLERS, //5.0
+				'UploadMediaMessageController.php' => $CONTROLLERS, //5.0
+				'UploadMediaWelcomeMessageController.php' => $CONTROLLERS, //5.0
+				'UserController.php' => $CONTROLLERS, //5.0
 
 				//======= MIDDLEWARE ============//
-				'UserOnline.php' => $MIDDLEWARE,//5.0
+				'UserOnline.php' => $MIDDLEWARE, //5.0
 
 				//======= PUBLIC ============//
-				'AgoraRTCSDK-v4.js' => public_path('js' . $DS . 'agora') . $DS,//5.0
+				'AgoraRTCSDK-v4.js' => public_path('js' . $DS . 'agora') . $DS, //5.0
 
 				'plyr.min.js' => public_path('js' . $DS . 'plyr') . $DS, //5.0
 				'plyr.polyfilled.min.js' => public_path('js' . $DS . 'plyr') . $DS, //5.0
 
-				'app-functions.js' => $PUBLIC_JS,//5.0
-				'core.min.js' => $PUBLIC_JS,//5.0
-				'live.js' => $PUBLIC_JS,//5.0
-				'live-private-request.js' => $PUBLIC_JS,//5.0
-				'upload-avatar-cover.js' => $PUBLIC_JS,//5.0
+				'app-functions.js' => $PUBLIC_JS, //5.0
+				'core.min.js' => $PUBLIC_JS, //5.0
+				'live.js' => $PUBLIC_JS, //5.0
+				'live-private-request.js' => $PUBLIC_JS, //5.0
+				'upload-avatar-cover.js' => $PUBLIC_JS, //5.0
 
-				'styles.css' => $PUBLIC_CSS,//5.0
+				'styles.css' => $PUBLIC_CSS, //5.0
 
-				'admin-styles.css' => $PUBLIC_ADMIN,//5.0
-				'bootstrap.min.css' => $PUBLIC_ADMIN,//5.0
-				'bootstrap.min.css.map' => $PUBLIC_ADMIN,//5.0
-				'bootstrap.min.js' => $PUBLIC_ADMIN,//5.0
-				'bootstrap.bundle.min.js.map' => $PUBLIC_ADMIN,//5.0
-				'bootstrap-icons.css' => $PUBLIC_CSS,//5.0
-				'bootstrap-icons.woff' => $PUBLIC_FONTS,//5.0
-				'bootstrap-icons.woff2' => $PUBLIC_FONTS,//5.0
+				'admin-styles.css' => $PUBLIC_ADMIN, //5.0
+				'bootstrap.min.css' => $PUBLIC_ADMIN, //5.0
+				'bootstrap.min.css.map' => $PUBLIC_ADMIN, //5.0
+				'bootstrap.min.js' => $PUBLIC_ADMIN, //5.0
+				'bootstrap.bundle.min.js.map' => $PUBLIC_ADMIN, //5.0
+				'bootstrap-icons.css' => $PUBLIC_CSS, //5.0
+				'bootstrap-icons.woff' => $PUBLIC_FONTS, //5.0
+				'bootstrap-icons.woff2' => $PUBLIC_FONTS, //5.0
 
-				'watermak-video.png' => $PUBLIC_IMG,//5.0
-				'plyr.svg' => $PUBLIC_IMG,//5.0
-				'bitcoin.png' => public_path('img' . $DS . 'payments') . $DS,//5.0
-				'bitcoin-white.png' => public_path('img' . $DS . 'payments') . $DS,//5.0
+				'watermak-video.png' => $PUBLIC_IMG, //5.0
+				'plyr.svg' => $PUBLIC_IMG, //5.0
+				'bitcoin.png' => public_path('img' . $DS . 'payments') . $DS, //5.0
+				'bitcoin-white.png' => public_path('img' . $DS . 'payments') . $DS, //5.0
 
-				'fileuploader-story-file.js' => public_path('js' . $DS . 'fileuploader') . $DS,//5.0
-				'fileuploader-welcome-msg.js' => public_path('js' . $DS . 'fileuploader') . $DS,//5.0
+				'fileuploader-story-file.js' => public_path('js' . $DS . 'fileuploader') . $DS, //5.0
+				'fileuploader-welcome-msg.js' => public_path('js' . $DS . 'fileuploader') . $DS, //5.0
 
 				//============================= VIEWS ===============================//
-				'app.blade.php' => $VIEWS_LAYOUTS,//5.0
+				'app.blade.php' => $VIEWS_LAYOUTS, //5.0
 
-				'register.blade.php' => $VIEWS_AUTH,//5.0
-				'login.blade.php' => $VIEWS_AUTH,//5.0
+				'register.blade.php' => $VIEWS_AUTH, //5.0
+				'login.blade.php' => $VIEWS_AUTH, //5.0
 
-				'email.blade.php' => $VIEWS_AUTH_PASS,//5.0
-				'reset.blade.php' => $VIEWS_AUTH_PASS,//5.0
+				'email.blade.php' => $VIEWS_AUTH_PASS, //5.0
+				'reset.blade.php' => $VIEWS_AUTH_PASS, //5.0
 
-				'contact.blade.php' => $VIEWS_INDEX,//5.0
-				'home.blade.php' => $VIEWS_INDEX,//5.0
-				'home-login.blade.php' => $VIEWS_INDEX,//5.0
-				'home-session.blade.php' => $VIEWS_INDEX,//5.0
-				'blog.blade.php' => $VIEWS_INDEX,//5.0
-				'post.blade.php' => $VIEWS_INDEX,//5.0
-				
+				'contact.blade.php' => $VIEWS_INDEX, //5.0
+				'home.blade.php' => $VIEWS_INDEX, //5.0
+				'home-login.blade.php' => $VIEWS_INDEX, //5.0
+				'home-session.blade.php' => $VIEWS_INDEX, //5.0
+				'blog.blade.php' => $VIEWS_INDEX, //5.0
+				'post.blade.php' => $VIEWS_INDEX, //5.0
 
-				'advertising.blade.php' => $VIEWS_INCLUDES,//5.0
-				'alert-payment-disabled.blade.php' => $VIEWS_INCLUDES,//5.0
-				'site-billing-info.blade.php' => $VIEWS_INCLUDES,//5.0
-				'cards-settings.blade.php' => $VIEWS_INCLUDES,//5.0
-				'css_general.blade.php' => $VIEWS_INCLUDES,//5.0
-				'media-post.blade.php' => $VIEWS_INCLUDES,//5.0
-				'media-messages.blade.php' => $VIEWS_INCLUDES,//5.0
-				'messages-chat.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-custom-content.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-scheduled-posts.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-new-message.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-taxes.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-tip.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-pay-live.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-payperview.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-live-private-request.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-login.blade.php' => $VIEWS_INCLUDES,//5.0
-				'modal-transfer.blade.php' => $VIEWS_INCLUDES,//5.0
-				'navbar.blade.php' => $VIEWS_INCLUDES,//5.0
-				'listing-creators.blade.php' => $VIEWS_INCLUDES,//5.0
-				'listing-creators-live.blade.php' => $VIEWS_INCLUDES,//5.0
-				'listing-explore-creators.blade.php' => $VIEWS_INCLUDES,//5.0
-				'footer.blade.php' => $VIEWS_INCLUDES,//5.0
-				'footer-tiny.blade.php' => $VIEWS_INCLUDES,//5.0
-				'form-post.blade.php' => $VIEWS_INCLUDES,//5.0
-				'javascript_general.blade.php' => $VIEWS_INCLUDES,//5.0
-				'updates.blade.php' => $VIEWS_INCLUDES,//5.0
 
-				'listing-products.blade.php' => $VIEWS_SHOP,//5.0
-				'modal-buy.blade.php' => $VIEWS_SHOP,//5.0
-				'show.blade.php' => $VIEWS_SHOP,//5.0
+				'advertising.blade.php' => $VIEWS_INCLUDES, //5.0
+				'alert-payment-disabled.blade.php' => $VIEWS_INCLUDES, //5.0
+				'site-billing-info.blade.php' => $VIEWS_INCLUDES, //5.0
+				'cards-settings.blade.php' => $VIEWS_INCLUDES, //5.0
+				'css_general.blade.php' => $VIEWS_INCLUDES, //5.0
+				'media-post.blade.php' => $VIEWS_INCLUDES, //5.0
+				'media-messages.blade.php' => $VIEWS_INCLUDES, //5.0
+				'messages-chat.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-custom-content.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-scheduled-posts.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-new-message.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-taxes.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-tip.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-pay-live.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-payperview.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-live-private-request.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-login.blade.php' => $VIEWS_INCLUDES, //5.0
+				'modal-transfer.blade.php' => $VIEWS_INCLUDES, //5.0
+				'navbar.blade.php' => $VIEWS_INCLUDES, //5.0
+				'listing-creators.blade.php' => $VIEWS_INCLUDES, //5.0
+				'listing-creators-live.blade.php' => $VIEWS_INCLUDES, //5.0
+				'listing-explore-creators.blade.php' => $VIEWS_INCLUDES, //5.0
+				'footer.blade.php' => $VIEWS_INCLUDES, //5.0
+				'footer-tiny.blade.php' => $VIEWS_INCLUDES, //5.0
+				'form-post.blade.php' => $VIEWS_INCLUDES, //5.0
+				'javascript_general.blade.php' => $VIEWS_INCLUDES, //5.0
+				'updates.blade.php' => $VIEWS_INCLUDES, //5.0
 
-				'404.blade.php' => $VIEWS_ERRORS,//5.0
-				'503.blade.php' => $VIEWS_ERRORS,//5.0
+				'listing-products.blade.php' => $VIEWS_SHOP, //5.0
+				'modal-buy.blade.php' => $VIEWS_SHOP, //5.0
+				'show.blade.php' => $VIEWS_SHOP, //5.0
 
-				'conversations.blade.php' => $VIEWS_USERS,//5.0
-				'delete_account.blade.php' => $VIEWS_USERS,//5.0
-				'notifications.blade.php' => $VIEWS_USERS,//5.0
-				'profile.blade.php' => $VIEWS_USERS,//5.0
-				'live.blade.php' => $VIEWS_USERS,//5.0
-				'live-streaming-private-requests.blade.php' => $VIEWS_USERS,//5.0
-				'live-streaming-private-settings.blade.php' => $VIEWS_USERS,//5.0
-				'live-streaming-private-requests-sent.blade.php' => $VIEWS_USERS,//5.0
-				'privacy_security.blade.php' => $VIEWS_USERS,//5.0
-				'payout_method.blade.php' => $VIEWS_USERS,//5.0
-				'password.blade.php' => $VIEWS_USERS,//5.0
-				'edit_my_page.blade.php' => $VIEWS_USERS,//5.0
-				'my_posts.blade.php' => $VIEWS_USERS,//5.0
-				'my_subscribers.blade.php' => $VIEWS_USERS,//5.0
-				'my-sales.blade.php' => $VIEWS_USERS,//5.0
-				'messages-show.blade.php' => $VIEWS_USERS,//5.0
-				'messages.blade.php' => $VIEWS_USERS,//5.0
-				'invoice.blade.php' => $VIEWS_USERS,//5.0
-				'wallet.blade.php' => $VIEWS_USERS,//5.0
+				'404.blade.php' => $VIEWS_ERRORS, //5.0
+				'503.blade.php' => $VIEWS_ERRORS, //5.0
+
+				'conversations.blade.php' => $VIEWS_USERS, //5.0
+				'delete_account.blade.php' => $VIEWS_USERS, //5.0
+				'notifications.blade.php' => $VIEWS_USERS, //5.0
+				'profile.blade.php' => $VIEWS_USERS, //5.0
+				'live.blade.php' => $VIEWS_USERS, //5.0
+				'live-streaming-private-requests.blade.php' => $VIEWS_USERS, //5.0
+				'live-streaming-private-settings.blade.php' => $VIEWS_USERS, //5.0
+				'live-streaming-private-requests-sent.blade.php' => $VIEWS_USERS, //5.0
+				'privacy_security.blade.php' => $VIEWS_USERS, //5.0
+				'payout_method.blade.php' => $VIEWS_USERS, //5.0
+				'password.blade.php' => $VIEWS_USERS, //5.0
+				'edit_my_page.blade.php' => $VIEWS_USERS, //5.0
+				'my_posts.blade.php' => $VIEWS_USERS, //5.0
+				'my_subscribers.blade.php' => $VIEWS_USERS, //5.0
+				'my-sales.blade.php' => $VIEWS_USERS, //5.0
+				'messages-show.blade.php' => $VIEWS_USERS, //5.0
+				'messages.blade.php' => $VIEWS_USERS, //5.0
+				'invoice.blade.php' => $VIEWS_USERS, //5.0
+				'wallet.blade.php' => $VIEWS_USERS, //5.0
 			];
 
 			$filesAdmin = [
-				'advertising.blade.php' => $VIEWS_ADMIN,//5.0
-				'add-advertising.blade.php' => $VIEWS_ADMIN,//5.0
-				'billing.blade.php' => $VIEWS_ADMIN,//5.0
-				'cardinity-settings.blade.php' => $VIEWS_ADMIN,//5.0
-				'edit-advertising.blade.php' => $VIEWS_ADMIN,//5.0
-				'stories-posts.blade.php' => $VIEWS_ADMIN,//5.0
-				'stories-settings.blade.php' => $VIEWS_ADMIN,//5.0
-				'settings.blade.php' => $VIEWS_ADMIN,//5.0
-				'google.blade.php' => $VIEWS_ADMIN,//5.0
-				'stripe-settings.blade.php' => $VIEWS_ADMIN,//5.0
-				'reports.blade.php' => $VIEWS_ADMIN,//5.0
-				'members.blade.php' => $VIEWS_ADMIN,//5.0
-				'edit-member.blade.php' => $VIEWS_ADMIN,//5.0
-				'withdrawal-view.blade.php' => $VIEWS_ADMIN,//5.0
-				'payments-settings.blade.php' => $VIEWS_ADMIN,//5.0
-				'posts.blade.php' => $VIEWS_ADMIN,//5.0
-				'products.blade.php' => $VIEWS_ADMIN,//5.0
-				'profiles-social.blade.php' => $VIEWS_ADMIN,//5.0
-				'role-and-permissions-member.blade.php' => $VIEWS_ADMIN,//5.0
-				'replies.blade.php' => $VIEWS_ADMIN,//5.0
-				'messages.blade.php' => $VIEWS_ADMIN,//5.0
-				'comments.blade.php' => $VIEWS_ADMIN,//5.0
-				'layout.blade.php' => $VIEWS_ADMIN,//5.0
-				'live_streaming.blade.php' => $VIEWS_ADMIN,//5.0
-				'live-streaming-private-requests.blade.php' => $VIEWS_ADMIN,//5.0
-				'theme.blade.php' => $VIEWS_ADMIN,//5.0
-				'transactions.blade.php' => $VIEWS_ADMIN,//5.0
-				'deposits-view.blade.php' => $VIEWS_ADMIN,//5.0
-				'video_encoding.blade.php' => $VIEWS_ADMIN,//5.0
+				'advertising.blade.php' => $VIEWS_ADMIN, //5.0
+				'add-advertising.blade.php' => $VIEWS_ADMIN, //5.0
+				'billing.blade.php' => $VIEWS_ADMIN, //5.0
+				'cardinity-settings.blade.php' => $VIEWS_ADMIN, //5.0
+				'edit-advertising.blade.php' => $VIEWS_ADMIN, //5.0
+				'stories-posts.blade.php' => $VIEWS_ADMIN, //5.0
+				'stories-settings.blade.php' => $VIEWS_ADMIN, //5.0
+				'settings.blade.php' => $VIEWS_ADMIN, //5.0
+				'google.blade.php' => $VIEWS_ADMIN, //5.0
+				'stripe-settings.blade.php' => $VIEWS_ADMIN, //5.0
+				'reports.blade.php' => $VIEWS_ADMIN, //5.0
+				'members.blade.php' => $VIEWS_ADMIN, //5.0
+				'edit-member.blade.php' => $VIEWS_ADMIN, //5.0
+				'withdrawal-view.blade.php' => $VIEWS_ADMIN, //5.0
+				'payments-settings.blade.php' => $VIEWS_ADMIN, //5.0
+				'posts.blade.php' => $VIEWS_ADMIN, //5.0
+				'products.blade.php' => $VIEWS_ADMIN, //5.0
+				'profiles-social.blade.php' => $VIEWS_ADMIN, //5.0
+				'role-and-permissions-member.blade.php' => $VIEWS_ADMIN, //5.0
+				'replies.blade.php' => $VIEWS_ADMIN, //5.0
+				'messages.blade.php' => $VIEWS_ADMIN, //5.0
+				'comments.blade.php' => $VIEWS_ADMIN, //5.0
+				'layout.blade.php' => $VIEWS_ADMIN, //5.0
+				'live_streaming.blade.php' => $VIEWS_ADMIN, //5.0
+				'live-streaming-private-requests.blade.php' => $VIEWS_ADMIN, //5.0
+				'theme.blade.php' => $VIEWS_ADMIN, //5.0
+				'transactions.blade.php' => $VIEWS_ADMIN, //5.0
+				'deposits-view.blade.php' => $VIEWS_ADMIN, //5.0
+				'video_encoding.blade.php' => $VIEWS_ADMIN, //5.0
 			];
 
 			// Files
@@ -8408,11 +8410,12 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 					'.env',
 					"\n\nFFMPEG_BINARIES=\nFFPROBE_BINARIES=",
 					FILE_APPEND
-				  );
-				
+				);
+
 				//============ Start Query SQL ====================================
-				if (!Schema::hasColumn('admin_settings', 
-					'payout_method_crypto', 
+				if (!Schema::hasColumn(
+					'admin_settings',
+					'payout_method_crypto',
 					'threads',
 					'watermak_video',
 					'coconut_key',
@@ -8425,7 +8428,7 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 					'live_streaming_max_price_private',
 					'limit_live_streaming_private',
 					'show_address_company_footer'
-					)) {
+				)) {
 					Schema::table('admin_settings', function (Blueprint $table) {
 						$table->enum('payout_method_crypto', ['on', 'off'])->default('off');
 						$table->string('threads', 200);
@@ -8451,7 +8454,7 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 					Schema::table('payment_gateways', function (Blueprint $table) {
 						$table->boolean('allow_payments_alipay')->default(0);
 					});
-				  }
+				}
 
 				if (!Schema::hasColumn('reports', 'message')) {
 					Schema::table('reports', function (Blueprint $table) {
@@ -8461,51 +8464,52 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 
 				if (!Schema::hasColumn('media', 'job_id')) {
 					Schema::table('media', function (Blueprint $table) {
-					  $table->string('job_id', 200)->index('job_id')->nullable();
+						$table->string('job_id', 200)->index('job_id')->nullable();
 					});
-				  }
-			  
-				  if (!Schema::hasColumn('media_messages', 'job_id')) {
-					Schema::table('media_messages', function (Blueprint $table) {
-					  $table->string('job_id', 200)->index('job_id')->nullable();
-					});
-				  }
-			  
-				  if (!Schema::hasColumn('media_stories', 'job_id')) {
-					Schema::table('media_stories', function (Blueprint $table) {
-					  $table->string('job_id', 200)->index('job_id')->nullable();
-					});
-				  }
+				}
 
-				if (!Schema::hasColumn('users', 
-					'crypto_wallet', 
-					'threads', 
-					'allow_live_streaming_private', 
+				if (!Schema::hasColumn('media_messages', 'job_id')) {
+					Schema::table('media_messages', function (Blueprint $table) {
+						$table->string('job_id', 200)->index('job_id')->nullable();
+					});
+				}
+
+				if (!Schema::hasColumn('media_stories', 'job_id')) {
+					Schema::table('media_stories', function (Blueprint $table) {
+						$table->string('job_id', 200)->index('job_id')->nullable();
+					});
+				}
+
+				if (!Schema::hasColumn(
+					'users',
+					'crypto_wallet',
+					'threads',
+					'allow_live_streaming_private',
 					'price_live_streaming_private',
 					'allow_dm',
 					'welcome_message_new_subs',
 					'send_welcome_message',
 					'price_welcome_message',
-					)) {
-						Schema::table('users', function (Blueprint $table) {
-							$table->string('crypto_wallet', 255);
-							$table->string('threads', 200);
-							$table->enum('allow_live_streaming_private', ['on', 'off'])->default('off');
-							$table->decimal('price_live_streaming_private', 10, 2)->nullable();
-							$table->boolean('allow_dm')->default(true);
-							$table->text('welcome_message_new_subs')->collation('utf8mb4_unicode_ci');
-							$table->boolean('send_welcome_message')->default(false);
-							$table->decimal('price_welcome_message', 10, 2)->nullable();
-						});
-					}
+				)) {
+					Schema::table('users', function (Blueprint $table) {
+						$table->string('crypto_wallet', 255);
+						$table->string('threads', 200);
+						$table->enum('allow_live_streaming_private', ['on', 'off'])->default('off');
+						$table->decimal('price_live_streaming_private', 10, 2)->nullable();
+						$table->boolean('allow_dm')->default(true);
+						$table->text('welcome_message_new_subs')->collation('utf8mb4_unicode_ci');
+						$table->boolean('send_welcome_message')->default(false);
+						$table->decimal('price_welcome_message', 10, 2)->nullable();
+					});
+				}
 
 				if (!Schema::hasColumn('updates', 'ip', 'scheduled_date', 'schedule')) {
 					Schema::table('updates', function (Blueprint $table) {
-					  $table->string('ip', 200)->nullable();
-					  $table->timestamp('scheduled_date')->nullable();
-					  $table->boolean('schedule')->default(false);
+						$table->string('ip', 200)->nullable();
+						$table->timestamp('scheduled_date')->nullable();
+						$table->boolean('schedule')->default(false);
 					});
-				  }
+				}
 
 				\DB::table('payment_gateways')->insert(
 					[
@@ -8564,35 +8568,35 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 					'joined_at',
 					'ends_at',
 					'token'
-				  )) {
+				)) {
 					Schema::table('live_streamings', function (Blueprint $table) {
-					  $table->string('type', 100)->index('type')->default('normal')->after('id');
-					  $table->unsignedInteger('buyer_id')->index('buyer_id')->nullable()->after('user_id');
-					  $table->unsignedInteger('minutes')->index('minutes')->after('channel');
-					  $table->timestamp('joined_at')->index('joined_at')->nullable()->after('status');
-					  $table->timestamp('ends_at')->nullable()->after('updated_at');
-					  $table->string('token', 100)->index('token')->nullable();
+						$table->string('type', 100)->index('type')->default('normal')->after('id');
+						$table->unsignedInteger('buyer_id')->index('buyer_id')->nullable()->after('user_id');
+						$table->unsignedInteger('minutes')->index('minutes')->after('channel');
+						$table->timestamp('joined_at')->index('joined_at')->nullable()->after('status');
+						$table->timestamp('ends_at')->nullable()->after('updated_at');
+						$table->string('token', 100)->index('token')->nullable();
 					});
-				  }
-			  
-				  if (!Schema::hasTable('live_streaming_private_requests')) {
+				}
+
+				if (!Schema::hasTable('live_streaming_private_requests')) {
 					Schema::create('live_streaming_private_requests', function (Blueprint $table) {
-					  $table->id();
-					  $table->unsignedBigInteger('transaction_id')->index('transaction_id');
-					  $table->unsignedInteger('user_id')->index('user_id');
-					  $table->unsignedInteger('creator_id')->index('creator_id');
-					  $table->unsignedInteger('minutes')->index('minutes');
-					  $table->boolean('status')->default(false);
-					  $table->timestamps();
+						$table->id();
+						$table->unsignedBigInteger('transaction_id')->index('transaction_id');
+						$table->unsignedInteger('user_id')->index('user_id');
+						$table->unsignedInteger('creator_id')->index('creator_id');
+						$table->unsignedInteger('minutes')->index('minutes');
+						$table->boolean('status')->default(false);
+						$table->timestamps();
 					});
-				  }
+				}
 
-				  DB::statement('ALTER TABLE `live_streamings` ADD INDEX(`updated_at`)');
+				DB::statement('ALTER TABLE `live_streamings` ADD INDEX(`updated_at`)');
 
 
-				  Schema::table('transactions', function (Blueprint $table) {
-						$table->string('approved', 50)->change();
-				  });
+				Schema::table('transactions', function (Blueprint $table) {
+					$table->string('approved', 50)->change();
+				});
 
 				if (!Schema::hasTable('media_welcome_messages')) {
 					Schema::create('media_welcome_messages', function (Blueprint $table) {
@@ -8625,40 +8629,40 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 						$table->timestamps();
 					});
 				}
-				
+
 
 				if (!Schema::hasColumn('subscriptions', 'creator_id')) {
 					Schema::table('subscriptions', function (Blueprint $table) {
 						$table->unsignedBigInteger('creator_id')->after('id')->index('creator_id');
 					});
 				}
-			  
-				  if (Schema::hasColumn('subscriptions', 'creator_id')) {
+
+				if (Schema::hasColumn('subscriptions', 'creator_id')) {
 					$subscriptions = Subscriptions::select('id', 'stripe_price')->get();
-			  
+
 					foreach ($subscriptions->chunk(1000) as $chunk) {
-					  $cases = [];
-					  $ids = [];
-					  $params = [];
-			  
-					  foreach ($chunk as $subscription) {
-						$explode = explode('_', $subscription->stripe_price);
-						$creatorId = $explode[1];
-			  
-						$cases[] = "WHEN {$subscription->id} then ?";
-						$params[] = $creatorId;
-						$ids[] = $subscription->id;
-					  }
-			  
-					  $ids = implode(',', $ids);
-					  $cases = implode(' ', $cases);
-			  
-					  if (!empty($ids)) {
-						DB::update("UPDATE subscriptions SET `creator_id` = CASE `id` {$cases} END WHERE `id` in ({$ids})", $params);
-					  }
+						$cases = [];
+						$ids = [];
+						$params = [];
+
+						foreach ($chunk as $subscription) {
+							$explode = explode('_', $subscription->stripe_price);
+							$creatorId = $explode[1];
+
+							$cases[] = "WHEN {$subscription->id} then ?";
+							$params[] = $creatorId;
+							$ids[] = $subscription->id;
+						}
+
+						$ids = implode(',', $ids);
+						$cases = implode(' ', $cases);
+
+						if (!empty($ids)) {
+							DB::update("UPDATE subscriptions SET `creator_id` = CASE `id` {$cases} END WHERE `id` in ({$ids})", $params);
+						}
 					}
-				  }
-				
+				}
+
 				//============ Ends Query SQL ====================================
 
 				// Delete folder
@@ -8674,14 +8678,14 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 			\Artisan::call('cache:clear');
 			\Artisan::call('config:clear');
 			\Artisan::call('view:clear');
-			\Artisan::call('queue:restart');			
+			\Artisan::call('queue:restart');
 
 			return $upgradeDone;
-		} //<<---- End Version 5.0 ----->>3
+		} //<<---- End Version 5.0 ----->>
 
 
 		if ($version == '5.1') {
-			
+
 			//============ Starting moving files...
 			$oldVersion = '5.0';
 			$path       = "v$version/";
@@ -8699,36 +8703,36 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 
 			//============== Files Affected ================//
 			$files = [
-				'filesystems.php' => $CONFIG,//5.1
+				'filesystems.php' => $CONFIG, //5.1
 
-				'app-functions.js' => $PUBLIC_JS,//5.1
+				'app-functions.js' => $PUBLIC_JS, //5.1
 
-				'CoconutVideoService.php' => $SERVICES,//5.1
+				'CoconutVideoService.php' => $SERVICES, //5.1
 
-				'RebillWallet.php' => $JOBS,//5.1
-				'RebillCardinity.php' => $JOBS,//5.1
+				'RebillWallet.php' => $JOBS, //5.1
+				'RebillCardinity.php' => $JOBS, //5.1
 
-				'Subscriptions.php' => $MODELS,//5.1
+				'Subscriptions.php' => $MODELS, //5.1
 
-				'AdminController.php' => $CONTROLLERS,//5.1
-				'AdvertisingController.php' => $CONTROLLERS,//5.1
-				'CardinityController.php' => $CONTROLLERS,//5.1
-				'CCBillController.php' => $CONTROLLERS,//5.1
-				'PayPalController.php' => $CONTROLLERS,//5.1
-				'PaystackController.php' => $CONTROLLERS,//5.1
-				'StripeController.php' => $CONTROLLERS,//5.1
-				'UserController.php' => $CONTROLLERS,//5.1
+				'AdminController.php' => $CONTROLLERS, //5.1
+				'AdvertisingController.php' => $CONTROLLERS, //5.1
+				'CardinityController.php' => $CONTROLLERS, //5.1
+				'CCBillController.php' => $CONTROLLERS, //5.1
+				'PayPalController.php' => $CONTROLLERS, //5.1
+				'PaystackController.php' => $CONTROLLERS, //5.1
+				'StripeController.php' => $CONTROLLERS, //5.1
+				'UserController.php' => $CONTROLLERS, //5.1
 
-				'my_subscribers.blade.php' => $VIEWS_USERS,//5.1
-				'my_subscriptions.blade.php' => $VIEWS_USERS,//5.1
+				'my_subscribers.blade.php' => $VIEWS_USERS, //5.1
+				'my_subscriptions.blade.php' => $VIEWS_USERS, //5.1
 
-				'show.blade.php' => $VIEWS_SHOP,//5.1
+				'show.blade.php' => $VIEWS_SHOP, //5.1
 			];
 
 			$filesAdmin = [
-				'advertising.blade.php' => $VIEWS_ADMIN,//5.1
-				'dashboard.blade.php' => $VIEWS_ADMIN,//5.1
-				'video_encoding.blade.php' => $VIEWS_ADMIN,//5.1
+				'advertising.blade.php' => $VIEWS_ADMIN, //5.1
+				'dashboard.blade.php' => $VIEWS_ADMIN, //5.1
+				'video_encoding.blade.php' => $VIEWS_ADMIN, //5.1
 			];
 
 			// Files
@@ -8800,7 +8804,7 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 
 
 		if ($version == '5.2') {
-			
+
 			//============ Starting moving files...
 			$oldVersion = '5.1';
 			$path       = "v$version/";
@@ -8818,35 +8822,35 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 
 			//============== Files Affected ================//
 			$files = [
-				'Helper.php' => $APP,//5.2
+				'Helper.php' => $APP, //5.2
 
-				'currencies.php' => $CONFIG,//5.2
+				'currencies.php' => $CONFIG, //5.2
 
-				'CoconutVideoService.php' => $SERVICES,//5.2
+				'CoconutVideoService.php' => $SERVICES, //5.2
 
-				'ExpiredAdvertising.php' => $JOBS,//5.2
-				'PostScheduled.php' => $JOBS,//5.2
-				'RebillCardinity.php' => $JOBS,//5.2
+				'ExpiredAdvertising.php' => $JOBS, //5.2
+				'PostScheduled.php' => $JOBS, //5.2
+				'RebillCardinity.php' => $JOBS, //5.2
 
-				'AdvertisingController.php' => $CONTROLLERS,//5.2
-				'AdminController.php' => $CONTROLLERS,//5.2
-				'AddFundsController.php' => $CONTROLLERS,//5.2
-				'StripeController.php' => $CONTROLLERS,//5.2
-				'StripeWebHookController.php' => $CONTROLLERS,//5.2
-				'TipController.php' => $CONTROLLERS,//5.2
-				'PayPerViewController.php' => $CONTROLLERS,//5.2
-				'UpdatesController.php' => $CONTROLLERS,//5.2
-				'UserController.php' => $CONTROLLERS,//5.2
+				'AdvertisingController.php' => $CONTROLLERS, //5.2
+				'AdminController.php' => $CONTROLLERS, //5.2
+				'AddFundsController.php' => $CONTROLLERS, //5.2
+				'StripeController.php' => $CONTROLLERS, //5.2
+				'StripeWebHookController.php' => $CONTROLLERS, //5.2
+				'TipController.php' => $CONTROLLERS, //5.2
+				'PayPerViewController.php' => $CONTROLLERS, //5.2
+				'UpdatesController.php' => $CONTROLLERS, //5.2
+				'UserController.php' => $CONTROLLERS, //5.2
 
-				'css_general.blade.php' => $VIEWS_INCLUDES,//5.2
-				'form-post.blade.php' => $VIEWS_INCLUDES,//5.2
+				'css_general.blade.php' => $VIEWS_INCLUDES, //5.2
+				'form-post.blade.php' => $VIEWS_INCLUDES, //5.2
 
-				'wallet.blade.php' => $VIEWS_USERS,//5.2
+				'wallet.blade.php' => $VIEWS_USERS, //5.2
 			];
 
 			$filesAdmin = [
 				'advertising.blade.php' => $VIEWS_ADMIN,
-				'video_encoding.blade.php' => $VIEWS_ADMIN,//5.2
+				'video_encoding.blade.php' => $VIEWS_ADMIN, //5.2
 			];
 
 			// Files
@@ -8895,7 +8899,7 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 			$path       = "v$version/";
 			$pathAdmin  = "v$version/admin/";
 			$pathPublic = "v$version/public/";
-			$copy       = false;
+			$copy       = true;
 
 			if ($this->settings->version == $version) {
 				return redirect('/');
@@ -8909,62 +8913,62 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 			$files = [
 				'filesystems.php' => $CONFIG, //v5.3
 
-				'app-functions.js' => $PUBLIC_JS,//5.3
+				'app-functions.js' => $PUBLIC_JS, //5.3
 
-				'AgoraRTCSDK-v4.js' => public_path('js' . $DS . 'agora') . $DS,//5.3
+				'AgoraRTCSDK-v4.js' => public_path('js' . $DS . 'agora') . $DS, //5.3
 
-				'admin-functions.js' => $PUBLIC_ADMIN,//5.3
-				'bootstrap.min.css' => $PUBLIC_ADMIN,//5.3
-				'bootstrap.min.css.map' => $PUBLIC_ADMIN,//5.3
-				'bootstrap.min.js' => $PUBLIC_ADMIN,//5.3
-				'bootstrap.bundle.min.js.map' => $PUBLIC_ADMIN,//5.3
+				'admin-functions.js' => $PUBLIC_ADMIN, //5.3
+				'bootstrap.min.css' => $PUBLIC_ADMIN, //5.3
+				'bootstrap.min.css.map' => $PUBLIC_ADMIN, //5.3
+				'bootstrap.min.js' => $PUBLIC_ADMIN, //5.3
+				'bootstrap.bundle.min.js.map' => $PUBLIC_ADMIN, //5.3
 
-				'web.php' => $ROUTES,//5.3
+				'web.php' => $ROUTES, //5.3
 
-				'Functions.php' => $TRAITS,//5.3
+				'Functions.php' => $TRAITS, //5.3
 
-				'Helper.php' => $APP,//5.3
+				'Helper.php' => $APP, //5.3
 
-				'StoryViews.php' => $MODELS,//5.3
-				'Comments.php' => $MODELS,//5.3
+				'StoryViews.php' => $MODELS, //5.3
+				'Comments.php' => $MODELS, //5.3
 
-				'RebillWallet.php' => $JOBS,//5.3
-				'SalesRefund.php' => $JOBS,//5.3
+				'RebillWallet.php' => $JOBS, //5.3
+				'SalesRefund.php' => $JOBS, //5.3
 
-				'CoconutUploadService.php' => $SERVICES,//5.3
-				'CoconutVideoService.php' => $SERVICES,//5.3
+				'CoconutUploadService.php' => $SERVICES, //5.3
+				'CoconutVideoService.php' => $SERVICES, //5.3
 
-				'UserDelete.php' => $TRAITS,//5.3
+				'UserDelete.php' => $TRAITS, //5.3
 
-				'RegisterController.php' => $CONTROLLERS_AUTH,//5.3
+				'RegisterController.php' => $CONTROLLERS_AUTH, //5.3
 
-				'AddFundsController.php' => $CONTROLLERS,//5.3
-				'AdminController.php' => $CONTROLLERS,//5.3
-				'AdvertisingController.php' => $CONTROLLERS,//5.3
-				'CCBillController.php' => $CONTROLLERS,//5.3
-				'HomeController.php' => $CONTROLLERS,//5.3
-				'StorageCoconutController.php' => $CONTROLLERS,//5.3
-				'PaystackController.php' => $CONTROLLERS,//5.3
-				'StoriesController.php' => $CONTROLLERS,//5.3
-				'SubscriptionsController.php' => $CONTROLLERS,//5.3
-				'UserController.php' => $CONTROLLERS,//5.3
-				'UpdatesController.php' => $CONTROLLERS,//5.3
-				'WebhookCoconutController.php' => $CONTROLLERS,//5.3
+				'AddFundsController.php' => $CONTROLLERS, //5.3
+				'AdminController.php' => $CONTROLLERS, //5.3
+				'AdvertisingController.php' => $CONTROLLERS, //5.3
+				'CCBillController.php' => $CONTROLLERS, //5.3
+				'HomeController.php' => $CONTROLLERS, //5.3
+				'StorageCoconutController.php' => $CONTROLLERS, //5.3
+				'PaystackController.php' => $CONTROLLERS, //5.3
+				'StoriesController.php' => $CONTROLLERS, //5.3
+				'SubscriptionsController.php' => $CONTROLLERS, //5.3
+				'UserController.php' => $CONTROLLERS, //5.3
+				'UpdatesController.php' => $CONTROLLERS, //5.3
+				'WebhookCoconutController.php' => $CONTROLLERS, //5.3
 
-				'profile.blade.php' => $VIEWS_USERS,//5.3
+				'profile.blade.php' => $VIEWS_USERS, //5.3
 
-				'css_general.blade.php' => $VIEWS_INCLUDES,//5.3
-				'modal-scheduled-posts.blade.php' => $VIEWS_INCLUDES,//5.3
+				'css_general.blade.php' => $VIEWS_INCLUDES, //5.3
+				'modal-scheduled-posts.blade.php' => $VIEWS_INCLUDES, //5.3
 			];
 
 			$filesAdmin = [
-				'dashboard.blade.php' => $VIEWS_ADMIN,//5.3
-				'deposits.blade.php' => $VIEWS_ADMIN,//5.3
-				'comments.blade.php' => $VIEWS_ADMIN,//5.3
-				'replies.blade.php' => $VIEWS_ADMIN,//5.3
-				'storage.blade.php' => $VIEWS_ADMIN,//5.3
-				'posts.blade.php' => $VIEWS_ADMIN,//5.3
-				'video_encoding.blade.php' => $VIEWS_ADMIN,//5.3
+				'dashboard.blade.php' => $VIEWS_ADMIN, //5.3
+				'deposits.blade.php' => $VIEWS_ADMIN, //5.3
+				'comments.blade.php' => $VIEWS_ADMIN, //5.3
+				'replies.blade.php' => $VIEWS_ADMIN, //5.3
+				'storage.blade.php' => $VIEWS_ADMIN, //5.3
+				'posts.blade.php' => $VIEWS_ADMIN, //5.3
+				'video_encoding.blade.php' => $VIEWS_ADMIN, //5.3
 			];
 
 			// Files
@@ -9000,6 +9004,1011 @@ Route::post('comment/like','CommentsController@like')->middleware('auth');",
 
 			return $upgradeDone;
 		} //<<---- End Version 5.3 ----->>
+
+		if ($version == '5.4') {
+			//============ Starting moving files...
+			$oldVersion = '5.3';
+			$path       = "v$version/";
+			$pathAdmin  = "v$version/admin/";
+			$pathPublic = "v$version/public/";
+			$copy       = true;
+
+			if ($this->settings->version == $version) {
+				return redirect('/');
+			}
+
+			if ($this->settings->version != $oldVersion  || !$this->settings->version) {
+				return "<h2 style='text-align:center; margin-top: 30px; font-family: Arial, san-serif;color: #ff0000;'>Error! you must update from version $oldVersion</h2>";
+			}
+
+			//============== Files Affected ================//
+			$files = [
+				'Functions.php' => $TRAITS, //5.4
+
+				'User.php' => $MODELS, //5.4
+
+				'AdminController.php' => $CONTROLLERS, //5.4
+				'UserController.php' => $CONTROLLERS, //5.4
+				'RegisterController.php' => $CONTROLLERS_AUTH, //5.4
+				'HomeController.php' => $CONTROLLERS, //5.4
+
+				'profile.blade.php' => $VIEWS_USERS, //5.4
+				'payout_method.blade.php' => $VIEWS_USERS, //5.4
+
+				'modal-scheduled-posts.blade.php' => $VIEWS_INCLUDES, //5.4
+				'listing-explore-creators.blade.php' => $VIEWS_INCLUDES, //5.4
+			];
+
+			$filesAdmin = [
+				'payments-settings.blade.php' => $VIEWS_ADMIN, //5.4
+				'withdrawal-view.blade.php' => $VIEWS_ADMIN, //5.4
+			];
+
+			// Files
+			foreach ($files as $file => $root) {
+				$this->moveFile($path . $file, $root . $file, $copy);
+			}
+
+			// Files Admin
+			foreach ($filesAdmin as $file => $root) {
+				$this->moveFile($pathAdmin . $file, $root . $file, $copy);
+			}
+
+			// Copy UpgradeController
+			if ($copy == true) {
+				$this->moveFile($path . 'UpgradeController.php', $CONTROLLERS . 'UpgradeController.php', $copy);
+			}
+
+			// Copy Folder Rules
+			$pathRules = $path . 'Rules';
+			$appPathRules = app_path('Rules');
+			$this->moveDirectory($pathRules, $appPathRules, $copy);
+
+			if ($copy == false) {
+				//============ Start Translate ==================
+				// Replace String
+				$findStringLang = ');';
+
+				// Ennglish
+				$replaceLangEN = "
+		// Version 5.4
+		'only_payments_for_argentina' => 'Only payments for Argentina',
+		'server_time_zone' => 'Server time zone',
+);";
+				$fileLangEN = 'lang/en/general.php';
+				@file_put_contents($fileLangEN, str_replace($findStringLang, $replaceLangEN, file_get_contents($fileLangEN)));
+
+				// Español
+				$replaceLangES = "
+	// Version 5.4
+	'only_payments_for_argentina' => 'Solamente pagos para Argentina',
+	'server_time_zone' => 'Zona horaria del servidor',
+);";
+				$fileLangES = 'lang/es/general.php';
+				@file_put_contents($fileLangES, str_replace($findStringLang, $replaceLangES, file_get_contents($fileLangES)));
+				//============== End Translate ====================
+
+				//============ Start Query SQL ====================================
+				if (!Schema::hasColumn('admin_settings', 'payout_method_mercadopago')) {
+					Schema::table('admin_settings', function ($table) {
+						$table->enum('payout_method_mercadopago', ['on', 'off'])->default('off');
+					});
+				} // End Schema
+
+				if (!Schema::hasColumn('users', 'alias_mp', 'cvu')) {
+					Schema::table('users', function ($table) {
+						$table->string('alias_mp', 100);
+						$table->string('cvu', 100);
+					});
+				} // End Schema
+
+				//============ End Query SQL ====================================
+
+				// Delete folder
+				File::deleteDirectory("v$version");
+			} //============ End $copy == false
+
+			// Update Version
+			$this->settings->update([
+				'version' => $version
+			]);
+
+			// Clear Cache, Config and Views
+			\Artisan::call('cache:clear');
+			\Artisan::call('config:clear');
+			\Artisan::call('view:clear');
+			\Artisan::call('queue:restart');
+
+			return $upgradeDone;
+		} //<<---- End Version 5.4 ----->>
+
+		if ($version == '5.5') {
+			//============ Starting moving files...
+			$oldVersion = $this->settings->version;
+			$path       = "v$version/";
+			$pathAdmin  = "v$version/admin/";
+			$pathPublic = "v$version/public/";
+			$copy       = true;
+
+			if ($this->settings->version == $version) {
+				return redirect('/');
+			}
+
+			if ($this->settings->version != $oldVersion  || !$this->settings->version) {
+				return "<h2 style='text-align:center; margin-top: 30px; font-family: Arial, san-serif;color: #ff0000;'>Error! you must update from version $oldVersion</h2>";
+			}
+
+			//============== Files Affected ================//
+			$files = [
+				'Helper.php' => $APP, //5.5
+				'web.php' => $ROUTES, //5.5
+
+
+				'Functions.php' => $TRAITS, //5.5
+
+				'filesystems.php' => $CONFIG, //5.5
+
+				'User.php' => $MODELS, //5.5
+				'Gift.php' => $MODELS, //5.5
+				'Media.php' => $MODELS, //5.5
+				'Messages.php' => $MODELS, //5.5
+				'MediaMessages.php' => $MODELS, //5.5
+				'Notifications.php' => $MODELS, //5.5
+				'Transactions.php' => $MODELS, //5.5
+				'LiveComments.php' => $MODELS, //5.5
+
+
+				'CoconutVideoService.php' => $SERVICES, //5.5
+				'SocialAccountService.php' => $SERVICES, //5.5
+
+				'MassMessagesEvent.php' => $EVENTS, //5.5
+
+				'EncodeVideo.php' => $JOBS, //5.5
+				'RebillWallet.php' => $JOBS, //5.5
+
+				'MassMessagesListener.php' => $LISTENERS, //5.5
+
+				'ViewServiceProvider.php' => $PROVIDERS, //5.5
+
+				'RegisterController.php' => $CONTROLLERS_AUTH, //5.5
+				'LoginController.php' => $CONTROLLERS_AUTH, //5.5
+
+				'AdminController.php' => $CONTROLLERS, //5.5
+				'AddFundsController.php' => $CONTROLLERS, //5.5
+				'CCBillController.php' => $CONTROLLERS, //5.5
+				'GiftController.php' => $CONTROLLERS, //5.5
+				'TipController.php' => $CONTROLLERS, //5.5
+				'MessagesController.php' => $CONTROLLERS, //5.5
+				'LiveStreamingsController.php' => $CONTROLLERS, //5.5
+				'LiveStreamingPrivateController.php' => $CONTROLLERS, //5.5
+				'HomeController.php' => $CONTROLLERS, //5.5
+				'WebhookCoconutController.php' => $CONTROLLERS, //5.5
+				'UserController.php' => $CONTROLLERS, //5.5
+				'UploadMediaController.php' => $CONTROLLERS, //5.5
+				'UpdatesController.php' => $CONTROLLERS, //5.5
+
+				'TempEmail.php' => $RULES, //5.5
+
+				'admin-styles.css' => $PUBLIC_ADMIN, //5.5
+				'admin-functions.js' => $PUBLIC_ADMIN, //5.5
+
+				'styles.css' => $PUBLIC_CSS, //5.5
+				'epub-viewer.css' => $PUBLIC_CSS, //5.5
+
+				'app-functions.js' => $PUBLIC_JS, //5.5
+				'jszip.min.js' => $PUBLIC_JS, //5.5
+				'epub.min.js' => $PUBLIC_JS, //5.5
+				'messages.js' => $PUBLIC_JS, //5.5
+				'send-gift.js' => $PUBLIC_JS, //5.5
+				'live.js' => $PUBLIC_JS, //5.5
+
+				'fileuploader-post.js' => public_path('js' . $DS . 'fileuploader') . $DS, //5.5
+				'jquery.fileuploader-theme-thumbnails.css' => public_path('js' . $DS . 'fileuploader') . $DS, //5.5
+
+				'binance.png' => public_path('img' . $DS . 'payments') . $DS, //5.5
+
+				'app.blade.php' => $VIEWS_LAYOUTS, //5.5
+
+				'referrals.blade.php' => $VIEWS_USERS, //5.5
+				'epub-viewer.blade.php' => $VIEWS_USERS, //5.5
+				'wallet.blade.php' => $VIEWS_USERS, //5.5
+				'messages-show.blade.php' => $VIEWS_USERS, //5.5
+				'my_posts.blade.php' => $VIEWS_USERS, //5.5
+				'edit_my_page.blade.php' => $VIEWS_USERS, //5.5
+				'edit-update.blade.php' => $VIEWS_USERS, //5.5
+				'privacy_security.blade.php' => $VIEWS_USERS, //5.5
+				'profile.blade.php' => $VIEWS_USERS, //5.5
+				'notifications.blade.php' => $VIEWS_USERS, //5.5
+				'invoice.blade.php' => $VIEWS_USERS, //5.5
+				'my_payments.blade.php' => $VIEWS_USERS, //5.5
+				'live.blade.php' => $VIEWS_USERS, //5.5
+
+				'css_general.blade.php' => $VIEWS_INCLUDES, //5.5
+				'comments-live.blade.php' => $VIEWS_INCLUDES, //5.5
+				'javascript_general.blade.php' => $VIEWS_INCLUDES, //5.5
+				'messages-inbox.blade.php' => $VIEWS_INCLUDES, //5.5
+				'messages-chat.blade.php' => $VIEWS_INCLUDES, //5.5
+				'media-messages.blade.php' => $VIEWS_INCLUDES, //5.5
+				'form-post.blade.php' => $VIEWS_INCLUDES, //5.5
+				'footer.blade.php' => $VIEWS_INCLUDES, //5.5
+				'modal-new-message.blade.php' => $VIEWS_INCLUDES, //5.5
+				'modal-gifts.blade.php' => $VIEWS_INCLUDES, //5.5
+				'menu-sidebar-home.blade.php' => $VIEWS_INCLUDES, //5.5
+				'menu-mobile.blade.php' => $VIEWS_INCLUDES, //5.5
+				'explore_creators.blade.php' => $VIEWS_INCLUDES, //5.5
+				'updates.blade.php' => $VIEWS_INCLUDES, //5.5
+				'navbar.blade.php' => $VIEWS_INCLUDES, //5.5
+
+				'profile-disabled.blade.php' => $VIEWS_ERRORS, //5.5
+
+				'home.blade.php' => $VIEWS_INDEX, //5.5
+				'home-login.blade.php' => $VIEWS_INDEX, //5.5
+				'creators.blade.php' => $VIEWS_INDEX, //5.5	
+				'categories.blade.php' => $VIEWS_INDEX, //5.5	
+				'creators-live.blade.php' => $VIEWS_INDEX, //5.5	
+			];
+
+			$filesAdmin = [
+				'add-gift.blade.php' => $VIEWS_ADMIN, //5.5
+				'binance-settings.blade.php' => $VIEWS_ADMIN, //5.5
+				'edit-gift.blade.php' => $VIEWS_ADMIN, //5.5
+				'gifts.blade.php' => $VIEWS_ADMIN, //5.5
+				'settings.blade.php' => $VIEWS_ADMIN, //5.5
+				'members.blade.php' => $VIEWS_ADMIN, //5.5
+				'edit-member.blade.php' => $VIEWS_ADMIN, //5.5
+				'posts.blade.php' => $VIEWS_ADMIN, //5.5
+				'withdrawal-view.blade.php' => $VIEWS_ADMIN, //5.5
+				'role-and-permissions-member.blade.php' => $VIEWS_ADMIN, //5.5
+				'layout.blade.php' => $VIEWS_ADMIN, //5.5
+				'storage.blade.php' => $VIEWS_ADMIN, //5.5
+			];
+
+			// Files
+			foreach ($files as $file => $root) {
+				$this->moveFile($path . $file, $root . $file, $copy);
+			}
+
+			// Files Admin
+			foreach ($filesAdmin as $file => $root) {
+				$this->moveFile($pathAdmin . $file, $root . $file, $copy);
+			}
+
+			// Copy UpgradeController
+			if ($copy == true) {
+				$this->moveFile($path . 'UpgradeController.php', $CONTROLLERS . 'UpgradeController.php', $copy);
+			}
+
+			if ($copy == false) {
+				//============ Start Translate ==================
+				// Replace String
+				$findStringLang = ');';
+
+				// Ennglish
+				$replaceLangEN = "
+		// Version 5.5
+		'default_theme' => 'Default theme',
+		'deactivate_your_account' => 'Deactivate your account',
+		'deactivate_your_account_alert' => 'Your data will not be deleted and will be activated when you log in again.',
+		'yes_confirm_deactivate' => 'Yes, deactivate',
+		'allow_creators_deactivate_profile' => 'Allow creators to deactivate their profile',
+		'profile_deactivated_error' => 'This profile has been deactivated',
+		'profile_disabled' => 'Profile disabled',
+		'user_unavailable' => 'User unavailable',
+		'allow_epub_files' => 'Allow upload EPUB files (Post and Messages)',
+		'upload_epub_file' => 'Upload EPUB file',
+		'invalid_format' => 'Invalid format, only :formats are allowed.', // Not remove/edit :formats
+		'view_online' => 'View online',
+		'epub' => 'Epub',
+		'allow_sending_gifts' => 'Allow sending Gifts',
+		'gifts' => 'Gifts',
+		'gift' => 'Gift',
+		'send_a_gift' => 'Send a gift',
+		'send_gift' => 'Send gift',
+		'send_gift_desc_payment' => 'The amount will be deducted from your Wallet',
+		'gift_sent_success' => 'Gift sent successfully',
+		'has_sent_you_gift' => 'has sent you a gift',
+		'sent_a_gift' => 'sent a gift',
+		'sent_a_gift_for' => 'Sent a gift for',
+		'please_select_gift' => 'Please select a gift',
+		'currency' => 'Currency',
+		'disable_free_post' => 'Disable free post option',
+		'disable_explore_section' => 'Disable Explore section',
+		'disable_creators_section' => 'Disable Creators section',
+		'gift_for' => 'Gift for',
+);";
+				$fileLangEN = 'lang/en/general.php';
+				@file_put_contents($fileLangEN, str_replace($findStringLang, $replaceLangEN, file_get_contents($fileLangEN)));
+
+				// Español
+				$replaceLangES = "
+	// Version 5.5
+	'default_theme' => 'Tema predeterminado',
+	'deactivate_your_account' => 'Desactive su cuenta',
+	'deactivate_your_account_alert' => 'Sus datos no se eliminarán y se activarán cuando inicie sesión nuevamente.',
+	'yes_confirm_deactivate' => 'Sí, desactivar',
+	'allow_creators_deactivate_profile' => 'Permitir a creadores desactivar su perfil',
+	'profile_deactivated_error' => 'Este perfil ha sido desactivado',
+	'profile_disabled' => 'Perfil desactivado',
+	'user_unavailable' => 'Usuario no disponible',
+	'allow_epub_files' => 'Permitir subir archivos EPUB (Post y Mensajes)',
+	'upload_epub_file' => 'Subir archivo EPUB',
+	'invalid_format' => 'Formato no válido, solo se permiten :formats', // Not remove/edit :formats
+	'view_online' => 'Ver en línea',
+	'epub' => 'Epub',
+	'allow_sending_gifts' => 'Permitir enviar Regalos',
+	'gifts' => 'Regalos',
+	'gift' => 'Regalo',
+	'send_a_gift' => 'Enviar un regalo',
+	'send_gift' => 'Enviar regalo',
+	'send_gift_desc_payment' => 'El monto se deducirá de tu Billetera',
+	'gift_sent_success' => 'Regalo enviado con éxito',
+	'has_sent_you_gift' => 'te ha enviado un regalo',
+	'sent_a_gift' => 'envió un regalo',
+	'sent_a_gift_for' => 'Envió un regalo por',
+	'please_select_gift' => 'Por favor selecciona un regalo',
+	'currency' => 'Moneda',
+	'disable_free_post' => 'Deshabilitar la opción de publicación gratuita',
+	'disable_explore_section' => 'Deshabilitar la sección Explorar',
+	'disable_creators_section' => 'Deshabilitar la sección Creadores',
+	'gift_for' => 'Regalo por',
+);";
+				$fileLangES = 'lang/es/general.php';
+				@file_put_contents($fileLangES, str_replace($findStringLang, $replaceLangES, file_get_contents($fileLangES)));
+				//============== End Translate ====================
+
+				file_put_contents(
+					'.env',
+					"\n\nPUSHR_ACCESS_KEY=\nPUSHR_SECRET_KEY=\nPUSHR_BUCKET=\nPUSHR_URL=\nPUSHR_ENDPOINT=\n",
+					FILE_APPEND
+				);
+
+				//============ Start Query SQL ====================================
+				if (!Schema::hasColumn(
+					'admin_settings',
+					'theme',
+					'allow_creators_deactivate_profile',
+					'allow_epub_files',
+					'gifts',
+					'disable_free_post',
+					'disable_explore_section',
+					'disable_creators_section',
+				)) {
+					Schema::table('admin_settings', function ($table) {
+						$table->enum('theme', ['light', 'dark'])->default('light');
+						$table->boolean('allow_creators_deactivate_profile')->default(false);
+						$table->boolean('allow_epub_files')->default(false);
+						$table->boolean('gifts')->default(false);
+						$table->boolean('disable_free_post')->default(false);
+						$table->boolean('disable_explore_section')->default(false);
+						$table->boolean('disable_creators_section')->default(false);
+					});
+				} // End Schema
+
+				Schema::table('users', function (Blueprint $table) {
+					$table->string('status', 200)->change();
+				});
+
+				Schema::table('live_comments', function (Blueprint $table) {
+					$table->decimal('tip_amount', 10, 2)->change();
+				});
+
+				Schema::table('live_comments', function (Blueprint $table) {
+					$table->renameColumn('tip_amount', 'earnings');
+				});
+
+				if (!Schema::hasColumn('transactions', 'gift_id')) {
+					Schema::table('transactions', function (Blueprint $table) {
+						$table->unsignedInteger('gift_id')->nullable()->index('gift_id');
+					});
+				}
+
+				if (!Schema::hasColumn('messages', 'gift_id', 'gift_amount')) {
+					Schema::table('messages', function (Blueprint $table) {
+						$table->unsignedInteger('gift_id')->nullable()->index('gift_id');
+						$table->decimal('gift_amount', 10, 2);
+					});
+				}
+
+				if (!Schema::hasColumn('live_comments', 'gift_id')) {
+					Schema::table('live_comments', function (Blueprint $table) {
+						$table->unsignedInteger('gift_id')->nullable()->index('gift_id');
+					});
+				}
+
+				if (!Schema::hasColumn('media', 'bytes', 'mime')) {
+					Schema::table('media', function ($table) {
+						$table->string('bytes', 255)->nullable()->after('file_size');
+						$table->string('mime', 255)->nullable()->after('bytes');
+					});
+				} // End Schema
+
+				if (!Schema::hasColumn('updates', 'editing', 'can_media_edit')) {
+					Schema::table('updates', function (Blueprint $table) {
+						$table->boolean('editing')->default(false);
+						$table->boolean('can_media_edit')->index('can_media_edit')->default(false);
+					});
+				} // End Schema
+
+				if (!Schema::hasTable('gifts')) {
+					Schema::create('gifts', function (Blueprint $table) {
+						$table->id();
+						$table->string('image', 50);
+						$table->decimal('price', 10, 2);
+						$table->boolean('status')->default(true)->index('status');
+						$table->timestamps();
+					});
+				}
+
+				if (!Schema::hasColumn('payment_gateways', 'crypto_currency')) {
+					Schema::table('payment_gateways', function (Blueprint $table) {
+						$table->string('crypto_currency', 50)->nullable();
+					});
+				}
+
+				if (Schema::hasTable('payment_gateways')) {
+					\DB::table('payment_gateways')->insert(
+						[
+							[
+								'name' => 'Binance',
+								'type' => 'normal',
+								'enabled' => '0',
+								'fee' => 0.0,
+								'fee_cents' => 0.00,
+								'email' => '',
+								'key' => '',
+								'key_secret' => '',
+								'recurrent' => 'no',
+								'logo' => 'binance.png',
+								'subscription' => 'no',
+								'bank_info' => '',
+								'token' => str_random(150),
+							]
+						]
+					);
+				}
+
+				DB::statement('ALTER TABLE `subscriptions` ADD INDEX (`rebill_wallet`)');
+				DB::statement('ALTER TABLE `subscriptions` ADD INDEX (`cancelled`)');
+
+				//============ End Query SQL ====================================
+
+				// Delete folder
+				File::deleteDirectory("v$version");
+			} //============ End $copy == false
+
+			// Update Version
+			$this->settings->update([
+				'version' => $version
+			]);
+
+			// Clear Cache, Config and Views
+			\Artisan::call('cache:clear');
+			\Artisan::call('config:clear');
+			\Artisan::call('view:clear');
+			\Artisan::call('queue:restart');
+
+			return $upgradeDone;
+		} //<<---- End Version 5.5 ----->>
+
+		if ($version == '5.6') {
+			//============ Starting moving files...
+			$oldVersion = $this->settings->version;
+			$path       = "v$version/";
+			$pathAdmin  = "v$version/admin/";
+			$pathPublic = "v$version/public/";
+			$copy       = true;
+
+			if ($this->settings->version == $version) {
+				return redirect('/');
+			}
+
+			if ($this->settings->version != $oldVersion  || !$this->settings->version) {
+				return "<h2 style='text-align:center; margin-top: 30px; font-family: Arial, san-serif;color: #ff0000;'>Error! you must update from version $oldVersion</h2>";
+			}
+
+			//============== Files Affected ================//
+			$files = [
+				'messages.js' => $PUBLIC_JS, //5.6
+
+				'ViewServiceProvider.php' => $PROVIDERS, //5.6
+
+				'AddFundsController.php' => $CONTROLLERS, //5.6
+				'AdminController.php' => $CONTROLLERS, //5.6
+				'HomeController.php' => $CONTROLLERS, //5.6
+				'InstallScriptController.php' => $CONTROLLERS, //5.6
+				'UpdatesController.php' => $CONTROLLERS, //5.6
+				'UploadMediaController.php' => $CONTROLLERS, //5.6
+				'UserController.php' => $CONTROLLERS, //5.6
+
+				'messages-show.blade.php' => $VIEWS_USERS, //5.6
+				'edit-update.blade.php' => $VIEWS_USERS, //5.6
+				'invoice-deposits.blade.php' => $VIEWS_USERS, //5.6
+				'invoice.blade.php' => $VIEWS_USERS, //5.6
+				'edit_my_page.blade.php' => $VIEWS_USERS, //5.6
+				'profile.blade.php' => $VIEWS_USERS, //5.6
+				'wallet.blade.php' => $VIEWS_USERS, //5.6
+
+				'modal-tip.blade.php' => $VIEWS_INCLUDES, //5.6
+			];
+
+
+			$filesAdmin = [
+				'billing.blade.php' => $VIEWS_ADMIN, //5.6
+				'messages.blade.php' => $VIEWS_ADMIN, //5.6
+				'storage.blade.php' => $VIEWS_ADMIN, //5.6
+			];
+
+			// Files
+			foreach ($files as $file => $root) {
+				$this->moveFile($path . $file, $root . $file, $copy);
+			}
+
+			// Files Admin
+			foreach ($filesAdmin as $file => $root) {
+				$this->moveFile($pathAdmin . $file, $root . $file, $copy);
+			}
+
+			// Copy UpgradeController
+			if ($copy == true) {
+				$this->moveFile($path . 'UpgradeController.php', $CONTROLLERS . 'UpgradeController.php', $copy);
+			}
+
+			if ($copy == false) {
+				//============ Start Translate ==================
+				// Replace String
+				$findStringLang = ');';
+
+				// Ennglish
+				$replaceLangEN = "
+		// Version 5.6
+		'increase_decrease_amount' => 'to increase/decrease amount',
+);";
+				$fileLangEN = 'lang/en/general.php';
+				@file_put_contents($fileLangEN, str_replace($findStringLang, $replaceLangEN, file_get_contents($fileLangEN)));
+
+				// Español
+				$replaceLangES = "
+	// Version 5.6
+	'increase_decrease_amount' => 'para incrementar / disminuir monto',
+);";
+				$fileLangES = 'lang/es/general.php';
+				@file_put_contents($fileLangES, str_replace($findStringLang, $replaceLangES, file_get_contents($fileLangES)));
+				//============== End Translate ====================
+
+				if (!Schema::hasColumn('admin_settings', 'phone')) {
+					Schema::table('admin_settings', function ($table) {
+						$table->string('phone', 100)->nullable();
+					});
+				}
+
+				if (!Schema::hasColumn('users', 'kick')) {
+					Schema::table('users', function (Blueprint $table) {
+						$table->string('kick', 200);
+					});
+				}
+
+				// Delete folder
+				File::deleteDirectory("v$version");
+			} //============ End $copy == false
+
+			// Update Version
+			$this->settings->update([
+				'version' => $version
+			]);
+
+			// Clear Cache, Config and Views
+			\Artisan::call('cache:clear');
+			\Artisan::call('config:clear');
+			\Artisan::call('view:clear');
+			\Artisan::call('queue:restart');
+
+			return $upgradeDone;
+		} //<<---- End Version 5.6 ----->>
+
+		if ($version == '5.7') {
+			//============ Starting moving files...
+			$oldVersion = $this->settings->version;
+			$path       = "v$version/";
+			$pathAdmin  = "v$version/admin/";
+			$pathPublic = "v$version/public/";
+			$copy       = true;
+
+			if ($this->settings->version == $version) {
+				return redirect('/');
+			}
+
+			if ($this->settings->version != $oldVersion  || !$this->settings->version) {
+				return "<h2 style='text-align:center; margin-top: 30px; font-family: Arial, san-serif;color: #ff0000;'>Error! you must update from version $oldVersion</h2>";
+			}
+
+			//============== Files Affected ================//
+			$files = [
+				'composer.json' => $ROOT, //5.7
+				'composer.lock' => $ROOT, //5.7
+
+				'core.min.js' => $PUBLIC_JS, //5.7
+				'messages.js' => $PUBLIC_JS, //5.7
+
+				'Helper.php' => $APP, //5.7
+
+				'RebillCardinity.php' => $JOBS, //5.7
+				'EncodeVideo.php' => $JOBS, //5.7
+				'EncodeVideoMessages.php' => $JOBS, //5.7
+				'EncodeVideoWelcomeMessage.php' => $JOBS, //5.7
+				'EncodeVideoStory.php' => $JOBS, //5.7
+
+				'SocialAccountService.php' => $SERVICES, //5.7
+
+				'AdminController.php' => $CONTROLLERS, //5.7
+				'MessagesController.php' => $CONTROLLERS, //5.7
+				'UpdatesController.php' => $CONTROLLERS, //5.7
+				'SocialAuthController.php' => $CONTROLLERS, //5.7
+				'UserController.php' => $CONTROLLERS, //5.7
+
+				'login.blade.php' => $VIEWS_AUTH, //5.7
+				'register.blade.php' => $VIEWS_AUTH, //5.7
+
+				'verify_account.blade.php' => $VIEWS_USERS, //5.7
+				'referrals.blade.php' => $VIEWS_USERS, //5.7
+
+				'javascript_general.blade.php' => $VIEWS_INCLUDES, //5.7
+				'media-messages.blade.php' => $VIEWS_INCLUDES, //5.7
+				'modal-login.blade.php' => $VIEWS_INCLUDES, //5.7
+				'cards-settings.blade.php' => $VIEWS_INCLUDES, //5.7
+				'navbar.blade.php' => $VIEWS_INCLUDES, //5.7
+			];
+
+			// Files
+			foreach ($files as $file => $root) {
+				$this->moveFile($path . $file, $root . $file, $copy);
+			}
+
+			// Copy UpgradeController
+			if ($copy == true) {
+				$this->moveFile($path . 'UpgradeController.php', $CONTROLLERS . 'UpgradeController.php', $copy);
+			}
+
+			if ($copy == false) {
+				// Delete folder
+				File::deleteDirectory("v$version");
+			} //============ End $copy == false
+
+			// Update Version
+			$this->settings->update([
+				'version' => $version
+			]);
+
+			// Clear Cache, Config and Views
+			\Artisan::call('cache:clear');
+			\Artisan::call('config:clear');
+			\Artisan::call('view:clear');
+			\Artisan::call('queue:restart');
+
+			return $upgradeDone;
+		} //<<---- End Version 5.7 ----->>
+
+		if ($version == '5.8') {
+			//============ Starting moving files...
+			$oldVersion = $this->settings->version;
+			$path       = "v$version/";
+			$pathAdmin  = "v$version/admin/";
+			$pathPublic = "v$version/public/";
+			$copy       = true;
+
+			if ($this->settings->version == $version) {
+				return redirect('/');
+			}
+
+			if ($this->settings->version != $oldVersion  || !$this->settings->version) {
+				return "<h2 style='text-align:center; margin-top: 30px; font-family: Arial, san-serif;color: #ff0000;'>Error! you must update from version $oldVersion</h2>";
+			}
+
+			//============== Files Affected ================//
+			$files = [
+				'composer.json' => $ROOT, //5.8
+				'composer.lock' => $ROOT, //5.8
+
+				'UserDelete.php' => $TRAITS, //5.8
+
+				'EncodeVideo.php' => $JOBS, //5.8
+				'EncodeVideoMessages.php' => $JOBS, //5.8
+				'EncodeVideoWelcomeMessage.php' => $JOBS, //5.8
+				'EncodeVideoStory.php' => $JOBS, //5.8
+
+				'PrivateContent.php' => $MIDDLEWARE, //5.8
+
+				'AdminController.php' => $CONTROLLERS, //5.8
+				'ProductsController.php' => $CONTROLLERS, //5.8
+				'UserController.php' => $CONTROLLERS, //5.8
+
+				'login.blade.php' => $VIEWS_AUTH, //5.8
+
+				'dashboard.blade.php' => $VIEWS_USERS, //5.8
+
+				'home-login.blade.php' => $VIEWS_INDEX, //5.8
+			];
+
+			$filesAdmin = [
+				'comments.blade.php' => $VIEWS_ADMIN, //5.8
+				'messages.blade.php' => $VIEWS_ADMIN, //5.8
+				'replies.blade.php' => $VIEWS_ADMIN, //5.8
+			];
+
+			// Files
+			foreach ($files as $file => $root) {
+				$this->moveFile($path . $file, $root . $file, $copy);
+			}
+
+			// Files Admin
+			foreach ($filesAdmin as $file => $root) {
+				$this->moveFile($pathAdmin . $file, $root . $file, $copy);
+			}
+
+			// Copy UpgradeController
+			if ($copy == true) {
+				$this->moveFile($path . 'UpgradeController.php', $CONTROLLERS . 'UpgradeController.php', $copy);
+			}
+
+			if ($copy == false) {
+				// Delete folder
+				File::deleteDirectory("v$version");
+			} //============ End $copy == false
+
+			// Update Version
+			$this->settings->update([
+				'version' => $version
+			]);
+
+			// Clear Cache, Config and Views
+			\Artisan::call('cache:clear');
+			\Artisan::call('config:clear');
+			\Artisan::call('view:clear');
+			\Artisan::call('queue:restart');
+
+			return $upgradeDone;
+		} //<<---- End Version 5.8 ----->>
+
+		if ($version == '5.9') {
+			//============ Starting moving files...
+			$oldVersion = $this->settings->version;
+			$path       = "v$version/";
+			$pathAdmin  = "v$version/admin/";
+			$pathPublic = "v$version/public/";
+			$copy       = false;
+
+			if ($this->settings->version == $version) {
+				return redirect('/');
+			}
+
+			if ($this->settings->version != $oldVersion  || !$this->settings->version) {
+				return "<h2 style='text-align:center; margin-top: 30px; font-family: Arial, san-serif;color: #ff0000;'>Error! you must update from version $oldVersion</h2>";
+			}
+
+			//============== Files Affected ================//
+			$files = [
+				'composer.json' => $ROOT, //5.9
+				'composer.lock' => $ROOT, //5.9
+
+				'web.php' => $ROUTES, //5.9
+
+				'Functions.php' => $TRAITS, //5.9
+
+				'Helper.php' => $APP, //5.9
+
+				'UserDelete.php' => $TRAITS, //5.9
+
+				'User.php' => $MODELS, //5.9
+				'Updates.php' => $MODELS, //5.9
+
+				'Kernel.php' => app_path('Console') . $DS, //5.9
+
+				'NewMessage.php' => $NOTIFICATIONS, //5.9
+
+				'DeleteInactiveUsers.php' => $JOBS,//5.9
+
+				'AdminController.php' => $CONTROLLERS, //5.9
+				'MessagesController.php' => $CONTROLLERS, //5.9
+				'HomeController.php' => $CONTROLLERS, //5.9
+				'UserController.php' => $CONTROLLERS, //5.9
+				'PagesController.php' => $CONTROLLERS, //5.9
+				'SubscriptionsController.php' => $CONTROLLERS, //5.9
+				'ProductsController.php' => $CONTROLLERS, //5.9
+				'LiveStreamingsController.php' => $CONTROLLERS, //5.9
+				'GiftController.php' => $CONTROLLERS, //5.9
+
+				'app.blade.php' => $VIEWS_LAYOUTS,//5.9
+
+				'notifications.blade.php' => $VIEWS_USERS, //5.9
+				'messages-show.blade.php' => $VIEWS_USERS, //5.9
+				'privacy_security.blade.php' => $VIEWS_USERS, //5.9
+
+				'css_general.blade.php' => $VIEWS_INCLUDES, //5.9
+				'comments-live.blade.php' => $VIEWS_INCLUDES, //5.9
+				'messages-chat.blade.php' => $VIEWS_INCLUDES, //5.9
+				'messages-inbox.blade.php' => $VIEWS_INCLUDES, //5.9
+				'media-messages.blade.php' => $VIEWS_INCLUDES, //5.9
+				'modal-gifts.blade.php' => $VIEWS_INCLUDES, //5.9
+				'menu-sidebar-home.blade.php' => $VIEWS_INCLUDES,//5.9
+				'navbar.blade.php' => $VIEWS_INCLUDES,//5.9
+				'updates.blade.php' => $VIEWS_INCLUDES,//5.9
+
+				'explore.blade.php' => $VIEWS_INDEX,//5.9
+
+				'add-physical-product.blade.php' => $VIEWS_SHOP,//5.9
+				'add-product.blade.php' => $VIEWS_SHOP,//5.9
+				'show.blade.php' => $VIEWS_SHOP,//5.9
+				'modal-edit.blade.php' => $VIEWS_SHOP,//5.9
+				'listing-products.blade.php' => $VIEWS_SHOP,//5.9
+
+				'AgoraRTCSDK-v4.js' => public_path('js' . $DS . 'agora') . $DS, //5.9
+				'fileuploader-shop-file.js' => public_path('js' . $DS . 'fileuploader') . $DS, //5.9
+				'fileuploader-welcome-msg.js' => public_path('js' . $DS . 'fileuploader') . $DS, //5.9
+				'fileuploader-story-file.js' => public_path('js' . $DS . 'fileuploader') . $DS, //5.9
+
+				'homepage-explore.jpg' => $PUBLIC_IMG,//5.9
+			];
+
+			$filesAdmin = [
+				'edit-page.blade.php' => $VIEWS_ADMIN, //5.9
+				'ffmpeg.blade.php' => $VIEWS_ADMIN,//5.9
+				'shop.blade.php' => $VIEWS_ADMIN,//5.9
+				'video_encoding.blade.php' => $VIEWS_ADMIN,//5.9
+				'maintenance_mode.blade.php' => $VIEWS_ADMIN,//5.9
+				'layout.blade.php' => $VIEWS_ADMIN,//5.9
+				'role-and-permissions-member.blade.php' => $VIEWS_ADMIN,//5.9
+				'settings.blade.php' => $VIEWS_ADMIN,//5.9
+				'theme.blade.php' => $VIEWS_ADMIN,//5.9
+				'edit-member.blade.php' => $VIEWS_ADMIN,//5.9
+			];
+
+			// Files
+			foreach ($files as $file => $root) {
+				$this->moveFile($path . $file, $root . $file, $copy);
+			}
+
+			// Files Admin
+			foreach ($filesAdmin as $file => $root) {
+				$this->moveFile($pathAdmin . $file, $root . $file, $copy);
+			}
+
+			// Copy UpgradeController
+			if ($copy == true) {
+				$this->moveFile($path . 'UpgradeController.php', $CONTROLLERS . 'UpgradeController.php', $copy);
+			}
+
+			if ($copy == false) {
+				//============ Start Translate ==================
+				// Replace String
+				$findStringLang = ');';
+
+				// Ennglish
+				$replaceLangEN = "
+		// Version 5.9
+		'go_to_messages' => 'Go to Messages',
+		'someone_sent_message' => 'Someone sent me a message',
+		'choose_file_to_upload' => 'Choose file to upload',
+		'browse_file' => 'Browse file',
+		'one_file_chosen' => 'file chosen',
+		'more_files_chosen' => 'files chosen',
+		'size' => 'Size',
+		'dimensions' => 'Dimensions',
+		'duration' => 'Duration',
+		'crop' => 'Crop',
+		'rotate' => 'Rotate',
+		'drop_files' => 'Drop the files here to Upload',
+		'paste_files' => 'Pasting a file, click here to cancel.',
+		'removeConfirmation' => 'Are you sure you want to remove this file?',
+		'filesLimit' => 'You can only upload',
+		'filesType' => 'Only these extensions are allowed:',
+		'fileSize' => 'is too large, please choose a file up to',
+		'filesSizeAll' => 'The chosen files are too large! Please select files up to',
+		'fileName' => 'A file with the same name is already selected.',
+		'remoteFile' => 'Remote files are not allowed.',
+		'folderUpload' => 'Folders are not allowed.',
+		'allow_free_items_shop' => 'Allow selling free items (digital products only)',
+		'allow_external_links_shop' => 'Allow external links for purchases (physical products only)',
+		'free_item_shop' => 'Set the price to 0 if you want the item to be free',
+		'downloads' => 'Downloads',
+		'external_link_buy' => 'External link to buy',
+		'info_external_link' => 'You will be redirected to an external URL',
+		'error_file_not_found' => 'File not found',
+		'users_can_delete_messages' => 'Users can delete messages and conversations',
+		'delete_old_users_inactive' => 'Delete inactive users via cron job',
+		'write_short_message' => 'Write a short message (optional)',
+		'allow_comments' => 'Allow comments on your posts',
+		'comments_disabled' => 'Comments have been disabled',
+);";
+				$fileLangEN = 'lang/en/general.php';
+				@file_put_contents($fileLangEN, str_replace($findStringLang, $replaceLangEN, file_get_contents($fileLangEN)));
+
+				// Español
+				$replaceLangES = "
+	// Version 5.9
+	'go_to_messages' => 'Ir a Mensajes',
+	'someone_sent_message' => 'Alguien me ha enviado un mensaje',
+	'choose_file_to_upload' => 'Selecciona el archivo para subir',
+	'browse_file' => 'Examinar archivo',
+	'one_file_chosen' => 'archivo seleccionado',
+	'more_files_chosen' => 'archivos seleccionados',
+	'size' => 'Tamaño',
+	'dimensions' => 'Dimensiones',
+	'duration' => 'Duración',
+	'crop' => 'Cortar',
+	'rotate' => 'Rotar',
+	'drop_files' => 'Suelta los archivos aquí para subir',
+	'paste_files' => 'Pegando un archivo, haz clic aquí para cancelar.',
+	'removeConfirmation' => '¿Está seguro de que desea eliminar este archivo?',
+	'filesLimit' => 'Solo se puede subir',
+	'filesType' => 'Solo se permiten estas extensiones:',
+	'fileSize' => 'es demasiado grande, por favor, elija un archivo menor a',
+	'filesSizeAll' => '¡Los archivos elegidos son demasiado grandes! Por favor, selecciona archivos de hasta',
+	'fileName' => 'Un archivo con el mismo nombre ya ha sido seleccionado.',
+	'remoteFile' => 'No se permiten archivos remotos.',
+	'folderUpload' => 'No se permiten carpetas.',
+	'allow_free_items_shop' => 'Permitir vender Items gratis (solo productos digitales)',
+	'allow_external_links_shop' => 'Permitir enlaces externos para compras (solo en productos físicos)',
+	'free_item_shop'	=> 'Coloque el precio en 0 si desea que el Item sea gratuito',
+	'downloads' => 'Descargas',
+	'external_link_buy' => 'Enlace externo para comprar',
+	'info_external_link' => 'Serás redireccionado a una URL externa',
+	'error_file_not_found' => 'Archivo no encontrado',
+	'users_can_delete_messages' => 'Usuarios pueden eliminar mensajes y conversaciones',
+	'delete_old_users_inactive' => 'Eliminar usuarios inactivos vía cron job',
+	'write_short_message' => 'Escribe un mensaje corto (opcional)',
+	'allow_comments' => 'Permitir comentarios en tus publicaciones',
+	'comments_disabled' => 'Los comentarios han sido desactivados',
+);";
+				$fileLangES = 'lang/es/general.php';
+				@file_put_contents($fileLangES, str_replace($findStringLang, $replaceLangES, file_get_contents($fileLangES)));
+				//============== End Translate ====================
+
+				if (!Schema::hasColumn('users', 'email_new_message', 'allow_comments')) {
+					Schema::table('users', function (Blueprint $table) {
+						$table->boolean('email_new_message')->default(1);
+						$table->boolean('allow_comments')->default(1);
+					});
+				}
+
+				if (!Schema::hasColumn('admin_settings', 
+					'allow_free_items_shop', 
+					'allow_external_links_shop', 
+					'users_can_delete_messages', 
+					'delete_old_users_inactive',
+					)) {
+					Schema::table('admin_settings', function (Blueprint $table) {
+						$table->boolean('allow_free_items_shop')->default(0);
+						$table->boolean('allow_external_links_shop')->default(0);
+						$table->boolean('users_can_delete_messages')->default(1);
+						$table->boolean('delete_old_users_inactive')->default(0);
+					});
+				}
+
+				if (!Schema::hasColumn('products', 'downloads', 'external_link')) {
+					Schema::table('products', function (Blueprint $table) {
+						$table->unsignedInteger('downloads');
+						$table->text('external_link')->nullable();
+					});
+				}
+
+				// Delete folder
+				File::deleteDirectory("v$version");
+
+				File::delete('ffmpeg.php');
+			} //============ End $copy == false
+
+			// Update Version
+			$this->settings->update([
+				'version' => $version
+			]);
+
+			// Clear Cache, Config and Views
+			\Artisan::call('cache:clear');
+			\Artisan::call('config:clear');
+			\Artisan::call('view:clear');
+			\Artisan::call('queue:restart');
+
+			return $upgradeDone;
+		} //<<---- End Version 5.9 ----->>
 
 
 	} //<--- End Method version

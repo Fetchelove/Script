@@ -156,7 +156,7 @@ class TipController extends Controller
       $sql->live_streamings_id = $this->request->liveID;
       $sql->joined  = 0;
       $sql->tip     = '1';
-      $sql->tip_amount = $amount;
+      $sql->earnings = $amount;
       $sql->save();
     }
 
@@ -404,7 +404,6 @@ class TipController extends Controller
         $verifyTxnId = Transactions::where('txn_id', $tranx->data->reference)->first();
 
         if (!isset($verifyTxnId)) {
-
           // Admin and user earnings calculation
           $earnings = $this->earningsAdminUser($user->custom_fee, $amount, $payment->fee, $payment->fee_cents);
 

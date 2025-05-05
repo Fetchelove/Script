@@ -51,9 +51,17 @@
 
           <span class="w-100 d-block mb-1">{{__('auth.email')}}: {{$settings->email_admin}}</span>
 
+          @if ($settings->phone)
+          <span class="w-100 d-block mb-1">
+            {{__('general.phone')}}: {{$settings->phone}}
+          </span>
+          @endif
+
           @if ($settings->vat)
             {{__('general.vat')}}: {{$settings->vat}}
           @endif
+
+          
         </address>
       </div>
       <!-- /.col -->
@@ -116,6 +124,8 @@
               <td class="text-center">{{__('general.purchase_item').$creator}}</td>
             @elseif ($data->type == 'live_streaming_private')
               <td class="text-center">{{__('general.live_streaming_private').$creator}}</td>
+            @elseif ($data->type == 'gift')
+              <td class="text-center">{{__('general.single_payment').' ('.__('general.gift').')'.$creator}}</td>
             @else
               <td class="text-center">{{__('general.single_payment').' ('.__('general.tip').')'.$creator}}</td>
             @endif

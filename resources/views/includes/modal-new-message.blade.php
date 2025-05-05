@@ -90,9 +90,14 @@
 					</div><!-- End form-group -->
 
 					<div class="w-100">
-						<span id="previewImage"></span>
-						<a href="javascript:void(0)" id="removePhoto" class="text-danger p-1 px-2 display-none btn-tooltip" data-toggle="tooltip" data-placement="top" title="{{__('general.delete')}}"><i class="fa fa-times-circle"></i></a>
+						<small id="previewImage"></small>
+						<a href="javascript:void(0)" id="removePhoto" class="text-danger small p-1 px-2 display-none btn-tooltip" data-toggle="tooltip" data-placement="top" title="{{__('general.delete')}}"><i class="fa fa-times-circle"></i></a>
 					</div>
+
+					<div class="w-100 mb-2">
+						<small id="previewEpub"></small>
+						<a href="javascript:void(0)" id="removeEpub" class="text-danger p-1 small display-none btn-tooltip-form" data-toggle="tooltip" data-placement="top" title="{{__('general.delete')}}"><i class="fa fa-times-circle"></i></a>
+					  </div>
 
 					<input type="file" name="media[]" id="file" accept="image/*,video/mp4,video/x-m4v,video/quicktime,audio/mp3" multiple class="visibility-hidden filepond">
 
@@ -109,6 +114,14 @@
 							<i class="bi bi-file-earmark-zip align-bottom f-size-25"></i>
 						</button>
 					@endif
+
+					@if ($settings->allow_epub_files)
+					<input type="file" name="epub" id="ePubFile" accept="application/epub+zip" class="visibility-hidden">
+
+					<button type="button" class="btn btn-post btn-tooltip-form p-bottom-8 e-none @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill" data-toggle="tooltip" data-placement="top" title="{{__('general.upload_epub_file')}}" onclick="$('#ePubFile').trigger('click')">
+					<i class="bi-book f-size-25 align-bottom"></i>
+					</button>
+				@endif
 
 						<button type="button" id="setPrice" class="btn btn-upload btn-tooltip e-none align-bottom @if (auth()->user()->dark_mode == 'off') text-primary @else text-white @endif rounded-pill" data-toggle="tooltip" data-placement="top" title="{{__('general.set_price_for_msg')}}">
 							<i class="feather icon-tag align-bottom f-size-25"></i>

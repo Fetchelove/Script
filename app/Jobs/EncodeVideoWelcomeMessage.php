@@ -135,20 +135,8 @@ class EncodeVideoWelcomeMessage implements ShouldQueue
 
       // Notify to user - destination, author, type, target
       Notifications::send($user->creator->id, $user->creator->id, 24, $this->video->id);
-
     } catch (\Exception $e) {
-      // Notify to user (ERROR) - destination, author, type, target
-      Notifications::send($user->creator->id, $user->creator->id, 25, $this->video->id);
-
-      // Delete file
-      $this->deleteFile($videoPathDisk);
-
-      if ($videoPoster) {
-        $this->deleteFile($videoPoster);
-      }
-
-      // Delete Media
-      MediaWelcomeMessage::whereId($this->video->id)->delete();
+      $this->handleFailedJob($user, $videoPathDisk, $videoPoster);
     }
   } // End Handle
 
@@ -168,6 +156,30 @@ class EncodeVideoWelcomeMessage implements ShouldQueue
 
     // Delete temp file
     unlink($localFile);
+  }
+
+  public function handleFailedJob($user, $videoPathDisk, $videoPoster = null)
+  {
+    // Notify to user (ERROR) - destination, author, type, target
+    Notifications::send($user->creator->id, $user->creator->id, 25, $this->video->id);
+
+    // Delete file
+    $this->deleteFile($videoPathDisk);
+
+    if ($videoPoster) {
+      $this->deleteFile($videoPoster);
+    }
+
+    // Delete Media
+    MediaWelcomeMessage::whereId($this->video->id)->delete();
+  }
+
+  /**
+   * Handle a job failure.
+   */
+  public function failed($user, $videoPathDisk, $videoPoster): void
+  {
+    self::handleFailedJob($user, $videoPathDisk, $videoPoster);
   }
 
   /**

@@ -17,9 +17,15 @@
               <small class="btn-block text-center mt-2 mb-4">{{ __('auth.login_welcome') }}</small>
 
               @if (session('login_required'))
-    			<div class="alert alert-danger" id="dangerAlert">
-                		<i class="fa fa-exclamation-triangle"></i> {{__('auth.login_required')}}
-                		</div>
+                <div class="alert alert-danger" id="dangerAlert">
+                  <i class="fa fa-exclamation-triangle"></i> {{session('login_required')}}
+                </div>
+                	@endif
+
+                  @if (session('error_social_login'))
+                  <div class="alert alert-danger" id="dangerAlert">
+                    <i class="fa fa-exclamation-triangle"></i> {{__('general.error')}} "{{ session('error_social_login') }}"
+                  </div>
                 	@endif
 
               @include('errors.errors-forms')
@@ -35,7 +41,7 @@
 
                 @if ($settings->twitter_login == 'on')
                 <a href="{{url('oauth/twitter')}}" class="btn btn-twitter auth-form-btn mb-2 w-100">
-                  <i class="bi-twitter-x mr-2"></i> {{ __('auth.login_with') }} Twitter
+                  <i class="bi-twitter-x mr-2"></i> {{ __('auth.login_with') }} X
                 </a>
               @endif
 

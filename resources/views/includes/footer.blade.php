@@ -1,5 +1,5 @@
 <!-- FOOTER -->
-<div class="py-5 @auth d-none d-lg-block @endauth @if (auth()->check() && auth()->user()->dark_mode == 'off' || auth()->guest() ) footer_background_color footer_text_color @else bg-white @endif @if (auth()->check() && auth()->user()->dark_mode == 'off' && $settings->footer_background_color == '#ffffff' || auth()->guest() && $settings->footer_background_color == '#ffffff' ) border-top @endif">
+<div class="py-5 @auth d-none d-lg-block @endauth @if (auth()->check() && auth()->user()->dark_mode == 'off' || auth()->guest()) footer_background_color footer_text_color @else bg-white @endif @if (auth()->check() && auth()->user()->dark_mode == 'off' && $settings->footer_background_color == '#ffffff' || auth()->guest() && $settings->footer_background_color == '#ffffff' ) border-top @endif">
 <footer class="container">
   <div class="row">
     <div class="col-md-3">
@@ -92,7 +92,6 @@
         @foreach (Helper::pages() as $page)
 
       @if ($page->access == 'all')
-
           <li>
             <a class="link-footer" href="{{ url('/p', $page->slug) }}">
               {{ $page->title }}
@@ -126,24 +125,26 @@
         @endif
       </ul>
     </div>
-    @if ($categoriesCount != 0)
-    <div class="col-md-3">
-      <h6 class="text-uppercase">@lang('general.categories')</h6>
-      <ul class="list-unstyled">
-        @foreach ($categoriesFooter as $category)
-        <li>
-          <a class="link-footer" href="{{ url('category', $category->slug) }}">
-            {{ Lang::has('categories.' . $category->slug) ? __('categories.' . $category->slug) : $category->name }}
-          </a>
-        </li>
-        @endforeach
+    @if (!$settings->disable_creators_section)
+      @if ($categoriesCount != 0)
+      <div class="col-md-3">
+        <h6 class="text-uppercase">@lang('general.categories')</h6>
+        <ul class="list-unstyled">
+          @foreach ($categoriesFooter as $category)
+          <li>
+            <a class="link-footer" href="{{ url('category', $category->slug) }}">
+              {{ Lang::has('categories.' . $category->slug) ? __('categories.' . $category->slug) : $category->name }}
+            </a>
+          </li>
+          @endforeach
 
-        @if ($categoriesCount > 6)
-          <li><a class="link-footer btn-arrow" href="{{ url('creators') }}">{{ trans('general.explore') }}</a></li>
-          @endif
-      </ul>
-    </div>
-  @endif
+          @if ($categoriesCount > 6)
+            <li><a class="link-footer btn-arrow" href="{{ url('creators') }}">{{ trans('general.explore') }}</a></li>
+            @endif
+        </ul>
+      </div>
+      @endif
+    @endif
     <div class="col-md-3">
       <h6 class="text-uppercase">@lang('general.links')</h6>
       <ul class="list-unstyled">

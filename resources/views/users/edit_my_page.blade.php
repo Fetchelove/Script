@@ -352,12 +352,21 @@
                                             </div>
                                           </div><!-- ./col-md-6 -->
 
-                                          <div class="col-lg-12">
+                                          <div class="col-md-6">
                                             <div class="input-group mb-4">
                                               <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="bi-threads"></i></span>
                                               </div>
                                               <input class="form-control" name="threads" placeholder="https://threads.net/username"  value="{{auth()->user()->threads}}" type="text">
+                                            </div>
+                                          </div><!-- ./col-md-6 -->
+
+                                          <div class="col-md-6">
+                                            <div class="input-group mb-4">
+                                              <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fab fa-kickstarter"></i></span>
+                                              </div>
+                                              <input class="form-control" name="kick" placeholder="https://kick.com/username"  value="{{auth()->user()->kick}}" type="text">
                                             </div>
                                           </div><!-- ./col-md-6 -->
                                     </div><!-- End Row Form Group -->

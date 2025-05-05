@@ -20,15 +20,15 @@ use App\Models\MediaMessages;
 use App\Models\Notifications;
 use App\Models\Subscriptions;
 use App\Models\PaymentGateways;
+use App\Models\VerificationRequests;
 use Illuminate\Support\Facades\Storage;
 use App\Models\LiveStreamingPrivateRequest;
 
 trait UserDelete
 {
-	// START
 	public function deleteUser($id)
 	{
-		$user     = User::findOrFail($id);
+		$user = User::findOrFail($id);
 		$settings = AdminSettings::first();
 
 		// Comments Delete
@@ -130,11 +130,10 @@ trait UserDelete
 
 		// Subscriptions User
 		$subscriptions = Subscriptions::whereUserId($id)->get();
-		$payment       = PaymentGateways::whereId(2)->whereName('Stripe')->whereEnabled(1)->first();
+		$payment = PaymentGateways::whereId(2)->whereName('Stripe')->whereEnabled(1)->first();
 
 
 		if (isset($subscriptions)) {
-
 			foreach ($subscriptions as $subscription) {
 				if ($subscription->stripe_id == '') {
 					$subscription->delete();
@@ -252,6 +251,21 @@ trait UserDelete
 				$live->delete();
 			}
 		}
+
+		$verification = VerificationRequests::whereUserId($id)->first();
+		$pathImageVerification = config('path.verification');
+
+		if ($verification) {
+			// Delete Image and Form W-9
+			Storage::delete([
+				$pathImageVerification . $verification->image,
+				$pathImageVerification . $verification->image_reverse,
+				$pathImageVerification . $verification->image_selfie,
+				$pathImageVerification . $verification->form_w9
+			]);
+
+			$verification->delete();
+		}		
 
 		// User Delete
 		$user->delete();

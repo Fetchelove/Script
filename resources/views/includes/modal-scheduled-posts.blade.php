@@ -31,7 +31,7 @@
                         </div>
 
                         <div class="w-100 d-block text-center mt-3">
-                            <small class="d-block w-100">{{ __('admin.default_timezone') }}: 
+                            <small class="d-block w-100">{{ __('general.server_time_zone') }}: 
                                 <a href="https://www.google.com/search?q=time+{{ str_replace('_', ' ', config('app.timezone')) }}" target="_blank">
                                     {{ str_replace('_', ' ', config('app.timezone')) }} <i class="bi-box-arrow-up-right ml-1"></i>
                                 </a>

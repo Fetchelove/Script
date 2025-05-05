@@ -53,6 +53,9 @@ class User extends Authenticatable implements HasLocalePreference
     'welcome_message_new_subs',
     'send_welcome_message',
     'price_welcome_message',
+    'alias_mp',
+    'cvu',
+    'dark_mode'
   ];
 
   /**
@@ -61,12 +64,17 @@ class User extends Authenticatable implements HasLocalePreference
    * @var array
    */
   protected $hidden = [
-    'password', 'remember_token',
+    'password',
+    'remember_token',
   ];
 
   protected $withCount = [
     'newNotifications',
     'newInbox'
+  ];
+
+  protected $casts = [
+    'last_seen' => 'datetime:Y-m-d',
   ];
 
   /**
@@ -524,7 +532,7 @@ class User extends Authenticatable implements HasLocalePreference
         break;
 
       case 'yearly':
-        return now()->add(12, 'months');
+        return now()->add(60, 'months');
         break;
     }
   }

@@ -1,5 +1,5 @@
 <header>
-	<nav class="navbar navbar-expand-lg navbar-inverse fixed-top p-nav @if(auth()->guest() && request()->path() == '/') scroll @else p-3 @if (request()->is('live/*')) d-none @endif  @if (request()->is('messages/*')) d-none d-lg-block shadow-sm @elseif(request()->is('messages')) shadow-sm @else shadow-custom @endif {{ auth()->check() && auth()->user()->dark_mode == 'on' ? 'bg-white' : 'navbar_background_color' }} link-scroll @endif">
+	<nav class="navbar navbar-expand-lg navbar-inverse fixed-top p-nav @if(auth()->guest() && request()->path() == '/' && $settings->home_style == 0) scroll @else p-3 @if (request()->is('live/*')) d-none @endif  @if (request()->is('messages/*')) d-none d-lg-block shadow-sm @elseif(request()->is('messages')) shadow-sm @else shadow-custom @endif {{ auth()->check() && auth()->user()->dark_mode == 'on' ? 'bg-white' : 'navbar_background_color' }} link-scroll @endif">
 		<div class="container-fluid d-flex position-relative">
 
 			@auth
@@ -14,12 +14,12 @@
 				@if (auth()->check() && auth()->user()->dark_mode == 'on' )
 					<img src="{{url('public/img', $settings->logo)}}" data-logo="{{$settings->logo}}" data-logo-2="{{$settings->logo_2}}" alt="{{$settings->title}}" class="logo align-bottom max-w-100" />
 				@else
-				<img src="{{url('public/img', auth()->guest() && request()->path() == '/' ? $settings->logo : $settings->logo_2)}}" data-logo="{{$settings->logo}}" data-logo-2="{{$settings->logo_2}}" alt="{{$settings->title}}" class="logo align-bottom max-w-100" />
+				<img src="{{url('public/img', auth()->guest() && request()->path() == '/' && $settings->home_style == 0 ? $settings->logo : $settings->logo_2)}}" data-logo="{{$settings->logo}}" data-logo-2="{{$settings->logo_2}}" alt="{{$settings->title}}" class="logo align-bottom max-w-100" />
 			@endif
 			</a>
 
 			@guest
-				<button class="navbar-toggler @if(auth()->guest() && request()->path() == '/') text-white @endif" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+				<button class="navbar-toggler @if(auth()->guest() && request()->path() == '/' && $settings->home_style == 0) text-white @endif" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
 					<i class="fa fa-bars"></i>
 				</button>
 			@endguest
@@ -35,37 +35,41 @@
 			@if (auth()->guest() && $settings->who_can_see_content == 'all' || auth()->check())
 				<ul class="navbar-nav mr-auto">
 
-					@if (! $settings->disable_search_creators)
-					<form class="form-inline my-lg-0 position-relative" method="get" action="{{url('creators')}}">
-						<input id="searchCreatorNavbar"
-							class="form-control search-bar @if(auth()->guest() && request()->path() == '/') border-0 @endif" type="text"
-							required name="q" autocomplete="off" minlength="3" placeholder="{{ __('general.find_user') }}"
-							aria-label="Search">
-						<button class="btn btn-outline-success my-sm-0 button-search e-none" type="submit"><i
-								class="bi bi-search"></i></button>
-					
-						<div class="dropdown-menu dd-menu-user position-absolute" style="width: 95%; top: 48px;" id="dropdownCreators">
-					
-							<button type="button" class="d-none" id="triggerBtn" data-toggle="dropdown" aria-haspopup="true"
-								aria-expanded="false"></button>
-					
-							<div class="w-100 text-center display-none py-2" id="spinnerSearch">
-								<span class="spinner-border spinner-border-sm align-middle text-primary"></span>
-							</div>
-					
-							<div id="containerCreators"></div>
-					
-							<div id="viewAll" class="display-none mt-2">
-								<a class="dropdown-item border-top py-2 text-center" href="#">{{ __('general.view_all') }}</a>
-							</div>
-						</div><!-- dropdown-menu -->
-					</form>
-				@endif
+					@if (!$settings->disable_creators_section)
+						@if (!$settings->disable_search_creators)
+						<form class="form-inline my-lg-0 position-relative" method="get" action="{{url('creators')}}">
+							<input id="searchCreatorNavbar"
+								class="form-control search-bar @if(auth()->guest() && request()->path() == '/') border-0 @endif" type="text"
+								required name="q" autocomplete="off" minlength="3" placeholder="{{ __('general.find_user') }}"
+								aria-label="Search">
+							<button class="btn btn-outline-success my-sm-0 button-search e-none" type="submit"><i
+									class="bi bi-search"></i></button>
+						
+							<div class="dropdown-menu dd-menu-user position-absolute" style="width: 95%; top: 48px;" id="dropdownCreators">
+						
+								<button type="button" class="d-none" id="triggerBtn" data-toggle="dropdown" aria-haspopup="true"
+									aria-expanded="false"></button>
+						
+								<div class="w-100 text-center display-none py-2" id="spinnerSearch">
+									<span class="spinner-border spinner-border-sm align-middle text-primary"></span>
+								</div>
+						
+								<div id="containerCreators"></div>
+						
+								<div id="viewAll" class="display-none mt-2">
+									<a class="dropdown-item border-top py-2 text-center" href="#">{{ __('general.view_all') }}</a>
+								</div>
+							</div><!-- dropdown-menu -->
+						</form>
+						@endif
+					@endif
 
 					@guest
+					 @if (!$settings->disable_creators_section)
 						<li class="nav-item">
 							<a class="nav-link" href="{{url('creators')}}">{{__('general.explore')}}</a>
 						</li>
+						@endif
 
 						@if ($settings->shop)
 						<li class="nav-item">
@@ -80,14 +84,14 @@
 				<ul class="navbar-nav ml-auto">
 					@guest
 					<li class="nav-item mr-1">
-						<a @if (Helper::showLoginFormModal()) data-toggle="modal" data-target="#loginFormModal" @endif class="nav-link login-btn @if ($settings->registration_active == '0')  btn btn-main btn-primary pr-3 pl-3 @endif" href="{{$settings->home_style == 0 ? url('login') : url('/')}}">
+						<a @if (Helper::showLoginFormModal()) data-toggle="modal" data-target="#loginFormModal" @endif class="nav-link login-btn @if ($settings->registration_active == '0')  btn btn-main btn-primary pr-3 pl-3 @endif" href="{{ in_array(config('settings.home_style'), [0, 2]) ? url('login') : url('/')}}">
 							{{__('auth.login')}}
 						</a>
 					</li>
 
 					@if ($settings->registration_active == '1')
 					<li class="nav-item">
-						<a @if (Helper::showLoginFormModal()) data-toggle="modal" data-target="#loginFormModal" @endif class="toggleRegister nav-link btn btn-main @if (request()->path() == '/') btn-light @else btn-primary @endif btn-register-menu pr-3 pl-3 btn-arrow btn-arrow-sm" href="{{$settings->home_style == 0 ? url('signup') : url('/')}}">
+						<a @if (Helper::showLoginFormModal()) data-toggle="modal" data-target="#loginFormModal" @endif class="toggleRegister nav-link btn btn-main @if (request()->path() == '/' && $settings->home_style == 0) btn-light @else btn-primary @endif btn-register-menu pr-3 pl-3 btn-arrow btn-arrow-sm" href="{{ in_array(config('settings.home_style'), [0, 2]) ? url('signup') : url('/') }}">
 							{{__('general.getting_started')}}
 						</a>
 					</li>
@@ -155,7 +159,7 @@
 				</a>
 			</li>
 
-			@if (auth()->user()->verified_id == 'yes' || $settings->referral_system == 'on' || auth()->user()->balance != 0.00)
+			@if (auth()->user()->verified_id == 'yes')
 				<li class="nav-item dropdown d-lg-none">
 					<a class="nav-link px-2 link-menu-mobile py-1 balance">
 						<div>
@@ -244,12 +248,14 @@
 						</a>
 					</li>
 
+					@if (!$settings->disable_creators_section)
 					<li class="nav-item dropdown d-lg-block d-none">
 						<a class="nav-link px-2" href="{{url('creators')}}" title="{{__('general.explore_creators')}}">
 							<i class="far	fa-compass icon-navbar"></i>
 							<span class="d-lg-none align-middle ml-1">{{__('general.explore')}}</span>
 						</a>
 					</li>
+					@endif
 
 					@if ($settings->shop)
 					<li class="nav-item dropdown d-lg-block d-none">
@@ -296,7 +302,7 @@
 								<div class="dropdown-divider"></div>
 						@endif
 
-						@if (auth()->user()->verified_id == 'yes' || $settings->referral_system == 'on' || auth()->user()->balance != 0.00)
+						@if (auth()->user()->verified_id == 'yes')
 						<span class="dropdown-item dropdown-navbar balance">
 							<i class="iconmoon icon-Dollar mr-2"></i> {{__('general.balance')}}: {{Helper::amountFormatDecimal(auth()->user()->balance)}}
 						</span>

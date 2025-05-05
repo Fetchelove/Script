@@ -21,7 +21,7 @@
 
         @if (session('login_required'))
     			<div class="alert alert-danger" id="dangerAlert">
-                		<i class="fa fa-exclamation-triangle"></i> {{__('auth.login_required')}}
+                		<i class="fa fa-exclamation-triangle"></i> {{session('login_required')}}
                 		</div>
                 	@endif
 
@@ -186,7 +186,7 @@
     </div>
   </div>
 
-  <div class="text-center py-3 px-3">
+  <div class="text-center py-3 px-3 footer_background_color footer_text_color">
     @include('includes.footer-tiny')
   </div>
 @endsection

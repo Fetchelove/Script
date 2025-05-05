@@ -232,6 +232,41 @@
                 <!--============ END BITCOIN ============-->
                 @endif
 
+                @if ($settings->payout_method_mercadopago == 'on')
+              <!--============ START WESTERN ============-->
+              <div class="custom-control custom-radio mb-3 mt-3">
+                    <input name="payment_gateway" value="Mercadopago" id="radioMP" class="custom-control-input" @if (auth()->user()->payment_gateway == 'Mercado Pago') checked @endif type="radio">
+                    <label class="custom-control-label" for="radioMP">
+                      <span><img src="{{ auth()->user()->dark_mode == 'off' ? url('public/img/payments/mercadopago.png') : url('public/img/payments/mercadopago-white.png') }}" width="150"/></span>
+                      <small class="w-100 d-block">* {{__('general.only_payments_for_argentina')}}</small>
+                    </label>
+                  </div>
+
+                  <form method="POST" action="{{ url('settings/payout/method/mercadopago') }}" id="MercadoPago" @if (auth()->user()->payment_gateway != 'Mercado Pago') class="display-none" @endif>
+                    @csrf
+
+                    <div class="form-group">
+                        <div class="input-group mb-4">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="bi-stars"></i></span>
+                          </div>
+                          <input class="form-control" name="alias_mp" value="{{auth()->user()->alias_mp == '' ? old('alias_mp') : auth()->user()->alias_mp}}" placeholder="Alias MP" required type="text">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                          <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text"><i class="bi-123"></i></span>
+                            </div>
+                            <input class="form-control" name="cvu" value="{{auth()->user()->cvu == '' ? old('cvu') : auth()->user()->cvu}}" placeholder="Nro. CVU" required type="text">
+                          </div>
+                        </div>
+                        <button class="btn btn-1 btn-success btn-block" type="submit">{{__('general.save_payout_method')}}</button>
+                  </form>
+                <!--============ END WESTERN ============-->
+                @endif
+
             @if( $settings->payout_method_bank == 'on' )
             <!--============ START BANK TRANSFER ============-->
               <div class="custom-control custom-radio mb-3 mt-3">
@@ -329,6 +364,12 @@
       $('#Bank').slideDown();
     } else {
       $('#Bank').slideUp();
+    }
+
+    if($(this).val() == 'Mercadopago') {
+      $('#MercadoPago').slideDown();
+    } else {
+      $('#MercadoPago').slideUp();
     }
 
   });

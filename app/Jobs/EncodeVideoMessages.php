@@ -150,27 +150,8 @@ class EncodeVideoMessages implements ShouldQueue
         // Notify to user - destination, author, type, target
         Notifications::send($message->user()->id, $message->user()->id, 10, $this->video->messages_id);
       }
-
     } catch (\Exception $e) {
-      // Update date the post and status
-      Messages::whereId($this->video->messages_id)->update([
-        'created_at' => now(),
-        'updated_at' => now(),
-        'mode' => 'active'
-      ]);
-
-      // Notify to user (ERROR) - destination, author, type, target
-      Notifications::send($message->user()->id, $message->user()->id, 21, $this->video->messages_id);
-
-      // Delete file
-      $this->deleteFile($videoPathDisk);
-
-      if ($videoPoster) {
-        $this->deleteFile($videoPoster);
-      }
-
-      // Delete Media
-      MediaMessages::whereMessagesId($this->video->messages_id)->delete();
+      $this->handleFailedJob($message, $videoPathDisk, $videoPoster);
     }
   } // End Handle
 
@@ -190,6 +171,37 @@ class EncodeVideoMessages implements ShouldQueue
 
     // Delete temp file
     unlink($localFile);
+  }
+
+  public function handleFailedJob($message, $videoPathDisk, $videoPoster = null)
+  {
+    // Update date the post and status
+    Messages::whereId($this->video->messages_id)->update([
+      'created_at' => now(),
+      'updated_at' => now(),
+      'mode' => 'active'
+    ]);
+
+    // Notify to user (ERROR) - destination, author, type, target
+    Notifications::send($message->user()->id, $message->user()->id, 21, $this->video->messages_id);
+
+    // Delete file
+    $this->deleteFile($videoPathDisk);
+
+    if ($videoPoster) {
+      $this->deleteFile($videoPoster);
+    }
+
+    // Delete Media
+    MediaMessages::whereMessagesId($this->video->messages_id)->delete();
+  }
+
+  /**
+   * Handle a job failure.
+   */
+  public function failed($message, $videoPathDisk, $videoPoster): void
+  {
+    self::handleFailedJob($message, $videoPathDisk, $videoPoster);
   }
 
   /**

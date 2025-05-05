@@ -51,6 +51,12 @@
 
           <span class="w-100 d-block mb-1">{{trans('auth.email')}}: {{$settings->email_admin}}</span>
 
+          @if ($settings->phone)
+          <span class="w-100 d-block mb-1">
+            {{__('general.phone')}}: {{$settings->phone}}
+          </span>
+          @endif
+
           @if ($settings->vat)
             {{trans('general.vat')}}: {{$settings->vat}}
           @endif

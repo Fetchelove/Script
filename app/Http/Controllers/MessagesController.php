@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Cache;
 use App\Helper;
-use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Messages;
 use Illuminate\Support\Str;
@@ -13,13 +12,16 @@ use App\Models\MediaMessages;
 use App\Models\Notifications;
 use App\Events\MassMessagesEvent;
 use App\Jobs\EncodeVideoMessages;
+use App\Notifications\NewMessage;
+use App\Services\CoconutVideoService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Traits\PushNotificationTrait;
-use App\Services\CoconutVideoService;
 
 class MessagesController extends Controller
 {
+  use Traits\Functions;
+
   public function __construct()
   {
     $this->middleware('auth');
@@ -104,7 +106,10 @@ class MessagesController extends Controller
    */
   public function messages($id)
   {
-    $user = User::whereId($id)->where('id', '<>', auth()->id())->firstOrFail();
+    $user = User::whereId($id)
+      ->where('id', '<>', auth()->id())
+      ->whereStatus('active')
+      ->firstOrFail();
 
     $messages = Messages::where('to_user_id', auth()->id())
       ->where('from_user_id', $id)
@@ -263,16 +268,13 @@ class MessagesController extends Controller
       'user' => $user,
       'hasMorePages' => $hasMorePages ?? null,
     ])->render();
-  } //<--- End Method
+  }
 
   public function send(Request $request)
   {
     if (!auth()->check()) {
       return response()->json(['session_null' => true]);
     }
-
-    // PATHS
-    $path = config('path.messages');
 
     // Find user in Database
     $user = User::findOrFail($request->get('id_user'));
@@ -287,6 +289,7 @@ class MessagesController extends Controller
     $messages = [
       "required"    => __('validation.required'),
       "message.max"  => __('validation.max.string'),
+      'epub.mimes' => __('general.invalid_format', ['formats' => 'EPUB']),
       'price.min' => __('general.amount_minimum' . $currencyPosition, ['symbol' => config('settings.currency_symbol'), 'code' => config('settings.currency_code')]),
       'price.max' => __('general.amount_maximum' . $currencyPosition, ['symbol' => config('settings.currency_symbol'), 'code' => config('settings.currency_code')]),
     ];
@@ -295,6 +298,7 @@ class MessagesController extends Controller
     $rules = [
       'message' => 'required|min:1|max:' . config('settings.comment_length') . '',
       'zip'    => 'mimes:zip|max:' . config('settings.file_size_allowed') . '',
+      'epub'    => 'mimes:epub,zip|max:' . config('settings.file_size_allowed') . '',
       'price'  => 'numeric|min:' . config('settings.min_ppv_amount') . '|max:' . config('settings.max_ppv_amount'),
     ];
 
@@ -308,14 +312,12 @@ class MessagesController extends Controller
       ));
     }
 
-    $time = Carbon::now();
-
     $message = new Messages();
     $message->conversations_id = 0;
     $message->from_user_id    = auth()->id();
     $message->to_user_id      = $user->id;
     $message->message         = trim(Helper::checkTextDb($request->get('message')));
-    $message->updated_at      = $time;
+    $message->updated_at      = now();
     $message->price           = $request->price;
     $message->mode            = 'pending';
     $message->save();
@@ -333,29 +335,15 @@ class MessagesController extends Controller
       }
     }
 
-    //=== Upload File Zip
+    // Insert File Zip
     if ($request->hasFile('zip')) {
-      $fileZip         = $request->file('zip');
-      $extension       = $fileZip->getClientOriginalExtension();
-      $size            = Helper::formatBytes($fileZip->getSize(), 1);
-      $originalName    = Helper::fileNameOriginal($fileZip->getClientOriginalName());
-      $file            = strtolower(auth()->id() . time() . Str::random(20) . '.' . $extension);
+      $this->uploadMediaFileMsg($request->file('zip'), $message->id);
+    }
 
-      $fileZip->storePubliclyAs($path, $file);
-      $token = Str::random(150) . uniqid() . now()->timestamp;
-
-      // We insert the file into the database
-      MediaMessages::create([
-        'messages_id' => $message->id,
-        'type' => 'zip',
-        'file' => $file,
-        'file_name' => $originalName,
-        'file_size' => $size,
-        'token' => $token,
-        'status' => 'active',
-        'created_at' => now()
-      ]);
-    } //=== End Upload File Zip
+    // Insert EPUB File
+    if ($request->hasFile('epub')) {
+      $this->uploadMediaFileMsg($request->file('epub'), $message->id, 'epub');
+    }
 
     // Get all videos of the message
     $videos = MediaMessages::whereMessagesId($message->id)->whereType('video')->get();
@@ -387,6 +375,16 @@ class MessagesController extends Controller
     // Get the minutes that the receiver of the message was active
     $diffInMinutes = now()->diffInMinutes($user->last_seen);
     $getPushNotificationDevices = $user->oneSignalDevices->pluck('player_id')->all();
+
+    if ($diffInMinutes > 10 && $diffInMinutes < 1000) {
+      app()->setLocale($user->language);
+      
+      try {
+        $user->notify(new NewMessage(auth()->user()));
+      } catch (\Exception $e) {
+        info('Error Send Email New Message - ' . $e->getMessage());
+      }
+    }
 
     if (config('settings.push_notification_status') && $getPushNotificationDevices && $diffInMinutes > 10 && $diffInMinutes < 1000) {
 
@@ -583,7 +581,7 @@ class MessagesController extends Controller
       abort(404);
     }
 
-    $media = MediaMessages::whereMessagesId($msg->id)->where('type', 'zip')->firstOrFail();
+    $media = MediaMessages::whereMessagesId($msg->id)->whereType('zip')->firstOrFail();
 
     $pathFile = config('path.messages') . $media->file;
     $headers = [
@@ -638,16 +636,25 @@ class MessagesController extends Controller
 
     //=== Upload File Zip
     if ($request->hasFile('zip')) {
-
-      $fileZip         = $request->file('zip');
-      $extension       = $fileZip->getClientOriginalExtension();
-      $size            = Helper::formatBytes($fileZip->getSize(), 1);
-      $originalName    = Helper::fileNameOriginal($fileZip->getClientOriginalName());
-      $file            = strtolower(auth()->id() . time() . Str::random(20) . '.' . $extension);
+      $fileZip = $request->file('zip');
+      $extension = $fileZip->getClientOriginalExtension();
+      $size = Helper::formatBytes($fileZip->getSize(), 1);
+      $originalName = Helper::fileNameOriginal($fileZip->getClientOriginalName());
+      $file = strtolower(auth()->id() . time() . Str::random(20) . '.' . $extension);
 
       $fileZip->storePubliclyAs($path, $file);
-      $token = Str::random(150) . uniqid() . now()->timestamp;
     } //=== End Upload File Zip
+
+    //=== Upload File Epub
+    if ($request->hasFile('epub')) {
+      $fileRequest = $request->file('epub');
+      $extension = $fileRequest->getClientOriginalExtension();
+      $sizeEpub = Helper::formatBytes($fileRequest->getSize(), 1);
+      $originalNameEpub = Helper::fileNameOriginal($fileRequest->getClientOriginalName());
+      $fileEpub = strtolower(auth()->id() . time() . Str::random(20) . '.' . $extension);
+
+      $fileRequest->storePubliclyAs($path, $fileEpub);
+    } //=== End Upload File Epub
 
     // Event send all messages
     $authUser = auth()->user();
@@ -656,6 +663,7 @@ class MessagesController extends Controller
     $messageData = $request->get('message');
     $priceMessage = $request->price;
     $hasFileZip = $request->hasFile('zip') ? true : false;
+    $hasFileEpub = $request->hasFile('epub') ? true : false;
 
     event(new MassMessagesEvent(
       $authUser,
@@ -666,13 +674,38 @@ class MessagesController extends Controller
       $file ?? null,
       $originalName ?? null,
       $size ?? null,
-      $token ?? null
+      $hasFileEpub,
+      $fileEpub ?? null,
+      $originalNameEpub ?? null,
+      $sizeEpub ?? null,
     ));
 
     return response()->json([
       'success' => true,
       'fromChat' => false,
     ], 200);
-  } //<<--- End Method send()
+  }
 
+  public function viewEpub($id)
+  {
+    $epub = MediaMessages::with(['messages'])->whereId($id)->firstOrfail();
+
+    $checkUserSubscription = auth()->user()->checkSubscription($epub->messages->user());
+
+    if (
+      !$checkUserSubscription
+      && !auth()->user()->checkPayPerViewMsg($epub->messages_id)
+      && $epub->messages->user()->id != auth()->id()
+      || $checkUserSubscription
+      && $epub->messages->price != 0.00
+      && $checkUserSubscription->free == 'yes'
+      && !auth()->user()->checkPayPerViewMsg($epub->messages_id)
+    ) {
+      abort(404);
+    }
+
+    return view('users.epub-viewer', [
+      'urlFile' => Helper::getFile(config('path.messages') . $epub->file)
+    ]);
+  }
 }
