@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\TipController;
 use App\Http\Controllers\BlogController;
-use App\Http\Controllers\GiftController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LangController;
 use App\Http\Controllers\UserController;
@@ -38,7 +37,6 @@ use App\Http\Controllers\SubscriptionsController;
 use App\Http\Controllers\TwoFactorAuthController;
 use App\Http\Controllers\LiveStreamingsController;
 use App\Http\Controllers\StorageCoconutController;
-use App\Http\Controllers\WebhookCoconutController;
 use App\Http\Controllers\CountriesStatesController;
 use App\Http\Controllers\UploadMediaStoryController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -48,6 +46,7 @@ use App\Http\Controllers\UploadMediaMessageController;
 use App\Http\Controllers\LiveStreamingPrivateController;
 use App\Http\Controllers\UploadMediaPreviewShopController;
 use App\Http\Controllers\UploadMediaWelcomeMessageController;
+use App\Http\Controllers\WebhookCoconutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -185,8 +184,6 @@ Route::get('verify/account/{confirmation_code}', [HomeController::class, 'getVer
 		// Paypal IPN (PPV)
 	  Route::post('paypal/ppv/ipn', [PayPerViewController::class, 'paypalPPVIpn']);
 
-	  Route::get('ajax/explore', [UpdatesController::class, 'ajaxExplore']);
-
  /*
   |-----------------------------------
   | User Views LOGGED
@@ -222,6 +219,7 @@ Route::get('verify/account/{confirmation_code}', [HomeController::class, 'getVer
 	 // Settings Page
   	Route::get('settings/page', [UserController::class, 'settingsPage']);
   	Route::post('settings/page', [UserController::class, 'updateSettingsPage']);
+	Route::post('delete/cover', [UserController::class, 'deleteImageCover']);
 
 	// Privacy and Security
    	Route::get('privacy/security', [UserController::class, 'privacySecurity']);
@@ -240,9 +238,6 @@ Route::get('verify/account/{confirmation_code}', [HomeController::class, 'getVer
 	// Delete Account
 	Route::view('account/delete', 'users.delete_account');
    	Route::post('account/delete', [UserController::class, 'deleteAccount']);
-
-	// Deactivate Account
-   	Route::post('account/deactivate', [UserController::class, 'deactivateAccount'])->name('deactivate.account');
 
 	// Notifications
  	Route::get('notifications', [UserController::class, 'notifications']);
@@ -266,7 +261,6 @@ Route::get('verify/account/{confirmation_code}', [HomeController::class, 'getVer
 
 	// Upload Cover
 	Route::post('upload/cover', [UserController::class, 'uploadCover']);
-	Route::post('delete/cover', [UserController::class, 'deleteImageCover']);
 
  	// Password
  	Route::get('settings/password', [UserController::class, 'password']);
@@ -298,7 +292,7 @@ Route::get('verify/account/{confirmation_code}', [HomeController::class, 'getVer
 
 	// Updates
 	Route::post('update/create',[UpdatesController::class, 'create']);
-	Route::get('post/edit/{id}',[UpdatesController::class, 'edit'])->name('post.edit');
+	Route::get('update/edit/{id}',[UpdatesController::class, 'edit']);
 	Route::post('update/edit',[UpdatesController::class, 'postEdit']);
 	Route::post('update/delete/{id}',[UpdatesController::class, 'delete']);
 
@@ -374,6 +368,7 @@ Route::get('verify/account/{confirmation_code}', [HomeController::class, 'getVer
 
 	// Explore
 	Route::get('explore',[UpdatesController::class, 'explore']);
+	Route::get('ajax/explore', [UpdatesController::class, 'ajaxExplore']);
 
 	// Add/Remove Restrict User
 	Route::post('restrict/user/{id}', [UserController::class, 'restrictUser']);
@@ -450,8 +445,7 @@ Route::get('verify/account/{confirmation_code}', [HomeController::class, 'getVer
 	// Comment Like
 	Route::post('comment/like',[CommentsController::class, 'like'])->middleware('auth'); 
 
-	Route::get('my/posts',[UserController::class, 'myPosts'])->name('my.posts');
-	Route::get('post/editing',[UserController::class, 'postEditing'])->name('post.edit.pending');
+	Route::get('my/posts',[UserController::class, 'myPosts']);
 	Route::get('block/countries',[UserController::class, 'blockCountries']);
 	Route::post('block/countries',[UserController::class, 'blockCountriesStore']);
 
@@ -502,11 +496,6 @@ Route::get('verify/account/{confirmation_code}', [HomeController::class, 'getVer
 	Route::any('upload/media/welcome/message',[UploadMediaWelcomeMessageController::class, 'store']); 
 	Route::post('delete/media/welcome/message',[UploadMediaWelcomeMessageController::class, 'delete']);
 
-	Route::get('viewer/epub/{id}', [UpdatesController::class, 'viewEpub']);
-	Route::get('viewer/message/epub/{id}', [MessagesController::class, 'viewEpub']);
-
-	Route::post('send/gift', [GiftController::class, 'send']);
-
  });//<------ End User Views LOGGED
 
 // Private content
@@ -523,7 +512,7 @@ Route::group(['middleware' => 'private.content'], function() {
 
 	// Profile User
 	Route::get('{slug}', [UserController::class, 'profile'])->where('slug','[A-Za-z0-9\_-]+')->name('profile');
-	Route::get('{slug}/{media}', [UserController::class, 'profile'])->where('media', '(photos|videos|audio|shop|files|epub)$')->name('profile');
+	Route::get('{slug}/{media}', [UserController::class, 'profile'])->where('media', '(photos|videos|audio|shop|files)$')->name('profile');
 
 	// Profile User
 	Route::get('{slug}/post/{id}', [UserController::class, 'postDetail'])->where('slug','[A-Za-z0-9\_-]+')->name('profile');
@@ -813,17 +802,6 @@ Route::group(['middleware' => 'private.content'], function() {
 
 		// Live streaming private
 		Route::get('/live-streaming-private-requests', [AdminController::class, 'liveStreamingPrivateRequests'])->name('live_streaming_private_requests');
-
-		// Gifts
-		Route::get('/gifts', [GiftController::class, 'show'])->name('gifts');
-		Route::post('/gifts/store', [GiftController::class, 'store'])->name('gifts.store');
-		Route::get('/gifts/edit/{gift}', [GiftController::class, 'edit'])->name('gifts.edit');
-		Route::post('/gifts/update/{gift}', [GiftController::class, 'update'])->name('gifts.update');
-		Route::post('/gifts/destroy/{gift}', [GiftController::class, 'destroy'])->name('gifts.destroy');
-
-		Route::view('/ffmpeg', 'admin.ffmpeg');
-
-		Route::get('/download/logs', [AdminController::class, 'downloadLogs']);
 	});	
 
  });
@@ -893,6 +871,9 @@ Route::post('webhook/payku', [AddFundsController::class, 'paykuNotify']);
 // Coinbase
 Route::any('webhook/coinbase', [AddFundsController::class, 'webhookCoinbase']);
 
+// Asaas
+Route::any('webhook/asaas', [AddFundsController::class, 'webhookAsaas']);
+
 // NOWPayments
 Route::post('webhook/nowpayments', [AddFundsController::class, 'webhookNowpayments'])->name('webhook.nowpayments');
 
@@ -928,6 +909,3 @@ Route::any('webhook/story/coco/{mediaId}/{resourceId}', [WebhookCoconutControlle
 Route::get('click/ad/{ad}', [AdvertisingController::class, 'clicksAds'])->name('clicks');
 
 Route::get('verify/squad', [AddFundsController::class, 'verifySquad'])->name('webhook.squad');
-
-// Binance
-Route::any('webhook/binance', [AddFundsController::class, 'webhookBinance'])->name('webhook.binance');
