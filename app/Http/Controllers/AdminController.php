@@ -351,6 +351,15 @@ class AdminController extends Controller
 		$sql->allow_zip_files = $request->allow_zip_files;
 		$sql->zip_verification_creator = $request->zip_verification_creator;
 		$sql->allow_scheduled_posts = $request->allow_scheduled_posts;
+		$sql->allow_creators_deactivate_profile = $request->allow_creators_deactivate_profile;
+		$sql->theme = $request->theme;
+		$sql->allow_epub_files = $request->allow_epub_files;
+		$sql->gifts = $request->gifts;
+		$sql->disable_free_post = $request->disable_free_post;
+		$sql->disable_explore_section = $request->disable_explore_section;
+		$sql->disable_creators_section = $request->disable_creators_section;
+		$sql->users_can_delete_messages = $request->users_can_delete_messages;
+		$sql->delete_old_users_inactive = $request->delete_old_users_inactive;
 		$sql->save();
 
 		// Default locale
@@ -562,6 +571,10 @@ class AdminController extends Controller
 		// Subtract user earnings
 		User::whereId($transaction->subscribed)->decrement('balance', $transaction->earning_net_user);
 
+		if ($transaction->type == 'purchase') {
+			self::salesRefund(Purchases::where('transactions_id', $transaction->id)->pluck('id')->first());
+		}
+
 		// Change status transaction to canceled
 		$transaction->approved = '2';
 		$transaction->earning_net_user = 0;
@@ -635,6 +648,7 @@ class AdminController extends Controller
 		$sql->payout_method_western_union = $request->payout_method_western_union;
 		$sql->payout_method_bank = $request->payout_method_bank;
 		$sql->payout_method_crypto = $request->payout_method_crypto;
+		$sql->payout_method_mercadopago = $request->payout_method_mercadopago;
 		$sql->decimal_format           = $request->decimal_format;
 		$sql->disable_wallet = $request->disable_wallet;
 		$sql->tax_on_wallet = $request->tax_on_wallet;
@@ -966,8 +980,6 @@ class AdminController extends Controller
 		$data = PaymentGateways::findOrFail($id);
 		$name = ucfirst($data->name);
 
-	
-
 		return view('admin.' . str_slug($name) . '-settings')->withData($data);
 	}
 
@@ -993,6 +1005,10 @@ class AdminController extends Controller
 		// Enabled off
 		if (!$request->ccbill_skip_subaccount_cancellations) {
 			$input['ccbill_skip_subaccount_cancellations'] = '0';
+		}
+
+		if ($request->crypto_currency) {
+			$input['crypto_currency'] = strtoupper($input['crypto_currency']);
 		}
 
 		$this->validate($request, [
@@ -1226,7 +1242,6 @@ class AdminController extends Controller
 
 		//======== Avatar
 		if ($request->hasFile('avatar')) {
-
 			$extension  = $request->file('avatar')->getClientOriginalExtension();
 			$file       = 'default-' . time() . '.' . $extension;
 
@@ -1254,14 +1269,12 @@ class AdminController extends Controller
 		if ($request->hasFile('cover_default')) {
 
 			$pathCover = config('path.cover');
-			$extension  = $request->file('cover_default')->getClientOriginalExtension();
-			$file       = 'cover_default-' . time() . '.' . $extension;
+			$file = 'cover_default-' . $request->file('cover_default')->hashName();
 
 			$request->file('cover_default')->storePubliclyAs($pathCover, $file);
 
 			// Update Cover all users
 			User::where('cover', $this->settings->cover_default)
-				->orWhere('cover', '')
 				->update([
 					'cover' => $file
 				]);
@@ -1330,9 +1343,13 @@ class AdminController extends Controller
 		if (!isset($member)) {
 			$sql = VerificationRequests::findOrFail($id);
 			// Delete Image
-			Storage::delete($pathImage . $sql->image);
-			// Delete Form W-9
-			Storage::delete($pathImage . $sql->form_w9);
+			Storage::delete([
+				$pathImage . $sql->image,
+				$pathImage . $sql->image_reverse,
+				$pathImage . $sql->image_selfie,
+				$pathImage . $sql->form_w9
+			]);
+
 			$sql->delete();
 
 			\Session::flash('success_message', __('admin.success_update'));
@@ -1382,10 +1399,12 @@ class AdminController extends Controller
 			$sql = VerificationRequests::findOrFail($id);
 
 			// Delete Image
-			Storage::delete($pathImage . $sql->image);
-
-			// Delete Form W-9
-			Storage::delete($pathImage . $sql->form_w9);
+			Storage::delete([
+				$pathImage . $sql->image,
+				$pathImage . $sql->image_reverse,
+				$pathImage . $sql->image_selfie,
+				$pathImage . $sql->form_w9
+			]);
 
 			$sql->delete();
 
@@ -1428,6 +1447,7 @@ class AdminController extends Controller
 		$this->settings->city = $request->city;
 		$this->settings->zip = $request->zip;
 		$this->settings->vat = $request->vat;
+		$this->settings->phone = $request->phone;
 		$this->settings->show_address_company_footer = $request->show_address_company_footer;
 		$this->settings->save();
 
@@ -1452,6 +1472,8 @@ class AdminController extends Controller
 				Helper::envUpdate('MAIL_FROM_ADDRESS', ' "' . $request->MAIL_FROM_ADDRESS . '" ', true);
 			}
 		}
+
+		\Artisan::call('queue:restart');
 
 		\Session::flash('success_message', __('admin.success_update'));
 
@@ -1506,6 +1528,12 @@ class AdminController extends Controller
 			'VULTR_SECRET_KEY' => 'required_if:FILESYSTEM_DRIVER,==,vultr',
 			'VULTR_REGION' => 'required_if:FILESYSTEM_DRIVER,==,vultr',
 			'VULTR_BUCKET' => 'required_if:FILESYSTEM_DRIVER,==,vultr',
+
+			'PUSHR_ACCESS_KEY' => 'required_if:FILESYSTEM_DRIVER,==,pushr',
+			'PUSHR_SECRET_KEY' => 'required_if:FILESYSTEM_DRIVER,==,pushr',
+			'PUSHR_BUCKET' => 'required_if:FILESYSTEM_DRIVER,==,pushr',
+			'PUSHR_URL' => 'required_if:FILESYSTEM_DRIVER,==,pushr',
+			'PUSHR_ENDPOINT' => 'required_if:FILESYSTEM_DRIVER,==,pushr',
 		], $messages);
 
 		// Enabled/Disabled DigitalOcean CDN
@@ -1973,7 +2001,9 @@ class AdminController extends Controller
 
 		$this->validate($request, $rules);
 
-		$this->settings->shop        = $request->shop;
+		$this->settings->shop = $request->shop;
+		$this->settings->allow_free_items_shop = $request->allow_free_items_shop;
+		$this->settings->allow_external_links_shop = $request->allow_external_links_shop;
 		$this->settings->min_price_product = $request->min_price_product;
 		$this->settings->max_price_product = $request->max_price_product;
 		$this->settings->digital_product_sale = $request->digital_product_sale;
@@ -2042,7 +2072,6 @@ class AdminController extends Controller
 
 			if ($purchase->transactions()->referred_commission && $referralTransaction) {
 				User::find($referralTransaction->referred_by)->decrement('balance', $referralTransaction->earnings);
-
 				// Delete $referralTransaction
 				$referralTransaction->delete();
 			}
@@ -2199,9 +2228,7 @@ class AdminController extends Controller
 				$year  = date('Y');
 				$daysMonth = Helper::daysInMonth($month, $year);
 				$dateFormat = "$year-$month-";
-
 				$monthFormat  = __("months.$month");
-				$currencySymbol = $this->settings->currency_symbol;
 
 				for ($i = 1; $i <= $daysMonth; ++$i) {
 					$date = date('Y-m-d', strtotime($dateFormat . $i));
@@ -2222,9 +2249,7 @@ class AdminController extends Controller
 				$year  = date('Y', strtotime('-1 month'));
 				$daysMonth = Helper::daysInMonth($month, $year);
 				$dateFormat = "$year-$month-";
-
 				$monthFormat  = __("months.$month");
-				$currencySymbol = $this->settings->currency_symbol;
 
 				for ($i = 1; $i <= $daysMonth; ++$i) {
 					$date = date('Y-m-d', strtotime($dateFormat . $i));
@@ -2243,7 +2268,6 @@ class AdminController extends Controller
 			case 'year':
 				$year  = date('Y');
 				$dateFormat = "$year-";
-				$currencySymbol = $this->settings->currency_symbol;
 
 				for ($i = 1; $i <= 12; ++$i) {
 					$month = str_pad($i, 2, "0", STR_PAD_LEFT);
@@ -2340,8 +2364,9 @@ class AdminController extends Controller
 
 	public function storiesBackgrounds()
 	{
-		$data = StoryBackgrounds::orderBy('id', 'desc')->paginate(20);
-		return view('admin.stories-backgrounds', ['data' => $data]);
+		return view('admin.stories-backgrounds', [
+			'data' => StoryBackgrounds::orderBy('id', 'desc')->paginate(20)
+		]);
 	}
 
 	public function addStoryBackground(Request $request)
@@ -2413,7 +2438,11 @@ class AdminController extends Controller
 			'updates:id,user_id' => [
 				'creator:id,username'
 			]
-		])->orderBy('id', 'desc')->paginate(20);
+		])
+			->when(request('q'), function ($query) {
+				$query->where('reply', 'LIKE', '%' . request('q') . '%');
+			})
+			->orderBy('id', 'desc')->paginate(20);
 
 		return view('admin.comments')->withData($data);
 	}
@@ -2431,6 +2460,10 @@ class AdminController extends Controller
 			'receiver:id,username'
 		])
 			->whereTip('no')
+			->whereNull('gift_id')
+			->when(request('q'), function ($query) {
+				$query->where('message', 'LIKE', '%' . request('q') . '%');
+			})
 			->orderBy('id', 'desc')
 			->paginate(20);
 
@@ -2444,7 +2477,12 @@ class AdminController extends Controller
 			'posts:id,user_id' => [
 				'creator:id,username'
 			]
-		])->orderBy('id', 'desc')->paginate(20);
+		])
+			->when(request('q'), function ($query) {
+				$query->where('reply', 'LIKE', '%' . request('q') . '%');
+			})
+			->orderBy('id', 'desc')
+			->paginate(20);
 
 		return view('admin.replies')->withData($data);
 	}
@@ -2481,6 +2519,19 @@ class AdminController extends Controller
 	{
 		return view('admin.live-streaming-private-requests', [
 			'lives' => LiveStreamingPrivateRequest::latest()->paginate(15)
+		]);
+	}
+
+	public function downloadLogs()
+	{
+		$path = storage_path('logs'.DIRECTORY_SEPARATOR.'laravel.log');
+
+		if (file_exists($path)) {
+			return response()->download($path, 'laravel.txt');
+		}
+
+		return back()->withErrors([
+			'errors' => __('general.error_file_not_found')
 		]);
 	}
 }

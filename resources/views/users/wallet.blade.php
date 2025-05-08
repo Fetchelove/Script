@@ -4,418 +4,437 @@
 
 @section('content')
 <section class="section section-sm">
-    <div class="container">
-      <div class="row justify-content-center text-center mb-sm">
-        <div class="col-lg-8 py-5">
-          <h2 class="mb-0 font-montserrat"><i class="iconmoon icon-Wallet mr-2"></i> {{__('general.wallet')}}</h2>
-          <p class="lead text-muted mt-0">{{__('general.wallet_desc')}}</p>
-        </div>
+  <div class="container">
+    <div class="row justify-content-center text-center mb-sm">
+      <div class="col-lg-8 py-5">
+        <h2 class="mb-0 font-montserrat"><i class="iconmoon icon-Wallet mr-2"></i> {{__('general.wallet')}}</h2>
+        <p class="lead text-muted mt-0">{{__('general.wallet_desc')}}</p>
       </div>
-      <div class="row">
+    </div>
+    <div class="row">
 
-        @include('includes.cards-settings')
+      @include('includes.cards-settings')
 
-        <div class="col-md-6 col-lg-9 mb-5 mb-lg-0">
+      <div class="col-md-6 col-lg-9 mb-5 mb-lg-0">
 
-          @include('errors.errors-forms')
+        @include('errors.errors-forms')
 
-          @if (session('error_message'))
-          <div class="alert alert-danger mb-3">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true"><i class="far fa-times-circle"></i></span>
-            </button>
+        @if (session('error_message'))
+        <div class="alert alert-danger mb-3">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true"><i class="far fa-times-circle"></i></span>
+          </button>
 
-            {{ session('error_message') }}
-          </div>
-          @endif
+          {{ session('error_message') }}
+        </div>
+        @endif
 
-          @if (session('success_message'))
-          <div class="alert alert-success mb-3">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true"><i class="far fa-times-circle"></i></span>
-            </button>
+        @if (session('success_message'))
+        <div class="alert alert-success mb-3">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true"><i class="far fa-times-circle"></i></span>
+          </button>
 
-            {{ session('success_message') }}
-          </div>
-          @endif
+          {{ session('success_message') }}
+        </div>
+        @endif
 
-          <div class="alert alert-primary shadow overflow-hidden" role="alert">
+        <div class="alert alert-primary shadow overflow-hidden" role="alert">
 
-            <div class="inner-wrap">
-              <span>
-                <h2><strong>{{ Helper::userWallet() }}</strong>
-                  <small class="h5">{{ $settings->wallet_format == 'real_money' ? $settings->currency_code : null}}</small>
-                </h2>
+          <div class="inner-wrap">
+            <span>
+              <h2><strong>{{ Helper::userWallet() }}</strong>
+                <small class="h5">{{ $settings->wallet_format == 'real_money' ? $settings->currency_code : null}}</small>
+              </h2>
 
-                <span class="w-100 d-block">
+              <span class="w-100 d-block">
                 {{__('general.funds_available')}}
-                </span>
-
-                @if ($equivalent_money)
-                  <span>
-                    <strong>{{ $equivalent_money }}</strong>
-                  </span>
-                @endif
-
-                <span class="w-100 d-block mt-2">
-                  @if (auth()->user()->balance != 0.00)
-                  <a href="#" data-toggle="modal" data-target="#modalTransfer" class="btn btn-1 btn-success mb-2">
-                    <i class="bi bi-arrow-left-right mr-2"></i> {{ __('general.transfer_balance') }}
-                  </a>
-                  @endif
-                </span>
               </span>
-            </div>
 
-            <span class="icon-wrap"><i class="iconmoon icon-Wallet"></i></span>
+              @if ($equivalent_money)
+              <span>
+                <strong>{{ $equivalent_money }}</strong>
+              </span>
+              @endif
+
+              <span class="w-100 d-block mt-2">
+                @if (auth()->user()->balance != 0.00)
+                <a href="#" data-toggle="modal" data-target="#modalTransfer" class="btn btn-1 btn-success mb-2">
+                  <i class="bi bi-arrow-left-right mr-2"></i> {{ __('general.transfer_balance') }}
+                </a>
+                @endif
+              </span>
+            </span>
+          </div>
+
+          <span class="icon-wrap"><i class="iconmoon icon-Wallet"></i></span>
 
         </div><!-- /alert -->
 
         <form method="POST" action="{{ url('add/funds') }}" id="formAddFunds">
-        @csrf
 
-        <div class="form-group mb-4">
+          @csrf
+
+          <div class="form-group mb-4">
             <div class="input-group mb-2">
-            <div class="input-group-prepend">
+              <div class="input-group-prepend">
                 <span class="input-group-text">{{$settings->currency_symbol}}</span>
-            </div>
-            <input class="form-control form-control-lg" required id="onlyNumber" name="amount" min="{{ $settings->min_deposits_amount }}" max="{{ $settings->max_deposits_amount }}" autocomplete="off" placeholder="{{__('admin.amount')}} ({{ __('general.minimum') }} {{ Helper::priceWithoutFormat($settings->min_deposits_amount) }} - {{ __('general.maximum') }} {{ Helper::priceWithoutFormat($settings->max_deposits_amount) }})" type="number">
+              </div>
+              <input class="form-control form-control-lg" required id="onlyNumber" name="amount" min="{{ $settings->min_deposits_amount }}" max="{{ $settings->max_deposits_amount }}" autocomplete="off" placeholder="{{__('admin.amount')}} ({{ __('general.minimum') }} {{ Helper::priceWithoutFormat($settings->min_deposits_amount) }} - {{ __('general.maximum') }} {{ Helper::priceWithoutFormat($settings->max_deposits_amount) }})" type="number">
+              <small class="d-block w-100 my-1">
+                <i class="bi-arrow-up-square mr-1"></i> <i class="bi-arrow-down-square mr-1"></i> {{ __('general.increase_decrease_amount') }}
+              </small>
             </div>
 
             <p class="help-block margin-bottom-zero fee-wrap">
-            <span class="d-block w-100">
+
+              <span class="d-block w-100">
                 {{ __('general.transaction_fee') }}:
+
                 <span class="float-right"><strong>{{ Helper::symbolPositionLeft() }}<span id="handlingFee">0</span>{{ Helper::symbolPositionRight() }}</strong></span>
-            </span><!-- end transaction fee -->
+              </span><!-- end transaction fee -->
 
-            @if (auth()->user()->isTaxable()->count() && $settings->tax_on_wallet)
-                @foreach (auth()->user()->isTaxable() as $tax)
-                <span class="d-block w-100 isTaxableWallet percentageAppliedTaxWallet{{$loop->iteration}}" data="{{ $tax->percentage }}">
+              @if (auth()->user()->isTaxable()->count() && $settings->tax_on_wallet)
+              @foreach (auth()->user()->isTaxable() as $tax)
+              <span class="d-block w-100 isTaxableWallet percentageAppliedTaxWallet{{$loop->iteration}}" data="{{ $tax->percentage }}">
                 {{ $tax->name }} {{ $tax->percentage }}%:
-                <span class="float-right">
-                    <strong>{{ Helper::symbolPositionLeft() }}<span class="percentageTax{{$loop->iteration}}">0</span>{{ Helper::symbolPositionRight() }}</strong>
-                </span>
-                </span>
-                @endforeach
-            @endif
 
-            <span class="d-block w-100">
+                <span class="float-right">
+                  <strong>{{ Helper::symbolPositionLeft() }}<span class="percentageTax{{$loop->iteration}}">0</span>{{ Helper::symbolPositionRight() }}</strong>
+                </span>
+              </span>
+              @endforeach
+
+              @endif
+
+              <span class="d-block w-100">
                 {{ __('general.total') }}:
-                <span class="float-right">
-                <strong>{{ Helper::symbolPositionLeft() }}<span id="total">0</span>{{ Helper::symbolPositionRight() }}</strong>
-                </span>
-            </span><!-- end total -->
-            </p>
-        </div><!-- End form-group -->
 
-        @foreach (PaymentGateways::where('enabled', '1')->orderBy('type', 'DESC')->get() as $payment)
-            @php
-            if ($payment->type == 'card' ) {
-            $paymentName = '<i class="far fa-credit-card mr-1 icon-sm-radio"></i> '. __('general.debit_credit_card') .' ('.$payment->name.')';
-            } elseif ($payment->type == 'bank') {
-            $paymentName = '<i class="fa fa-university mr-1 icon-sm-radio"></i> '.__('general.bank_transfer');
-            } else if ($payment->name == 'PayPal') {
-            $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'paypal-white.png').'" width="70"/>';
-            } else if ($payment->name == 'Coinpayments') {
-            $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'coinpayments-white.png').'" width="150"/>';
-            } else if ($payment->name == 'Coinbase') {
-            $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'coinbase-white.png').'" width="110"/>';
-            } else if ($payment->name == 'NowPayments') {
-            $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'nowpayments-white.png').'" width="130"/>';
-            } else if ($payment->name == 'Mercadopago') {
-            $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'mercadopago-white.png').'" width="100"/>';
-            } else if ($payment->name == 'Flutterwave') {
-            $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'flutterwave-white.png').'" width="150"/>';
-            } else if ($payment->name == 'Mollie') {
-            $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'mollie-white.png').'" width="80"/>';
-            } else if ($payment->name == 'Razorpay') {
-            $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'razorpay-white.png').'" width="110"/>';
-            } else {
-            $paymentName = '<img src="'.url('public/img/payments', $payment->logo).'" width="100"/>';
-            }
-            @endphp
-            <div class="custom-control custom-radio mb-3">
-            <input name="payment_gateway" required value="{{$payment->name}}" id="tip_radio{{$payment->name}}" @if (PaymentGateways::where('enabled', '1')->count() == 1) checked @endif class="custom-control-input" type="radio">
+                <span class="float-right">
+                  <strong>{{ Helper::symbolPositionLeft() }}<span id="total">0</span>{{ Helper::symbolPositionRight() }}</strong>
+                </span>
+              </span><!-- end total -->
+            </p>
+
+          </div><!-- End form-group -->
+
+          @foreach (PaymentGateways::where('enabled', '1')->orderBy('type', 'DESC')->get() as $payment)
+
+          @php
+          if ($payment->type == 'card' ) {
+          $paymentName = '<i class="far fa-credit-card mr-1 icon-sm-radio"></i> '. __('general.debit_credit_card') .' ('.$payment->name.')';
+          } elseif ($payment->type == 'bank') {
+          $paymentName = '<i class="fa fa-university mr-1 icon-sm-radio"></i> '.__('general.bank_transfer');
+          } else if ($payment->name == 'PayPal') {
+          $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'paypal-white.png').'" width="70" />';
+          } else if ($payment->name == 'Coinpayments') {
+          $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'coinpayments-white.png').'" width="150" />';
+          } else if ($payment->name == 'Coinbase') {
+          $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'coinbase-white.png').'" width="110" />';
+          } else if ($payment->name == 'NowPayments') {
+          $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'nowpayments-white.png').'" width="130" />';
+          } else if ($payment->name == 'Mercadopago') {
+          $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'mercadopago-white.png').'" width="100" />';
+          } else if ($payment->name == 'Flutterwave') {
+          $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'flutterwave-white.png').'" width="150" />';
+          } else if ($payment->name == 'Mollie') {
+          $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'mollie-white.png').'" width="80" />';
+          } else if ($payment->name == 'Razorpay') {
+          $paymentName = '<img src="'.url('public/img/payments', auth()->user()->dark_mode == 'off' ? $payment->logo : 'razorpay-white.png').'" width="110" />';
+          } else {
+          $paymentName = '<img src="'.url('public/img/payments', $payment->logo).'" width="100" />';
+          }
+
+          @endphp
+          <div class="custom-control custom-radio mb-3">
+            <input name="payment_gateway" required value="{{$payment->name}}" id="tip_radio{{$payment->name}}" @if (PaymentGateways::where('enabled', '1' )->count() == 1) checked @endif class="custom-control-input" type="radio">
             <label class="custom-control-label" for="tip_radio{{$payment->name}}">
-                <span><strong>{!!$paymentName!!}</strong></span>
-                <small class="w-100 d-block">{{ $payment->fee != 0.00 || $payment->fee_cents != 0.00 ? '* '.__('general.transaction_fee').':' : null }} {{ $payment->fee != 0.00 ? $payment->fee.'%' : null }} {{ $payment->fee_cents != 0.00 ? '+ '. Helper::amountFormatDecimal($payment->fee_cents) : null }}</small>
+              <span><strong>{!!$paymentName!!}</strong></span>
+              <small class="w-100 d-block">{{ $payment->fee != 0.00 || $payment->fee_cents != 0.00 ? '* '.__('general.transaction_fee').':' : null }} {{ $payment->fee != 0.00 ? $payment->fee.'%' : null }} {{ $payment->fee_cents != 0.00 ? '+ '. Helper::amountFormatDecimal($payment->fee_cents) : null }}</small>
             </label>
+          </div>
+
+          @if ($payment->type == 'bank')
+          <div class="btn-block @if (PaymentGateways::where('enabled', '1')->count() != 1) display-none @endif" id="bankTransferBox">
+            <div class="alert alert-default border">
+              <h5 class="font-weight-bold"><i class="fa fa-university mr-1 icon-sm-radio"></i> {{__('general.make_payment_bank')}}</h5>
+              <ul class="list-unstyled">
+                <li>
+                  {!!nl2br($payment->bank_info)!!}
+
+                  <hr />
+                  <span class="d-block w-100 mt-2">
+                    {{ __('general.total') }}: <strong>{{ Helper::symbolPositionLeft() }}<span id="total2">0</span>{{ Helper::symbolPositionRight() }}</strong>
+                    <span>
+
+                      @if ($equivalent_money)
+                      <small class="btn-block w-100">
+                        <strong>{{ $equivalent_money }}</strong>
+                      </small>
+                      @endif
+
+                </li>
+              </ul>
             </div>
 
-            @if ($payment->type == 'bank')
-            <div class="btn-block @if (PaymentGateways::where('enabled', '1')->count() != 1) display-none @endif" id="bankTransferBox">
-                <div class="alert alert-default border">
-                <h5 class="font-weight-bold"><i class="fa fa-university mr-1 icon-sm-radio"></i> {{__('general.make_payment_bank')}}</h5>
-                <ul class="list-unstyled">
-                    <li>
-                    {!!nl2br($payment->bank_info)!!}
-                    <hr />
-                    <span class="d-block w-100 mt-2">
-                        {{ __('general.total') }}: <strong>{{ Helper::symbolPositionLeft() }}<span id="total2">0</span>{{ Helper::symbolPositionRight() }}</strong>
-                        <span>
-                        @if ($equivalent_money)
-                        <small class="btn-block w-100">
-                            <strong>{{ $equivalent_money }}</strong>
-                        </small>
-                        @endif
-                    </span>
-                    </li>
-                </ul>
-                </div>
+            <div class="mb-3 text-center">
+              <span class="btn-block mb-2" id="previewImage"></span>
 
-                <div class="mb-3 text-center">
-                <span class="btn-block mb-2" id="previewImage"></span>
-                <input type="file" name="image" id="fileBankTransfer" accept="image/*" class="visibility-hidden">
-                <button class="btn btn-1 btn-block btn-outline-primary mb-2 border-dashed" onclick="$('#fileBankTransfer').trigger('click');" type="button" id="btnFilePhoto">{{__('general.upload_image')}} (JPG, PNG, GIF) {{__('general.maximum')}}: {{Helper::formatBytes($settings->file_size_allowed_verify_account * 1024)}}</button>
-                <small class="text-muted btn-block">{{__('general.info_bank_transfer')}}</small>
-                </div>
-            </div><!-- Alert -->
-            @endif
-        @endforeach
+              <input type="file" name="image" id="fileBankTransfer" accept="image/*" class="visibility-hidden">
+              <button class="btn btn-1 btn-block btn-outline-primary mb-2 border-dashed" onclick="$('#fileBankTransfer').trigger('click');" type="button" id="btnFilePhoto">{{__('general.upload_image')}} (JPG, PNG, GIF) {{__('general.maximum')}}: {{Helper::formatBytes($settings->file_size_allowed_verify_account * 1024)}}</button>
 
-        <div class="form-group">
+              <small class="text-muted btn-block">{{__('general.info_bank_transfer')}}</small>
+            </div>
+          </div><!-- Alert -->
+          @endif
+
+          @endforeach
+
+          <div class="form-group">
             <label for="NameComplete">Nome Completo</label>
             <input type="text" id="NameComplete" name="name_complete" class="form-control" placeholder="Digite Nome Completo" required>
-        </div>
-        <div class="form-group">
+          </div>
+          <div class="form-group">
             <label for="cardCpf">CPF</label>
             <input type="text" id="cardCpf" name="cpf" class="form-control" placeholder="Digite CPF" maxlength="14" required>
-        </div>
+          </div>
 
-        <div class="mb-3">
+          <div class="mb-3">
             <div type="button" class="btn btn-outline-primary" id="creditCardButton">Cartão de Crédito</div>
             <div type="button" class="btn btn-outline-primary" id="pixButton">Pix</div>
-        </div>
+          </div>
 
-        <!-- Campos para pagamento com cartão de crédito -->
-        <div id="creditCardFields" class="payment-method-fields" style="display: none;">
+          <!-- Campos para pagamento com cartão de crédito -->
+          <div id="creditCardFields" class="payment-method-fields" style="display: none;">
             <div class="form-group">
-            <label for="cardName">Nome no Cartão</label>
-            <input type="text" id="cardName" name="card_name" class="form-control" placeholder="Nome no Cartão">
+              <label for="cardName">Nome no Cartão</label>
+              <input type="text" id="cardName" name="card_name" class="form-control" placeholder="Nome no Cartão">
             </div>
             <div class="form-group">
-            <label for="cardNumber">Número do Cartão</label>
-            <input type="text" id="cardNumber" name="card_number" class="form-control" placeholder="Número do Cartão">
+              <label for="cardNumber">Número do Cartão</label>
+              <input type="text" id="cardNumber" name="card_number" class="form-control" placeholder="Número do Cartão">
             </div>
             <div class="form-group">
-            <label for="cardExpiryMonth">Mês de Expiração</label>
-            <select id="cardExpiryMonth" name="card_expiry_month" class="form-control">
+              <label for="cardExpiryMonth">Mês de Expiração</label>
+              <select id="cardExpiryMonth" name="card_expiry_month" class="form-control">
                 <option value="">Mês</option>
                 @for ($i = 1; $i <= 12; $i++)
-                <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
-                @endfor
-            </select>
+                  <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</option>
+                  @endfor
+              </select>
             </div>
             <div class="form-group">
-            <label for="cardExpiryYear">Ano de Expiração</label>
-            <select id="cardExpiryYear" name="card_expiry_year" class="form-control">
+              <label for="cardExpiryYear">Ano de Expiração</label>
+              <select id="cardExpiryYear" name="card_expiry_year" class="form-control">
                 <option value="">Ano</option>
                 @for ($i = date('Y'); $i <= date('Y') + 10; $i++)
-                <option value="{{ $i }}">{{ $i }}</option>
-                @endfor
-            </select>
+                  <option value="{{ $i }}">{{ $i }}</option>
+                  @endfor
+              </select>
             </div>
             <div class="form-group">
-            <label for="cardCVC">Código de Segurança (CVC)</label>
-            <input type="text" id="cardCVC" name="card_cvc" class="form-control" placeholder="CVC">
+              <label for="cardCVC">Código de Segurança (CVC)</label>
+              <input type="text" id="cardCVC" name="card_cvc" class="form-control" placeholder="CVC">
             </div>
-        </div>
+          </div>
 
-        <!-- Campos para pagamento via Pix -->
-        <div id="pixFields" class="payment-method-fields" style="display: none;">
+          <!-- Campos para pagamento via Pix -->
+          <div id="pixFields" class="payment-method-fields" style="display: none;">
             <p>Para finalizar o pagamento via Pix, siga as instruções abaixo.</p>
             <!-- Adicione outras instruções ou campos necessários para Pix aqui -->
-        </div>
+          </div>
 
-        <input type="hidden" id="paymentMethod" name="payment_method" value="">
+          <input type="hidden" id="paymentMethod" name="payment_method" value="">
 
-        <div class="alert alert-danger display-none" id="errorAddFunds">
+          <div class="alert alert-danger display-none" id="errorAddFunds">
             <ul class="list-unstyled m-0" id="showErrorsFunds"></ul>
-        </div>
+          </div>
 
-        <button class="btn btn-1 btn-success btn-block mt-4" id="addFundsBtn" type="submit"><i></i> {{__('general.add_funds')}}</button>
+          <div class="custom-control custom-control-alternative custom-checkbox">
+            <input class="custom-control-input" required id=" customCheckLogin" name="agree_terms" type="checkbox">
+            <label class="custom-control-label" for=" customCheckLogin">
+              <span>{{__('general.i_agree_with')}} <a href="{{$settings->link_terms}}" target="_blank">{{__('admin.terms_conditions')}}</a></span>
+            </label>
+          </div>
+
+          <button class="btn btn-1 btn-success btn-block mt-4" id="addFundsBtn" type="submit"><i></i> {{__('general.add_funds')}}</button>
         </form>
 
+        @if ($data->count() != 0)
+        <h6 class="text-center mt-5 font-weight-light">{{ __('general.history_deposits') }}</h6>
 
+        <div class="card shadow-sm">
+          <div class="table-responsive">
+            <table class="table table-striped m-0">
+              <thead>
+                <th scope="col">ID</th>
+                <th scope="col">{{ __('admin.amount') }}</th>
+                <th scope="col">{{ __('general.payment_gateway') }}</th>
+                <th scope="col">{{ __('admin.date') }}</th>
+                <th scope="col">{{ __('admin.status') }}</th>
+                <th> {{__('general.invoice')}}</th>
+              </thead>
 
-          @if ($data->count() != 0)
-          <h6 class="text-center mt-5 font-weight-light">{{ __('general.history_deposits') }}</h6>
+              <tbody>
+                @foreach ($data as $deposit)
 
-          <div class="card shadow-sm">
-            <div class="table-responsive">
-              <table class="table table-striped m-0">
-                <thead>
-                  <th scope="col">ID</th>
-                  <th scope="col">{{ __('admin.amount') }}</th>
-                  <th scope="col">{{ __('general.payment_gateway') }}</th>
-                  <th scope="col">{{ __('admin.date') }}</th>
-                  <th scope="col">{{ __('admin.status') }}</th>
-                  <th> {{__('general.invoice')}}</th>
-                </thead>
+                <tr>
+                  <td>{{ str_pad($deposit->id, 4, "0", STR_PAD_LEFT) }}</td>
+                  <td>{{ App\Helper::amountFormat($deposit->amount) }}</td>
+                  <td>{{ $deposit->payment_gateway == 'Bank Transfer' || $deposit->payment_gateway == 'Bank' ? __('general.bank_transfer') : $deposit->payment_gateway }}</td>
+                  <td>{{ date('d M, Y', strtotime($deposit->date)) }}</td>
 
-                <tbody>
-                  @foreach ($data as $deposit)
+                  @php
 
-                    <tr>
-                      <td>{{ str_pad($deposit->id, 4, "0", STR_PAD_LEFT) }}</td>
-                      <td>{{ App\Helper::amountFormat($deposit->amount) }}</td>
-                      <td>{{ $deposit->payment_gateway == 'Bank Transfer' || $deposit->payment_gateway == 'Bank' ? __('general.bank_transfer') : $deposit->payment_gateway }}</td>
-                      <td>{{ date('d M, Y', strtotime($deposit->date)) }}</td>
+                  if ($deposit->status == 'pending' ) {
+                  $mode = 'warning';
+                  $_status = __('admin.pending');
+                  } else {
+                  $mode = 'success';
+                  $_status = __('general.success');
+                  }
 
-                      @php
+                  @endphp
 
-                      if ($deposit->status == 'pending' ) {
-                       			$mode    = 'warning';
-             								$_status = __('admin.pending');
-                          } else {
-                            $mode = 'success';
-             								$_status = __('general.success');
-                          }
+                  <td><span class="badge badge-pill badge-{{$mode}} text-uppercase">{{ $_status }}</span></td>
 
-                       @endphp
+                  <td>
+                    @if ($deposit->status == 'active')
+                    <a href="{{url('deposits/invoice', $deposit->id)}}" target="_blank"><i class="far fa-file-alt"></i> {{__('general.invoice')}}</a>
+                  </td>
+                  @else
+                  {{__('general.no_available')}}
+                  @endif
+                </tr><!-- /.TR -->
+                @endforeach
+              </tbody>
+            </table>
+          </div><!-- table-responsive -->
+        </div><!-- card -->
+        <small class="w-100 d-block mt-2">{{ __('general.transaction_fee_info') }}</small>
 
-                       <td><span class="badge badge-pill badge-{{$mode}} text-uppercase">{{ $_status }}</span></td>
-
-                       <td>
-                         @if ($deposit->status == 'active')
-                         <a href="{{url('deposits/invoice', $deposit->id)}}" target="_blank"><i class="far fa-file-alt"></i> {{__('general.invoice')}}</a>
-                       </td>
-                     @else
-                       {{__('general.no_available')}}
-                         @endif
-                    </tr><!-- /.TR -->
-                    @endforeach
-                </tbody>
-              </table>
-            </div><!-- table-responsive -->
-          </div><!-- card -->
-          <small class="w-100 d-block mt-2">{{ __('general.transaction_fee_info') }}</small>
-
-          @if ($data->hasPages())
-  			    	<div class="mt-3">
-                {{ $data->links() }}
-              </div>
-  			    	@endif
+        @if ($data->hasPages())
+        <div class="mt-3">
+          {{ $data->links() }}
+        </div>
+        @endif
 
         @endif
 
-        </div><!-- end col-md-6 -->
-      </div>
+      </div><!-- end col-md-6 -->
     </div>
-  </section>
+  </div>
+</section>
 
-  @if (auth()->user()->balance != 0.00)
-    @include('includes.modal-transfer')
-  @endif
+@if (auth()->user()->balance != 0.00)
+@include('includes.modal-transfer')
+@endif
 
 @endsection
 
 @section('javascript')
 <script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-  // Função para formatar o CPF
-  function formatCPF(cpf) {
-    cpf = cpf.replace(/\D/g, ''); // Remove caracteres não numéricos
-    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o primeiro ponto
-    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o segundo ponto
-    cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Adiciona o traço
-    return cpf.slice(0, 14); // Limita a 14 caracteres
-  }
-
-  // Aplicar máscara de CPF
-  var cpfInput = document.getElementById('cardCpf');
-  cpfInput.addEventListener('input', function() {
-    this.value = formatCPF(this.value);
-  });
-
-  // Variável para armazenar o método de pagamento selecionado
-  var selectedPaymentMethod = '';
-
-  // Mostrar campos do formulário de acordo com o botão de pagamento selecionado
-  document.getElementById('creditCardButton').addEventListener('click', function() {
-    document.querySelectorAll('.payment-method-fields').forEach(function(field) {
-      field.style.display = 'none';
-    });
-    document.getElementById('creditCardFields').style.display = 'block';
-    selectedPaymentMethod = 'CreditCard';
-
-    // Atualizar classes dos botões
-    document.getElementById('creditCardButton').classList.remove('btn-outline-primary');
-    document.getElementById('creditCardButton').classList.add('btn-primary');
-    document.getElementById('pixButton').classList.remove('btn-primary');
-    document.getElementById('pixButton').classList.add('btn-outline-primary');
-
-    // Adicionar atributo required aos campos de cartão de crédito
-    document.getElementById('cardName').setAttribute('required', true);
-    document.getElementById('cardNumber').setAttribute('required', true);
-    document.getElementById('cardExpiryMonth').setAttribute('required', true);
-    document.getElementById('cardExpiryYear').setAttribute('required', true);
-    document.getElementById('cardCVC').setAttribute('required', true);
-
-    // Atualizar o campo oculto com o método de pagamento selecionado
-    document.getElementById('paymentMethod').value = 'CreditCard';
-  });
-
-  document.getElementById('pixButton').addEventListener('click', function() {
-    document.querySelectorAll('.payment-method-fields').forEach(function(field) {
-      field.style.display = 'none';
-    });
-    document.getElementById('pixFields').style.display = 'block';
-    selectedPaymentMethod = 'Pix';
-
-    // Atualizar classes dos botões
-    document.getElementById('pixButton').classList.remove('btn-outline-primary');
-    document.getElementById('pixButton').classList.add('btn-primary');
-    document.getElementById('creditCardButton').classList.remove('btn-primary');
-    document.getElementById('creditCardButton').classList.add('btn-outline-primary');
-
-    // Remover atributo required dos campos de cartão de crédito
-    document.getElementById('cardName').removeAttribute('required');
-    document.getElementById('cardNumber').removeAttribute('required');
-    document.getElementById('cardExpiryMonth').removeAttribute('required');
-    document.getElementById('cardExpiryYear').removeAttribute('required');
-    document.getElementById('cardCVC').removeAttribute('required');
-
-    // Atualizar o campo oculto com o método de pagamento selecionado
-    document.getElementById('paymentMethod').value = 'Pix';
-  });
-
-  // Validar formulário antes de enviar
-  document.getElementById('formAddFunds').addEventListener('submit', function(event) {
-    if (selectedPaymentMethod === 'CreditCard') {
-      // Adicione aqui a lógica de validação do cartão de crédito
-      var cardName = document.getElementById('cardName').value;
-      var cardNumber = document.getElementById('cardNumber').value;
-      var cardExpiryMonth = document.getElementById('cardExpiryMonth').value;
-      var cardExpiryYear = document.getElementById('cardExpiryYear').value;
-      var cardCVC = document.getElementById('cardCVC').value;
-
-      if (!cardName || !cardNumber || !cardExpiryMonth || !cardExpiryYear || !cardCVC) {
-        event.preventDefault();
-        alert('Por favor, preencha todos os campos do cartão de crédito.');
-      }
-    } else if (selectedPaymentMethod === 'Pix') {
-      // Adicione aqui a lógica de validação para Pix, se necessário
-    } else {
-      event.preventDefault();
-      alert('Por favor, selecione um método de pagamento.');
+  document.addEventListener('DOMContentLoaded', function() {
+    // Função para formatar o CPF
+    function formatCPF(cpf) {
+      cpf = cpf.replace(/\D/g, ''); // Remove caracteres não numéricos
+      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o primeiro ponto
+      cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2'); // Adiciona o segundo ponto
+      cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2'); // Adiciona o traço
+      return cpf.slice(0, 14); // Limita a 14 caracteres
     }
+
+    // Aplicar máscara de CPF
+    var cpfInput = document.getElementById('cardCpf');
+    cpfInput.addEventListener('input', function() {
+      this.value = formatCPF(this.value);
+    });
+
+    // Variável para armazenar o método de pagamento selecionado
+    var selectedPaymentMethod = '';
+
+    // Mostrar campos do formulário de acordo com o botão de pagamento selecionado
+    document.getElementById('creditCardButton').addEventListener('click', function() {
+      document.querySelectorAll('.payment-method-fields').forEach(function(field) {
+        field.style.display = 'none';
+      });
+      document.getElementById('creditCardFields').style.display = 'block';
+      selectedPaymentMethod = 'CreditCard';
+
+      // Atualizar classes dos botões
+      document.getElementById('creditCardButton').classList.remove('btn-outline-primary');
+      document.getElementById('creditCardButton').classList.add('btn-primary');
+      document.getElementById('pixButton').classList.remove('btn-primary');
+      document.getElementById('pixButton').classList.add('btn-outline-primary');
+
+      // Adicionar atributo required aos campos de cartão de crédito
+      document.getElementById('cardName').setAttribute('required', true);
+      document.getElementById('cardNumber').setAttribute('required', true);
+      document.getElementById('cardExpiryMonth').setAttribute('required', true);
+      document.getElementById('cardExpiryYear').setAttribute('required', true);
+      document.getElementById('cardCVC').setAttribute('required', true);
+
+      // Atualizar o campo oculto com o método de pagamento selecionado
+      document.getElementById('paymentMethod').value = 'CreditCard';
+    });
+
+    document.getElementById('pixButton').addEventListener('click', function() {
+      document.querySelectorAll('.payment-method-fields').forEach(function(field) {
+        field.style.display = 'none';
+      });
+      document.getElementById('pixFields').style.display = 'block';
+      selectedPaymentMethod = 'Pix';
+
+      // Atualizar classes dos botões
+      document.getElementById('pixButton').classList.remove('btn-outline-primary');
+      document.getElementById('pixButton').classList.add('btn-primary');
+      document.getElementById('creditCardButton').classList.remove('btn-primary');
+      document.getElementById('creditCardButton').classList.add('btn-outline-primary');
+
+      // Remover atributo required dos campos de cartão de crédito
+      document.getElementById('cardName').removeAttribute('required');
+      document.getElementById('cardNumber').removeAttribute('required');
+      document.getElementById('cardExpiryMonth').removeAttribute('required');
+      document.getElementById('cardExpiryYear').removeAttribute('required');
+      document.getElementById('cardCVC').removeAttribute('required');
+
+      // Atualizar o campo oculto com o método de pagamento selecionado
+      document.getElementById('paymentMethod').value = 'Pix';
+    });
+
+    // Validar formulário antes de enviar
+    document.getElementById('formAddFunds').addEventListener('submit', function(event) {
+      if (selectedPaymentMethod === 'CreditCard') {
+        // Adicione aqui a lógica de validação do cartão de crédito
+        var cardName = document.getElementById('cardName').value;
+        var cardNumber = document.getElementById('cardNumber').value;
+        var cardExpiryMonth = document.getElementById('cardExpiryMonth').value;
+        var cardExpiryYear = document.getElementById('cardExpiryYear').value;
+        var cardCVC = document.getElementById('cardCVC').value;
+
+        if (!cardName || !cardNumber || !cardExpiryMonth || !cardExpiryYear || !cardCVC) {
+          event.preventDefault();
+          alert('Por favor, preencha todos os campos do cartão de crédito.');
+        }
+      } else if (selectedPaymentMethod === 'Pix') {
+        // Adicione aqui a lógica de validação para Pix, se necessário
+      } else {
+        event.preventDefault();
+        alert('Por favor, selecione um método de pagamento.');
+      }
+    });
   });
-});
 
-
-
-
-@if (in_array(config('settings.currency_code'), config('currencies.zero-decimal')))
+  @if(in_array(config('settings.currency_code'), config('currencies.zero-decimal')))
   $decimal = 0;
   @else
   $decimal = 2;
   @endif
 
   function toFixed(number, decimals) {
-        var x = Math.pow(10, Number(decimals) + 1);
-        return (Number(number) + (1 / x)).toFixed(decimals);
-      }
+    var x = Math.pow(10, Number(decimals) + 1);
+    return (Number(number) + (1 / x)).toFixed(decimals);
+  }
 
   $('input[name=payment_gateway]').on('click', function() {
 
@@ -427,41 +446,65 @@ document.addEventListener('DOMContentLoaded', function() {
     var taxes = $('span.isTaxableWallet').length;
     var totalTax = 0;
 
-    if (valueOriginal.length == 0
-				|| valueOriginal == ''
-				|| value < {{ $settings->min_deposits_amount }}
-				|| value > {{$settings->max_deposits_amount}}
-      ) {
-        // Reset
-  			for (var i = 1; i <= taxes; i++) {
-  				$('.percentageTax'+i).html('0');
-  			}
-        $('#handlingFee, #total, #total2').html('0');
-      } else {
-        // Taxes
-        for (var i = 1; i <= taxes; i++) {
-          var percentage = $('.percentageAppliedTaxWallet'+i).attr('data');
-          var valueFinal = (value * percentage / 100);
-          $('.percentageTax'+i).html(toFixed(valueFinal, $decimal));
-          totalTax += valueFinal;
+    if (valueOriginal.length == 0 ||
+      valueOriginal == '' ||
+      value < {
+        {
+          $settings - > min_deposits_amount
         }
-        var totalTaxes = (Math.round(totalTax * 100) / 100).toFixed(2);
+      } ||
+      value > {
+        {
+          $settings - > max_deposits_amount
+        }
       }
-      //==== End Taxes
+    ) {
+      // Reset
+      for (var i = 1; i <= taxes; i++) {
+        $('.percentageTax' + i).html('0');
+      }
+      $('#handlingFee, #total, #total2').html('0');
+    } else {
+      // Taxes
+      for (var i = 1; i <= taxes; i++) {
+        var percentage = $('.percentageAppliedTaxWallet' + i).attr('data');
+        var valueFinal = (value * percentage / 100);
+        $('.percentageTax' + i).html(toFixed(valueFinal, $decimal));
+        totalTax += valueFinal;
+      }
+      var totalTaxes = (Math.round(totalTax * 100) / 100).toFixed(2);
+    }
+    //==== End Taxes
 
-    if (element != ''
-        && value <= {{ $settings->max_deposits_amount }}
-        && value >= {{ $settings->min_deposits_amount }}
-        && valueOriginal != ''
-      ) {
+    if (element != '' &&
+      value <= {
+        {
+          $settings - > max_deposits_amount
+        }
+      } &&
+      value >= {
+        {
+          $settings - > min_deposits_amount
+        }
+      } &&
+      valueOriginal != ''
+    ) {
       // Fees
       switch (element) {
-        @foreach (PaymentGateways::where('enabled', '1')->get(); as $payment)
+        @foreach(PaymentGateways::where('enabled', '1') - > get(); as $payment)
         case '{{$payment->name}}':
-          $fee   = {{$payment->fee}};
-          $cents =  {{$payment->fee_cents}};
+          $fee = {
+            {
+              $payment - > fee
+            }
+          };
+          $cents = {
+            {
+              $payment - > fee_cents
+            }
+          };
           break;
-        @endforeach
+          @endforeach
       }
 
       var amount = (value * $fee / 100) + $cents;
@@ -469,27 +512,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
       var total = (parseFloat(value) + parseFloat(amountFinal) + parseFloat(totalTaxes));
 
-      if (valueOriginal.length != 0
-  				|| valueOriginal != ''
-  				|| value >= {{ $settings->min_deposits_amount }}
-  				|| value <= {{$settings->max_deposits_amount}}
-        ) {
+      if (valueOriginal.length != 0 ||
+        valueOriginal != '' ||
+        value >= {
+          {
+            $settings - > min_deposits_amount
+          }
+        } ||
+        value <= {
+          {
+            $settings - > max_deposits_amount
+          }
+        }
+      ) {
         $('#handlingFee').html(amountFinal);
         $('#total, #total2').html(total.toFixed($decimal));
       }
     }
 
-});
+  });
 
-//<-------- * TRIM * ----------->
+  //<-------- * TRIM * ----------->
 
-$('#onlyNumber').on('keyup', function() {
+  $('#onlyNumber').on('keyup', function() {
 
     var valueOriginal = $(this).val();
     var value = parseFloat($(this).val());
     var paymentGateway = $('input[name=payment_gateway]:checked').val();
 
-    if (value > {{ $settings->max_deposits_amount }} || valueOriginal.length == 0) {
+    if (value > {
+        {
+          $settings - > max_deposits_amount
+        }
+      } || valueOriginal.length == 0) {
       $('#handlingFee').html('0');
       $('#total, #total2').html('0');
     }
@@ -498,41 +553,65 @@ $('#onlyNumber').on('keyup', function() {
     var taxes = $('span.isTaxableWallet').length;
     var totalTax = 0;
 
-    if (valueOriginal.length == 0
-				|| valueOriginal == ''
-				|| value < {{ $settings->min_deposits_amount }}
-				|| value > {{$settings->max_deposits_amount}}
-      ) {
-        // Reset
-  			for (var i = 1; i <= taxes; i++) {
-  				$('.percentageTax'+i).html('0');
-  			}
-        $('#handlingFee, #total, #total2').html('0');
-      } else {
-        // Taxes
-        for (var i = 1; i <= taxes; i++) {
-          var percentage = $('.percentageAppliedTaxWallet'+i).attr('data');
-          var valueFinal = (value * percentage / 100);
-          $('.percentageTax'+i).html(toFixed(valueFinal, $decimal));
-          totalTax += valueFinal;
+    if (valueOriginal.length == 0 ||
+      valueOriginal == '' ||
+      value < {
+        {
+          $settings - > min_deposits_amount
         }
-        var totalTaxes = (Math.round(totalTax * 100) / 100).toFixed(2);
+      } ||
+      value > {
+        {
+          $settings - > max_deposits_amount
+        }
       }
-      //==== End Taxes
+    ) {
+      // Reset
+      for (var i = 1; i <= taxes; i++) {
+        $('.percentageTax' + i).html('0');
+      }
+      $('#handlingFee, #total, #total2').html('0');
+    } else {
+      // Taxes
+      for (var i = 1; i <= taxes; i++) {
+        var percentage = $('.percentageAppliedTaxWallet' + i).attr('data');
+        var valueFinal = (value * percentage / 100);
+        $('.percentageTax' + i).html(toFixed(valueFinal, $decimal));
+        totalTax += valueFinal;
+      }
+      var totalTaxes = (Math.round(totalTax * 100) / 100).toFixed(2);
+    }
+    //==== End Taxes
 
-    if (paymentGateway
-        && value <= {{ $settings->max_deposits_amount }}
-        && value >= {{ $settings->min_deposits_amount }}
-        && valueOriginal != ''
-      ) {
+    if (paymentGateway &&
+      value <= {
+        {
+          $settings - > max_deposits_amount
+        }
+      } &&
+      value >= {
+        {
+          $settings - > min_deposits_amount
+        }
+      } &&
+      valueOriginal != ''
+    ) {
 
-      switch(paymentGateway) {
-        @foreach (PaymentGateways::where('enabled', '1')->get(); as $payment)
+      switch (paymentGateway) {
+        @foreach(PaymentGateways::where('enabled', '1') - > get(); as $payment)
         case '{{$payment->name}}':
-          $fee   = {{$payment->fee}};
-          $cents =  {{$payment->fee_cents}};
+          $fee = {
+            {
+              $payment - > fee
+            }
+          };
+          $cents = {
+            {
+              $payment - > fee_cents
+            }
+          };
           break;
-        @endforeach
+          @endforeach
       }
 
       var amount = (value * $fee / 100) + $cents;
@@ -540,28 +619,35 @@ $('#onlyNumber').on('keyup', function() {
 
       var total = (parseFloat(value) + parseFloat(amountFinal) + parseFloat(totalTaxes));
 
-      if (valueOriginal.length != 0
-  				|| valueOriginal != ''
-  				|| value >= {{ $settings->min_deposits_amount }}
-  				|| value <= {{$settings->max_deposits_amount}}
-        ) {
+      if (valueOriginal.length != 0 ||
+        valueOriginal != '' ||
+        value >= {
+          {
+            $settings - > min_deposits_amount
+          }
+        } ||
+        value <= {
+          {
+            $settings - > max_deposits_amount
+          }
+        }
+      ) {
         $('#handlingFee').html(amountFinal);
         $('#total, #total2').html(total.toFixed($decimal));
       } else {
         $('#handlingFee, #total, #total2').html('0');
-        }
+      }
     }
-});
+  });
 
-@if (session('payment_process'))
-   swal({
-     html:true,
-     title: "{{ __('general.congratulations') }}",
-     text: "{!! __('general.payment_process_wallet') !!}",
-     type: "success",
-     confirmButtonText: "{{ __('users.ok') }}"
-     });
+  @if(session('payment_process'))
+  swal({
+    html: true,
+    title: "{{ __('general.congratulations') }}",
+    text: "{!! __('general.payment_process_wallet') !!}",
+    type: "success",
+    confirmButtonText: "{{ __('users.ok') }}"
+  });
   @endif
-
 </script>
 @endsection
