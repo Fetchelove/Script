@@ -450,12 +450,12 @@
       valueOriginal == '' ||
       value < {
         {
-          $settings - > min_deposits_amount
+          $settings->min_deposits_amount
         }
       } ||
       value > {
         {
-          $settings - > max_deposits_amount
+          $settings->max_deposits_amount
         }
       }
     ) {
@@ -479,28 +479,28 @@
     if (element != '' &&
       value <= {
         {
-          $settings - > max_deposits_amount
+          $settings->max_deposits_amount
         }
       } &&
       value >= {
         {
-          $settings - > min_deposits_amount
+          $settings->min_deposits_amount
         }
       } &&
       valueOriginal != ''
     ) {
       // Fees
       switch (element) {
-        @foreach(PaymentGateways::where('enabled', '1') - > get(); as $payment)
+        @foreach(PaymentGateways::where('enabled', '1')->get(); as $payment)
         case '{{$payment->name}}':
           $fee = {
             {
-              $payment - > fee
+              $payment->fee
             }
           };
           $cents = {
             {
-              $payment - > fee_cents
+              $payment->fee_cents
             }
           };
           break;
@@ -516,12 +516,12 @@
         valueOriginal != '' ||
         value >= {
           {
-            $settings - > min_deposits_amount
+            $settings->min_deposits_amount
           }
         } ||
         value <= {
           {
-            $settings - > max_deposits_amount
+            $settings->max_deposits_amount
           }
         }
       ) {
@@ -542,7 +542,7 @@
 
     if (value > {
         {
-          $settings - > max_deposits_amount
+          $settings->max_deposits_amount
         }
       } || valueOriginal.length == 0) {
       $('#handlingFee').html('0');
@@ -557,12 +557,12 @@
       valueOriginal == '' ||
       value < {
         {
-          $settings - > min_deposits_amount
+          $settings->min_deposits_amount
         }
       } ||
       value > {
         {
-          $settings - > max_deposits_amount
+          $settings->max_deposits_amount
         }
       }
     ) {
@@ -586,28 +586,28 @@
     if (paymentGateway &&
       value <= {
         {
-          $settings - > max_deposits_amount
+          $settings->max_deposits_amount
         }
       } &&
       value >= {
         {
-          $settings - > min_deposits_amount
+          $settings->min_deposits_amount
         }
       } &&
       valueOriginal != ''
     ) {
 
       switch (paymentGateway) {
-        @foreach(PaymentGateways::where('enabled', '1') - > get(); as $payment)
+        @foreach(PaymentGateways::where('enabled', '1')->get(); as $payment)
         case '{{$payment->name}}':
           $fee = {
             {
-              $payment - > fee
+              $payment->fee
             }
           };
           $cents = {
             {
-              $payment - > fee_cents
+              $payment->fee_cents
             }
           };
           break;
@@ -623,12 +623,12 @@
         valueOriginal != '' ||
         value >= {
           {
-            $settings - > min_deposits_amount
+            $settings->min_deposits_amount
           }
         } ||
         value <= {
           {
-            $settings - > max_deposits_amount
+            $settings->max_deposits_amount
           }
         }
       ) {
