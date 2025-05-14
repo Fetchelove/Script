@@ -334,6 +334,12 @@
 
 @section('javascript')
 <script type="text/javascript">
+@if (in_array(config('settings.currency_code'), config('currencies.zero-decimal')))
+  $decimal = 0;
+  @else
+  $decimal = 2;
+  @endif
+
   document.addEventListener('DOMContentLoaded', function() {
     // Função para formatar o CPF
     function formatCPF(cpf) {
@@ -425,11 +431,7 @@
     });
   });
 
-  @if(in_array(config('settings.currency_code'), config('currencies.zero-decimal')))
-  $decimal = 0;
-  @else
-  $decimal = 2;
-  @endif
+
 
   function toFixed(number, decimals) {
     var x = Math.pow(10, Number(decimals) + 1);
@@ -446,18 +448,11 @@
     var taxes = $('span.isTaxableWallet').length;
     var totalTax = 0;
 
-    if (valueOriginal.length == 0 ||
-      valueOriginal == '' ||
-      value < {
-        {
-          $settings->min_deposits_amount
-        }
-      } ||
-      value > {
-        {
-          $settings->max_deposits_amount
-        }
-      }
+    if (
+      valueOriginal.length == 0
+      || valueOriginal == ''
+      || value < {{ $settings->min_deposits_amount }}
+      || value > {{$settings->max_deposits_amount}}
     ) {
       // Reset
       for (var i = 1; i <= taxes; i++) {
@@ -476,35 +471,19 @@
     }
     //==== End Taxes
 
-    if (element != '' &&
-      value <= {
-        {
-          $settings->max_deposits_amount
-        }
-      } &&
-      value >= {
-        {
-          $settings->min_deposits_amount
-        }
-      } &&
-      valueOriginal != ''
-    ) {
+    if (element != ''
+        && value <= {{ $settings->max_deposits_amount }}
+        && value >= {{ $settings->min_deposits_amount }}
+        && valueOriginal != ''
+      ) {
       // Fees
       switch (element) {
-        @foreach(PaymentGateways::where('enabled', '1')->get(); as $payment)
+        @foreach (PaymentGateways::where('enabled', '1')->get(); as $payment)
         case '{{$payment->name}}':
-          $fee = {
-            {
-              $payment->fee
-            }
-          };
-          $cents = {
-            {
-              $payment->fee_cents
-            }
-          };
+          $fee   = {{$payment->fee}};
+          $cents =  {{$payment->fee_cents}};
           break;
-          @endforeach
+        @endforeach
       }
 
       var amount = (value * $fee / 100) + $cents;
@@ -512,19 +491,11 @@
 
       var total = (parseFloat(value) + parseFloat(amountFinal) + parseFloat(totalTaxes));
 
-      if (valueOriginal.length != 0 ||
-        valueOriginal != '' ||
-        value >= {
-          {
-            $settings->min_deposits_amount
-          }
-        } ||
-        value <= {
-          {
-            $settings->max_deposits_amount
-          }
-        }
-      ) {
+      if (valueOriginal.length != 0
+  				|| valueOriginal != ''
+  				|| value >= {{ $settings->min_deposits_amount }}
+  				|| value <= {{$settings->max_deposits_amount}}
+        ) {
         $('#handlingFee').html(amountFinal);
         $('#total, #total2').html(total.toFixed($decimal));
       }
@@ -540,11 +511,7 @@
     var value = parseFloat($(this).val());
     var paymentGateway = $('input[name=payment_gateway]:checked').val();
 
-    if (value > {
-        {
-          $settings->max_deposits_amount
-        }
-      } || valueOriginal.length == 0) {
+    if (value > {{ $settings->max_deposits_amount }} || valueOriginal.length == 0) {
       $('#handlingFee').html('0');
       $('#total, #total2').html('0');
     }
@@ -553,18 +520,11 @@
     var taxes = $('span.isTaxableWallet').length;
     var totalTax = 0;
 
-    if (valueOriginal.length == 0 ||
-      valueOriginal == '' ||
-      value < {
-        {
-          $settings->min_deposits_amount
-        }
-      } ||
-      value > {
-        {
-          $settings->max_deposits_amount
-        }
-      }
+    if (
+      valueOriginal.length == 0
+      || valueOriginal == ''
+      || value < {{ $settings->min_deposits_amount }}
+      || value > {{$settings->max_deposits_amount}}
     ) {
       // Reset
       for (var i = 1; i <= taxes; i++) {
@@ -583,33 +543,18 @@
     }
     //==== End Taxes
 
-    if (paymentGateway &&
-      value <= {
-        {
-          $settings->max_deposits_amount
-        }
-      } &&
-      value >= {
-        {
-          $settings->min_deposits_amount
-        }
-      } &&
-      valueOriginal != ''
+    if (
+      paymentGateway
+      && value <= {{ $settings->max_deposits_amount }}
+      && value >= {{ $settings->min_deposits_amount }}
+      && valueOriginal != ''
     ) {
 
       switch (paymentGateway) {
         @foreach(PaymentGateways::where('enabled', '1')->get(); as $payment)
         case '{{$payment->name}}':
-          $fee = {
-            {
-              $payment->fee
-            }
-          };
-          $cents = {
-            {
-              $payment->fee_cents
-            }
-          };
+          $fee = {{ $payment->fee }};
+          $cents = {{ $payment->fee_cents }};
           break;
           @endforeach
       }
@@ -619,18 +564,11 @@
 
       var total = (parseFloat(value) + parseFloat(amountFinal) + parseFloat(totalTaxes));
 
-      if (valueOriginal.length != 0 ||
-        valueOriginal != '' ||
-        value >= {
-          {
-            $settings->min_deposits_amount
-          }
-        } ||
-        value <= {
-          {
-            $settings->max_deposits_amount
-          }
-        }
+      if (
+        valueOriginal.length != 0
+  				|| valueOriginal != ''
+  				|| value >= {{ $settings->min_deposits_amount }}
+  				|| value <= {{$settings->max_deposits_amount}}
       ) {
         $('#handlingFee').html(amountFinal);
         $('#total, #total2').html(total.toFixed($decimal));
